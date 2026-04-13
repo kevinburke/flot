@@ -1,53 +1,33 @@
 {
-  "name": "flot",
-  "version": "4.2.6",
-  "main": "dist/es5/jquery.flot.js",
-  "scripts": {
-    "test": "node node_modules/karma/bin/karma start --single-run --no-auto-watch --concurrency=1 --stopOnEsLintError",
-    "karma": "node node_modules/karma/bin/karma start --no-auto-watch",
-    "coverage": "node node_modules/karma/bin/karma start --single-run --coverage --no-auto-watch --concurrency=1",
-    "build": "node ./node_modules/gulp/bin/gulp.js build",
-    "dont-break": "dont-break --timeout 300",
-    "docs": "node ./update_docs.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/flot/flot.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/flot/flot/issues"
-  },
-  "homepage": "https://github.com/flot/flot#readme",
-  "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.8.3",
-    "@babel/plugin-external-helpers": "^7.2.0",
-    "@babel/preset-env": "^7.2.3",
-    "concat": "^1.0.3",
-    "eslint-config-standard": "^7.0.1",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^2.1.1",
-    "files-exist": "^1.1.0",
-    "gulp": "^4.0.2",
-    "gulp-babel": "^8.0.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-uglify": "^3.0.2",
-    "jasmine-core": "~4.5.0",
-    "jasmine-jquery": "^2.1.1",
-    "karma": "^6.3.0",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-coverage": "^1.1.2",
-    "karma-coveralls": "^1.1.2",
-    "karma-edge-launcher": "^0.4.2",
-    "karma-eslint": "^2.2.0",
-    "karma-firefox-launcher": "^2.1.0",
-    "karma-jasmine": "^5.1.0",
-    "karma-jasmine-html-reporter": "^2.0.0",
-    "karma-safari-launcher": "^1.0.0",
-    "karma-spec-reporter": "0.0.36",
-    "ljs": "^0.3.2",
-    "tmp": "0.0.33"
-  }
+	"name": "@kevinburke/flot",
+	"version": "5.0.0-alpha.0",
+	"description": "JavaScript plotting library for engineering and scientific applications.",
+	"type": "module",
+	"main": "./dist/jquery.flot.js",
+	"files": ["dist/", "source/", "lib/", "docs/", "CHANGELOG.md", "LICENSE.txt", "README.md"],
+	"scripts": {
+		"prepack": "node build.mjs"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kevinburke/flot.git"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/kevinburke/flot/issues"
+	},
+	"homepage": "https://github.com/kevinburke/flot#readme",
+	"peerDependencies": {
+		"jquery": ">=1.2.6"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@playwright/test": "^1.59.1",
+		"@size-limit/file": "^12.0.1",
+		"happy-dom": "^15.11.7",
+		"jquery": "^3.7.1",
+		"size-limit": "^12.0.1",
+		"terser": "^5.36.0",
+		"vitest": "^2.1.9"
+	}
 }
