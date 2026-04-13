@@ -1,5 +1,123 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
+
+Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
+For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
+
+## [5.0.0-alpha.0] - 2026-04-12
+
+This is the first release of the @kevinburke/flot fork. The plotting API is
+unchanged from flot 4.2.6; this release modernizes everything around it.
+
+### Breaking Changes
+
+- **Renamed** from `flot` to `@kevinburke/flot`.
+- **Minimum browser target** is now ES2019 (Chrome 73+, Firefox 67+,
+  Safari 12.1+, Edge 79+). IE is no longer supported.
+- **Build output paths changed**. The minified bundle is now at
+  `dist/jquery.flot.min.js` (was `dist/es5/jquery.flot.js`).
+- **Standalone plugins** are now built to `dist/plugins/` as individual
+  minified files (crosshair, image, pie, resize, threshold). The old
+  build did not produce these.
+
+### Changed
+
+- Build toolchain: gulp 4 + babel 7 + uglify-js replaced with a single
+  `build.mjs` script using terser at ES2019. Produces unminified,
+  minified, and sourcemap outputs.
+- Test runner: Karma + Jasmine replaced with Vitest (unit tests) and
+  Playwright (browser tests). All original Jasmine assertions are
+  preserved via a browser-side compatibility layer.
+- Linter: eslint-config-standard 7 replaced with Biome 1.9.
+- CI: Travis CI and CircleCI replaced with GitHub Actions.
+- Dev dependency count reduced from ~1,000 packages to ~90.
+- Canonical build interface is now Make (`make build`, `make test`,
+  `make ci`).
+
+### Added
+
+- Bundle size budget: size-limit gates the main bundle at 30 KB brotli.
+- Example smoke tests: Playwright loads 6 example pages and asserts no
+  JS errors.
+- `dist/plugins/` directory with individually minified standalone plugins.
+
+### Removed
+
+- gulp, babel, uglify-js, karma, jasmine, eslint, and all related
+  plugins and configs.
+- Travis CI and CircleCI configs.
+- `flot-2.1.3.tgz` (orphan tarball checked into the repo).
+- `.npmignore` (replaced by `package.json` `files` field).
+- `update_docs.js` (literate-js doc generator, unused).
+- `build.js` (redundant alternate concatenation script).
+- `dont-break` integration.
+
+## [4.2.6]
+
+### Changed
+
+- Force new version for deployment.
+
+## [4.2.5]
+
+### Changed
+
+- Test dependency updates and intermittent test fixes.
+
+## [4.2.4]
+
+### Bug Fixes
+
+- Fix step rendering not connecting last point with line.
+
+## [4.2.3]
+
+### Bug Fixes
+
+- Fix ticks not being generated in the right location.
+
+## [4.2.2]
+
+### Bug Fixes
+
+- Fix computing auto-scaled range for horizontal bar series.
+
+## [4.2.1]
+
+### Bug Fixes
+
+- Fix displaying y-axis endpoint ticks on horizontal bar graphs.
+
+## [4.2.0]
+
+### Changes
+
+- No notable changes documented.
+
+## [4.1.1]
+
+### Bug Fixes
+
+- Clear pie chart hover highlights on mouse leave.
+
+## [4.1.0]
+
+### Added
+
+- New hook that allows users to extend the default behavior of the
+  `findNearbyItems` method.
+
+## [4.0.0]
+
+### Breaking Changes
+
+- New major release requiring inclusion of a new script to maintain
+  correct behavior. Replaces the previous patch release from 3.2.11.
+
+### Bug Fixes
+
+- Fix hover issue with bar plots.
 
 ## [3.2.0]
 

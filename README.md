@@ -1,78 +1,92 @@
-# flot [![Build Status](https://travis-ci.org/flot/flot.svg?branch=master)](https://travis-ci.org/flot/flot) [![CircleCI](https://circleci.com/gh/flot/flot.svg?style=svg)](https://circleci.com/gh/flot/flot) [![Coverage Status](https://coveralls.io/repos/github/flot/flot/badge.svg?branch=master)](https://coveralls.io/github/flot/flot?branch=master) [![Greenkeeper badge](https://badges.greenkeeper.io/flot/flot.svg)](https://greenkeeper.io/)
+# @kevinburke/flot
 
-## About ##
+A JavaScript plotting library for engineering and scientific applications.
 
-flot is a JavaScript plotting library for engineering and scientific
-applications derived from Flot: <http://www.flotcharts.org/>
+This is a maintained fork of [flot/flot](https://github.com/flot/flot), which
+has been unmaintained since 2019. The plotting API and behavior are the same;
+this fork modernizes the build toolchain, test infrastructure, and packaging.
 
-Take a look at the the examples in examples/index.html; they should give a good
-impression of what flot can do, and the source code of the examples is probably
-the fastest way to learn how to use flot.
+## Differences from flot/flot
 
+- **Package**: published as `@kevinburke/flot` on npm (v5.0.0+).
+- **Build**: gulp + babel + uglify replaced with terser (ES2019 target). Build
+  is a single `build.mjs` script with no framework dependencies.
+- **Tests**: Karma + Jasmine replaced with Vitest (unit) and Playwright
+  (browser). All original test assertions are preserved via a Jasmine
+  compatibility layer.
+- **Lint**: eslint-config-standard replaced with Biome.
+- **CI**: Travis CI and CircleCI replaced with GitHub Actions.
+- **Size budget**: size-limit gates the main bundle at 30 KB brotli.
+- **Install footprint**: dev dependency count reduced from ~1,000 packages to
+  ~90.
+- **IE dropped**: minimum target is ES2019 (Chrome 73+, Firefox 67+, Safari
+  12.1+, Edge 79+).
 
-## Installation ##
+The `$.plot()` API, options, events, and plugin interface are unchanged. Code
+that works with flot/flot 3.x or 4.x should work with this fork without
+modification.
 
-Just include the JavaScript file after you've included jQuery.
+## Installation
 
-Generally, all modern browsers are supported.
-
-You need at least jQuery 1.2.6, but try at least 1.3.2 for interactive
-charts because of performance improvements in event handling.
-
-
-## Basic usage ##
-
-Create a placeholder div to put the graph in:
-
-```html
-<div id="placeholder"></div>
+```bash
+npm install @kevinburke/flot
 ```
 
-You need to set the width and height of this div, otherwise the plot
-library doesn't know how to scale the graph. You can do it inline like
-this:
+Or include the built file directly via a `<script>` tag:
+
+```html
+<script src="jquery.js"></script>
+<script src="dist/jquery.flot.min.js"></script>
+```
+
+jQuery >= 1.2.6 is required as a peer dependency.
+
+## Basic usage
+
+Create a placeholder div with explicit dimensions:
 
 ```html
 <div id="placeholder" style="width:600px;height:300px"></div>
 ```
 
-You can also do it with an external stylesheet. Make sure that the
-placeholder isn't within something with a display:none CSS property -
-in that case, Flot has trouble measuring label dimensions which
-results in garbled looks and might have trouble measuring the
-placeholder dimensions which is fatal (it'll throw an exception).
-
-Then when the div is ready in the DOM, which is usually on document
-ready, run the plot function:
+Then call `$.plot`:
 
 ```js
 $.plot($("#placeholder"), data, options);
 ```
 
-Here, data is an array of data series and options is an object with
-settings if you want to customize the plot. Take a look at the
-examples for some ideas of what to put in or look at the
-[API reference](API.md). Here's a quick example that'll draw a line
-from (0, 0) to (1, 1):
+Here, `data` is an array of data series and `options` is an object with
+settings. A quick example that draws a line from (0, 0) to (1, 1):
 
 ```js
-$.plot($("#placeholder"), [ [[0, 0], [1, 1]] ], { yaxis: { max: 1 } });
+$.plot($("#placeholder"), [[[0, 0], [1, 1]]], { yaxis: { max: 1 } });
 ```
 
-The plot function immediately draws the chart and then returns a plot
-object with a couple of methods.
+The plot function draws the chart immediately and returns a plot object. See
+the [API reference](docs/API.md) for the full option set.
 
-## Documentation and examples
+## Documentation
 
-API Documentation is available here: [API reference](docs/API.md)
+- [API reference](docs/API.md)
+- [Plugins](docs/PLUGINS.md)
+- [Interactions](docs/interactions.md)
+- Examples are in the `examples/` directory.
 
-About how the plugins work: [Plugins](docs/PLUGINS.md)
+## Development
 
-High level overview on how interactions are handled internally: [Interactions](docs/interactions.md)
+All commands go through Make:
 
-Examples are included in the examples folder of this repository, but they can be tried out online as well: [Examples](https://rawgit.com/flot/flot/master/examples/index.html)
+```bash
+make install     # install dependencies into node_modules
+make build       # build dist/ (main bundle + standalone plugins)
+make lint        # run Biome lint + format check
+make format      # auto-format with Biome
+make test        # run all tests (Vitest unit + Playwright browser)
+make size        # check bundle size budget (brotli)
+make ci          # lint + build + test + size (what CI runs)
+make help        # list all targets
+```
 
-## CircleCI
+## License
 
-[CircleCI](https://circleci.com/) is used in this repo to run [dont-break](https://www.npmjs.com/package/dont-break),
-which checks if the current version of flot breaks unit tests on specified dependent projects.
+MIT. See [LICENSE.txt](LICENSE.txt).
