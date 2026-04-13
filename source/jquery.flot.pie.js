@@ -55,7 +55,9 @@ More detail and specific examples can be found in the included HTML file.
 
 */
 
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+
     // Maximum redraw attempts when fitting labels within the plot
 
     var REDRAW_ATTEMPTS = 10;
@@ -785,10 +787,9 @@ More detail and specific examples can be found in the included HTML file.
         }
     };
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: "pie",
         version: "1.1"
     });
-})(jQuery);

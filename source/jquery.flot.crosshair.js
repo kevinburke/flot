@@ -58,7 +58,8 @@ The plugin also adds four public methods:
     Free the crosshair to move again after locking it.
 */
 
-(function ($) {
+import { plugins } from './jquery.flot.js';
+
     var options = {
         crosshair: {
             mode: null, // one of null, "x", "y" or "xy",
@@ -193,10 +194,9 @@ The plugin also adds four public methods:
         });
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'crosshair',
         version: '1.0'
     });
-})(jQuery);

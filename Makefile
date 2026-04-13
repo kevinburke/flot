@@ -22,8 +22,8 @@ node_modules: package.json
 
 install: node_modules ## install build/test dependencies into node_modules
 
-build: node_modules $(SOURCES) build.mjs ## build dist/ artifacts (main bundle + standalone plugins)
-	node build.mjs
+build: node_modules $(SOURCES) rollup.config.js source/index.js ## build dist/ artifacts via Rollup
+	$(NODE_BIN)/rollup --config rollup.config.js
 
 clean: ## remove built artifacts
 	rm -rf dist
@@ -36,10 +36,10 @@ format: node_modules ## auto-format with biome
 
 test: test-unit test-browser ## run the test suite
 
-test-unit: node_modules ## run unit tests in vitest
+test-unit: build ## run unit tests in vitest
 	$(NODE_BIN)/vitest run
 
-test-browser: node_modules ## run browser tests in playwright
+test-browser: build ## run browser tests in playwright
 	$(NODE_BIN)/playwright test
 
 size: build node_modules ## check bundle size budget (brotli)

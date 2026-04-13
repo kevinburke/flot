@@ -105,7 +105,12 @@ can set the default in the options.
 */
 
 /* eslint-enable */
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+import { saturated } from './jquery.flot.saturated.js';
+import { browser } from './jquery.flot.browser.js';
+import { uiConstants } from './jquery.flot.uiConstants.js';
+
     'use strict';
 
     var options = {
@@ -142,10 +147,8 @@ can set the default in the options.
         }
     };
 
-    var saturated = $.plot.saturated;
-    var browser = $.plot.browser;
-    var SNAPPING_CONSTANT = $.plot.uiConstants.SNAPPING_CONSTANT;
-    var PANHINT_LENGTH_CONSTANT = $.plot.uiConstants.PANHINT_LENGTH_CONSTANT;
+    var SNAPPING_CONSTANT = uiConstants.SNAPPING_CONSTANT;
+    var PANHINT_LENGTH_CONSTANT = uiConstants.PANHINT_LENGTH_CONSTANT;
 
     function init(plot) {
         plot.hooks.processOptions.push(initNevigation);
@@ -489,8 +492,8 @@ can set the default in the options.
                     continue;
                 }
 
-                min = $.plot.saturated.saturate(axis.c2p(min));
-                max = $.plot.saturated.saturate(axis.c2p(max));
+                min = saturated.saturate(axis.c2p(min));
+                max = saturated.saturate(axis.c2p(max));
                 if (min > max) {
                     // make sure min < max
                     var tmp = min;
@@ -510,8 +513,8 @@ can set the default in the options.
                     }
                 }
 
-                var offsetBelow = $.plot.saturated.saturate(navigationOffset.below - (axis.min - min));
-                var offsetAbove = $.plot.saturated.saturate(navigationOffset.above - (axis.max - max));
+                var offsetBelow = saturated.saturate(navigationOffset.below - (axis.min - min));
+                var offsetAbove = saturated.saturate(navigationOffset.above - (axis.max - max));
                 opts.offset = { below: offsetBelow, above: offsetAbove };
             };
 
@@ -825,10 +828,9 @@ can set the default in the options.
         plot.hooks.shutdown.push(shutdown);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'navigate',
         version: '1.3'
     });
-})(jQuery);

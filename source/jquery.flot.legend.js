@@ -2,7 +2,9 @@
 
 */
 
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+
     var defaultOptions = {
         legend: {
             show: false,
@@ -428,10 +430,9 @@
         });
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: defaultOptions,
         name: 'legend',
         version: '1.0'
     });
-})(jQuery);

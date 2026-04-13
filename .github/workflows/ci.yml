@@ -24,7 +24,7 @@ jobs:
         run: make install
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium 2>&1 | grep -v '^\s*|'
 
       - name: Lint
         run: make lint

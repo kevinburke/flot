@@ -29,7 +29,8 @@ jquery.flot.stack.js plugin, possibly some code could be shared.
 
 */
 
-(function ($) {
+import { plugins } from './jquery.flot.js';
+
     var options = {
         series: {
             fillBetween: null // or number
@@ -245,10 +246,9 @@ jquery.flot.stack.js plugin, possibly some code could be shared.
         plot.hooks.processDatapoints.push(computeFillBottoms);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: "fillbetween",
         version: "1.0"
     });
-})(jQuery);

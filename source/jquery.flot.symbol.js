@@ -13,7 +13,8 @@ The symbols are accessed as strings through the standard symbol options:
 
 */
 
-(function ($) {
+import { plugins } from './jquery.flot.js';
+
     // we normalize the area of each symbol so it is approximately the
     // same as a circle of the given radius
 
@@ -90,9 +91,8 @@ The symbols are accessed as strings through the standard symbol options:
         plot.drawSymbol = handlers;
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         name: 'symbols',
         version: '1.0'
     });
-})(jQuery);

@@ -32,17 +32,19 @@ composition process. It requires to be asynchronous, because this is how
 temporary images load their data.
 */
 
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+import { browser } from './jquery.flot.browser.js';
+
     "use strict";
     const GENERALFAILURECALLBACKERROR = -100; //simply a negative number
     const SUCCESSFULIMAGEPREPARATION = 0;
     const EMPTYARRAYOFIMAGESOURCES = -1;
     const NEGATIVEIMAGESIZE = -2;
     var pixelRatio = 1;
-    var browser = $.plot.browser;
     var getPixelRatio = browser.getPixelRatio;
 
-    function composeImages(canvasOrSvgSources, destinationCanvas) {
+    export function composeImages(canvasOrSvgSources, destinationCanvas) {
         var validCanvasOrSvgSources = canvasOrSvgSources.filter(isValidSource);
         pixelRatio = getPixelRatio(destinationCanvas.getContext('2d'));
 
@@ -314,17 +316,13 @@ temporary images load their data.
         return GENERALFAILURECALLBACKERROR;
     }
 
-    // used for testing
-    $.plot.composeImages = composeImages;
-
     function init(plot) {
         // used to extend the public API of the plot
         plot.composeImages = composeImages;
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         name: 'composeImages',
         version: '1.0'
     });
-})(jQuery);

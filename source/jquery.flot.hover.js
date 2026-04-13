@@ -24,7 +24,12 @@ handles this events by unhighlighting all of the previously highlighted points a
 the tooltip from webcharts).
 */
 
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+import { browser } from './jquery.flot.browser.js';
+import { drawSeries } from './jquery.flot.drawSeries.js';
+import { color } from './jquery.colorhelpers.js';
+
     'use strict';
 
     var options = {
@@ -33,8 +38,6 @@ the tooltip from webcharts).
             clickable: false
         }
     };
-
-    var browser = $.plot.browser;
 
     var eventType = {
         click: 'click',
@@ -279,7 +282,7 @@ the tooltip from webcharts).
                 y = point[1],
                 axisx = series.xaxis,
                 axisy = series.yaxis,
-                highlightColor = (typeof series.highlightColor === "string") ? series.highlightColor : $.color.parse(series.color).scale('a', 0.5).toString();
+                highlightColor = (typeof series.highlightColor === "string") ? series.highlightColor : color.parse(series.color).scale('a', 0.5).toString();
 
             if (x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max) {
                 return;
@@ -305,7 +308,7 @@ the tooltip from webcharts).
         }
 
         function drawBarHighlight(series, point, octx) {
-            var highlightColor = (typeof series.highlightColor === "string") ? series.highlightColor : $.color.parse(series.color).scale('a', 0.5).toString(),
+            var highlightColor = (typeof series.highlightColor === "string") ? series.highlightColor : color.parse(series.color).scale('a', 0.5).toString(),
                 fillStyle = highlightColor,
                 barLeft;
 
@@ -327,7 +330,7 @@ the tooltip from webcharts).
             var fillTowards = series.bars.fillTowards || 0,
                 bottom = fillTowards > series.yaxis.min ? Math.min(series.yaxis.max, fillTowards) : series.yaxis.min;
 
-            $.plot.drawSeries.drawBar(point[0], point[1], point[2] || bottom, barLeft, barLeft + barWidth,
+            drawSeries.drawBar(point[0], point[1], point[2] || bottom, barLeft, barLeft + barWidth,
                 function() {
                     return fillStyle;
                 }, series.xaxis, series.yaxis, octx, series.bars.horizontal, series.bars.lineWidth);
@@ -350,10 +353,9 @@ the tooltip from webcharts).
         plot.hooks.processOptions.push(initHover);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'hover',
         version: '0.1'
     });
-})(jQuery);

@@ -52,7 +52,9 @@ Google Maps).
 
 */
 
-(function ($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+
     var options = {
         series: {
             images: {
@@ -63,9 +65,9 @@ Google Maps).
         }
     };
 
-    $.plot.image = {};
+    export var image = {};
 
-    $.plot.image.loadDataImages = function (series, options, callback) {
+    image.loadDataImages = function (series, options, callback) {
         var urls = [], points = [];
 
         var defaultShow = options.series.images.show;
@@ -87,7 +89,7 @@ Google Maps).
             });
         });
 
-        $.plot.image.load(urls, function (loadedImages) {
+        image.load(urls, function (loadedImages) {
             $.each(points, function (i, p) {
                 var url = p[0];
                 if (loadedImages[url]) {
@@ -99,7 +101,7 @@ Google Maps).
         });
     }
 
-    $.plot.image.load = function (urls, callback) {
+    image.load = function (urls, callback) {
         var missing = urls.length, loaded = {};
         if (missing === 0) {
             callback({});
@@ -240,10 +242,9 @@ Google Maps).
         plot.hooks.drawSeries.push(drawSeries);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'image',
         version: '1.1'
     });
-})(jQuery);

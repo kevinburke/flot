@@ -1,6 +1,9 @@
 /* global jQuery */
 
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+import { uiConstants } from './jquery.flot.uiConstants.js';
+
     'use strict';
 
     var options = {
@@ -16,7 +19,7 @@
         }
     };
 
-    var ZOOM_DISTANCE_MARGIN = $.plot.uiConstants.ZOOM_DISTANCE_MARGIN;
+    var ZOOM_DISTANCE_MARGIN = uiConstants.ZOOM_DISTANCE_MARGIN;
 
     function init(plot) {
         plot.hooks.processOptions.push(initTouchNavigation);
@@ -186,7 +189,7 @@
         }
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'navigateTouch',
@@ -357,4 +360,3 @@
             }
         }
     }
-})(jQuery);

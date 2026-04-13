@@ -29,7 +29,9 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+
     "use strict";
 
     var options = {
@@ -203,10 +205,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         });
     };
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'axisLabels',
         version: '3.0'
     });
-})(jQuery);

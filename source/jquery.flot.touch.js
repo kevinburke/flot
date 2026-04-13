@@ -1,7 +1,8 @@
 
 /* global jQuery */
 
-(function($) {
+import { plugins } from './jquery.flot.js';
+
     'use strict';
 
     var options = {
@@ -311,10 +312,9 @@
         }
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'navigateTouch',
         version: '0.3'
     });
-})(jQuery);

@@ -43,7 +43,9 @@ as "categories" on the axis object, e.g. plot.getAxes().xaxis.categories.
 
 */
 
-(function ($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+
     var options = {
         xaxis: {
             categories: null
@@ -193,10 +195,9 @@ as "categories" on the axis object, e.g. plot.getAxes().xaxis.categories.
         plot.hooks.processDatapoints.push(processDatapoints);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'categories',
         version: '1.0'
     });
-})(jQuery);

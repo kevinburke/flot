@@ -8,6 +8,7 @@ const root = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const port = Number.parseInt(process.env.PORT ?? "4173", 10);
 const harnessPath = join(root, "tests/browser/harness.html");
 const allowedRoots = new Map([
+	["/dist/", join(root, "dist")],
 	["/source/", join(root, "source")],
 	["/lib/", join(root, "lib")],
 	["/tests/", join(root, "tests")],

@@ -4,9 +4,17 @@
 	"description": "JavaScript plotting library for engineering and scientific applications.",
 	"type": "module",
 	"main": "./dist/jquery.flot.js",
+	"module": "./dist/jquery.flot.mjs",
+	"exports": {
+		".": {
+			"import": "./dist/jquery.flot.mjs",
+			"require": "./dist/jquery.flot.js",
+			"default": "./dist/jquery.flot.js"
+		}
+	},
 	"files": ["dist/", "source/", "lib/", "docs/", "CHANGELOG.md", "LICENSE.txt", "README.md"],
 	"scripts": {
-		"prepack": "node build.mjs"
+		"prepack": "npx rollup --config rollup.config.js"
 	},
 	"repository": {
 		"type": "git",
@@ -23,9 +31,12 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"@playwright/test": "^1.59.1",
+		"@rollup/plugin-node-resolve": "^16.0.3",
+		"@rollup/plugin-terser": "^1.0.0",
 		"@size-limit/file": "^12.0.1",
 		"happy-dom": "^15.11.7",
 		"jquery": "^3.7.1",
+		"rollup": "^4.60.1",
 		"size-limit": "^12.0.1",
 		"terser": "^5.36.0",
 		"vitest": "^2.1.9"

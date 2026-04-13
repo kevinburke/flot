@@ -5,28 +5,30 @@ Licensed under the MIT license.
 
 */
 
-// the actual Flot code
-(function($) {
-    "use strict";
-
-    var Canvas = window.Flot.Canvas;
+import $ from 'jquery';
+import { Canvas } from './jquery.canvaswrapper.js';
+import { color } from './jquery.colorhelpers.js';
+import { saturated } from './jquery.flot.saturated.js';
+import { browser } from './jquery.flot.browser.js';
+import { uiConstants } from './jquery.flot.uiConstants.js';
+import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
 
     function defaultTickGenerator(axis) {
         var ticks = [],
-            start = $.plot.saturated.saturate($.plot.saturated.floorInBase(axis.min, axis.tickSize)),
+            start = saturated.saturate(saturated.floorInBase(axis.min, axis.tickSize)),
             i = 0,
             v = Number.NaN,
             prev;
 
         if (start === -Number.MAX_VALUE) {
             ticks.push(start);
-            start = $.plot.saturated.floorInBase(axis.min + axis.tickSize, axis.tickSize);
+            start = saturated.floorInBase(axis.min + axis.tickSize, axis.tickSize);
         }
 
         do {
             prev = v;
             //v = start + i * axis.tickSize;
-            v = $.plot.saturated.multiplyAdd(axis.tickSize, i, start);
+            v = saturated.multiplyAdd(axis.tickSize, i, start);
             ticks.push(v);
             ++i;
         } while (v < axis.max && v !== prev);
@@ -356,8 +358,8 @@ Licensed under the MIT license.
         plot.hooks = hooks;
 
         // initialize
-        var MINOR_TICKS_COUNT_CONSTANT = $.plot.uiConstants.MINOR_TICKS_COUNT_CONSTANT;
-        var TICK_LENGTH_CONSTANT = $.plot.uiConstants.TICK_LENGTH_CONSTANT;
+        var MINOR_TICKS_COUNT_CONSTANT = uiConstants.MINOR_TICKS_COUNT_CONSTANT;
+        var TICK_LENGTH_CONSTANT = uiConstants.TICK_LENGTH_CONSTANT;
         initPlugins(plot);
         setupCanvases();
         parseOptions(options_);
@@ -402,11 +404,11 @@ Licensed under the MIT license.
             }
 
             if (options.xaxis.color == null) {
-                options.xaxis.color = $.color.parse(options.grid.color).scale('a', 0.22).toString();
+                options.xaxis.color = color.parse(options.grid.color).scale('a', 0.22).toString();
             }
 
             if (options.yaxis.color == null) {
-                options.yaxis.color = $.color.parse(options.grid.color).scale('a', 0.22).toString();
+                options.yaxis.color = color.parse(options.grid.color).scale('a', 0.22).toString();
             }
 
             if (options.xaxis.tickColor == null) {
@@ -424,7 +426,7 @@ Licensed under the MIT license.
             }
 
             if (options.grid.tickColor == null) {
-                options.grid.tickColor = $.color.parse(options.grid.color).scale('a', 0.22).toString();
+                options.grid.tickColor = color.parse(options.grid.color).scale('a', 0.22).toString();
             }
 
             // Fill in defaults for axis options, including any unspecified
@@ -676,7 +678,7 @@ Licensed under the MIT license.
                 definedColors = Math.max(0, series.length - neededColors);
 
             for (i = 0; i < neededColors; i++) {
-                c = $.color.parse(colorPool[(definedColors + i) % colorPoolSize] || "#666");
+                c = color.parse(colorPool[(definedColors + i) % colorPoolSize] || "#666");
 
                 // Each time we exhaust the colors in the pool we adjust
                 // a scaling factor used to produce more variations on
@@ -1012,14 +1014,14 @@ Licensed under the MIT license.
                 if (isFinite(t(axis.max) - t(axis.min))) {
                     s = axis.scale = plotWidth / Math.abs(t(axis.max) - t(axis.min));
                 } else {
-                    s = axis.scale = 1 / Math.abs($.plot.saturated.delta(t(axis.min), t(axis.max), plotWidth));
+                    s = axis.scale = 1 / Math.abs(saturated.delta(t(axis.min), t(axis.max), plotWidth));
                 }
                 m = Math.min(t(axis.max), t(axis.min));
             } else {
                 if (isFinite(t(axis.max) - t(axis.min))) {
                     s = axis.scale = plotHeight / Math.abs(t(axis.max) - t(axis.min));
                 } else {
-                    s = axis.scale = 1 / Math.abs($.plot.saturated.delta(t(axis.min), t(axis.max), plotHeight));
+                    s = axis.scale = 1 / Math.abs(saturated.delta(t(axis.min), t(axis.max), plotHeight));
                 }
                 s = -s;
                 m = Math.max(t(axis.max), t(axis.min));
@@ -1439,10 +1441,10 @@ Licensed under the MIT license.
                     if (datamin != null && datamax != null) {
                         min = datamin;
                         max = datamax;
-                        delta = $.plot.saturated.saturate(max - min);
+                        delta = saturated.saturate(max - min);
                         var margin = ((typeof opts.autoScaleMargin === 'number') ? opts.autoScaleMargin : 0.02);
-                        min = $.plot.saturated.saturate(min - delta * margin);
-                        max = $.plot.saturated.saturate(max + delta * margin);
+                        min = saturated.saturate(min - delta * margin);
+                        max = saturated.saturate(max + delta * margin);
 
                         // make sure we don't go below zero if all values are positive
                         if (min < 0 && datamin >= 0) {
@@ -1502,14 +1504,14 @@ Licensed under the MIT license.
                 axis.options.offset = { above: 0, below: 0 };
             }
 
-            axis.min = $.plot.saturated.saturate(min);
-            axis.max = $.plot.saturated.saturate(max);
+            axis.min = saturated.saturate(min);
+            axis.max = saturated.saturate(max);
         }
 
         function computeValuePrecision (min, max, direction, ticks, tickDecimals) {
             var noTicks = fixupNumberOfTicks(direction, surface, ticks);
 
-            var delta = $.plot.saturated.delta(min, max, noTicks),
+            var delta = saturated.delta(min, max, noTicks),
                 dec = -Math.floor(Math.log(delta) / Math.LN10);
 
             //if it is called with tickDecimals, then the precision should not be greather then that
@@ -1529,7 +1531,7 @@ Licensed under the MIT license.
         };
 
         function computeTickSize (min, max, noTicks, tickDecimals) {
-            var delta = $.plot.saturated.delta(min, max, noTicks),
+            var delta = saturated.delta(min, max, noTicks),
                 dec = -Math.floor(Math.log(delta) / Math.LN10);
 
             //if it is called with tickDecimals, then the precision should not be greather then that
@@ -1610,7 +1612,7 @@ Licensed under the MIT license.
 
             noTicks = fixupNumberOfTicks(axis.direction, surface, opts.ticks);
 
-            axis.delta = $.plot.saturated.delta(axis.min, axis.max, noTicks);
+            axis.delta = saturated.delta(axis.min, axis.max, noTicks);
             var precision = plot.computeValuePrecision(axis.min, axis.max, axis.direction, noTicks, opts.tickDecimals);
 
             axis.tickDecimals = Math.max(0, opts.tickDecimals != null ? opts.tickDecimals : precision);
@@ -2335,15 +2337,15 @@ Licensed under the MIT license.
 
         function drawSeries(series) {
             if (series.lines.show) {
-                $.plot.drawSeries.drawSeriesLines(series, ctx, plotOffset, plotWidth, plotHeight, plot.drawSymbol, getColorOrGradient);
+                drawSeriesModule.drawSeriesLines(series, ctx, plotOffset, plotWidth, plotHeight, plot.drawSymbol, getColorOrGradient);
             }
 
             if (series.bars.show) {
-                $.plot.drawSeries.drawSeriesBars(series, ctx, plotOffset, plotWidth, plotHeight, plot.drawSymbol, getColorOrGradient);
+                drawSeriesModule.drawSeriesBars(series, ctx, plotOffset, plotWidth, plotHeight, plot.drawSymbol, getColorOrGradient);
             }
 
             if (series.points.show) {
-                $.plot.drawSeries.drawSeriesPoints(series, ctx, plotOffset, plotWidth, plotHeight, plot.drawSymbol, getColorOrGradient);
+                drawSeriesModule.drawSeriesPoints(series, ctx, plotOffset, plotWidth, plotHeight, plot.drawSymbol, getColorOrGradient);
             }
         }
 
@@ -2775,7 +2777,7 @@ Licensed under the MIT license.
                 for (var i = 0, l = spec.colors.length; i < l; ++i) {
                     var c = spec.colors[i];
                     if (typeof c !== "string") {
-                        var co = $.color.parse(defaultColor);
+                        var co = color.parse(defaultColor);
                         if (c.brightness != null) {
                             co = co.scale('rgb', c.brightness);
                         }
@@ -2794,25 +2796,15 @@ Licensed under the MIT license.
         }
     }
 
-    // Add the plot function to the top level of the jQuery object
+    // Plugin registry. Plugins push to this array to register themselves.
+    export var plugins = [];
 
-    $.plot = function(placeholder, data, options) {
-        var plot = new Plot($(placeholder), data, options, $.plot.plugins);
-        return plot;
-    };
+    export var version = "5.0.0-alpha.0";
 
-    $.plot.version = "3.0.0";
+    // The main plot function.
+    export function plot(placeholder, data, options) {
+        return new Plot($(placeholder), data, options, plugins);
+    }
 
-    $.plot.plugins = [];
-
-    // Also add the plot function as a chainable property
-    $.fn.plot = function(data, options) {
-        return this.each(function() {
-            $.plot(this, data, options);
-        });
-    };
-
-    $.plot.linearTickGenerator = defaultTickGenerator;
-    $.plot.defaultTickFormatter = defaultTickFormatter;
-    $.plot.expRepTickFormatter = expRepTickFormatter;
-})(jQuery);
+    export var linearTickGenerator = defaultTickGenerator;
+    export { defaultTickFormatter, expRepTickFormatter };

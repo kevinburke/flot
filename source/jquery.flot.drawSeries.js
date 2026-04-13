@@ -6,10 +6,9 @@ This plugin is used by flot for drawing lines, plots, bars or area.
 ### Public methods
 */
 
-(function($) {
-    "use strict";
+import { color } from './jquery.colorhelpers.js';
 
-    function DrawSeries() {
+function DrawSeries() {
         function plotLine(datapoints, xoffset, yoffset, axisx, axisy, ctx, steps) {
             var points = datapoints.points,
                 ps = datapoints.pointsize,
@@ -685,7 +684,7 @@ This plugin is used by flot for drawing lines, plots, bars or area.
                 return getColorOrGradient(filloptions.fillColor, bottom, top, seriesColor);
             }
 
-            var c = $.color.parse(seriesColor);
+            var c = color.parse(seriesColor);
             c.a = typeof fill === "number" ? fill : 0.4;
             c.normalize();
             return c.toString();
@@ -697,5 +696,4 @@ This plugin is used by flot for drawing lines, plots, bars or area.
         this.drawBar = drawBar;
     };
 
-    $.plot.drawSeries = new DrawSeries();
-})(jQuery);
+export var drawSeries = new DrawSeries();

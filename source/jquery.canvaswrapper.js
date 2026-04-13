@@ -12,8 +12,9 @@ don't work unless the canvas is attached to the DOM.
 ### jquery.canvaswrapper.js API functions
 */
 
-(function($) {
-    var Canvas = function(cls, container) {
+import { browser } from './jquery.flot.browser.js';
+
+var Canvas = function(cls, container) {
         var element = container.getElementsByClassName(cls)[0];
 
         if (!element) {
@@ -36,7 +37,7 @@ don't work unless the canvas is attached to the DOM.
         this.element = element;
 
         var context = this.context = element.getContext('2d');
-        this.pixelRatio = $.plot.browser.getPixelRatio(context);
+        this.pixelRatio = browser.getPixelRatio(context);
 
         // Size the canvas to match the internal dimensions of its container
         var width = $(container).width();
@@ -541,9 +542,4 @@ don't work unless the canvas is attached to the DOM.
         return text.replace(/0|1|2|3|4|5|6|7|8|9/g, '0');
     }
 
-    if (!window.Flot) {
-        window.Flot = {};
-    }
-
-    window.Flot.Canvas = Canvas;
-})(jQuery);
+export { Canvas };

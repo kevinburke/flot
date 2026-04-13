@@ -23,11 +23,11 @@ if (!$.trim) {
 	$.trim = (value: string) => value.trim();
 }
 
-for (const sourceFile of ["source/jquery.colorhelpers.js"]) {
-	loadLegacySource(sourceFile);
-}
+// Load the built IIFE bundle — it picks up jQuery from the global and
+// registers $.plot, $.color, etc.
+loadBundle("dist/jquery.flot.js");
 
-function loadLegacySource(relativePath: string) {
+function loadBundle(relativePath: string) {
 	const source = readFileSync(join(process.cwd(), relativePath), "utf8");
 	vm.runInThisContext(source, { filename: relativePath });
 }

@@ -90,7 +90,11 @@ The plugin allso adds the following methods to the plot object:
 
 */
 
-(function ($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+import { uiConstants } from './jquery.flot.uiConstants.js';
+import { color } from './jquery.colorhelpers.js';
+
     function init(plot) {
         var selection = {
             first: {x: -1, y: -1},
@@ -100,7 +104,7 @@ The plugin allso adds the following methods to the plot object:
             active: false
         };
 
-        var SNAPPING_CONSTANT = $.plot.uiConstants.SNAPPING_CONSTANT;
+        var SNAPPING_CONSTANT = uiConstants.SNAPPING_CONSTANT;
 
         // FIXME: The drag handling implemented here should be
         // abstracted out, there's some similar code from a library in
@@ -453,7 +457,7 @@ The plugin allso adds the following methods to the plot object:
                 ctx.save();
                 ctx.translate(plotOffset.left, plotOffset.top);
 
-                var c = $.color.parse(o.selection.color);
+                var c = color.parse(o.selection.color);
                 var visualization = o.selection.visualization;
                 var displaySelectionDecorations = o.selection.displaySelectionDecorations;
 
@@ -509,7 +513,7 @@ The plugin allso adds the following methods to the plot object:
         });
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: {
             selection: {
@@ -524,4 +528,3 @@ The plugin allso adds the following methods to the plot object:
         name: 'selection',
         version: '1.1'
     });
-})(jQuery);

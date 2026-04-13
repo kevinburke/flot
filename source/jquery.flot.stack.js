@@ -35,7 +35,8 @@ charts or filled areas).
 
 */
 
-(function ($) {
+import { plugins } from './jquery.flot.js';
+
     var options = {
         series: { stack: null } // or number/string
     };
@@ -211,10 +212,9 @@ charts or filled areas).
         plot.hooks.processDatapoints.push(stackData);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'stack',
         version: '1.2'
     });
-})(jQuery);

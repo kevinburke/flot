@@ -62,7 +62,9 @@ shadowSize and lineWidth are derived as well from the points series.
 
 */
 
-(function ($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+
     var options = {
         series: {
             points: {
@@ -366,10 +368,9 @@ shadowSize and lineWidth are derived as well from the points series.
         plot.hooks.draw.push(draw);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'errorbars',
         version: '1.0'
     });
-})(jQuery);

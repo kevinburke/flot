@@ -42,7 +42,9 @@ You may need to check for this in hover events.
 
 */
 
-(function ($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+
     var options = {
         series: { threshold: null } // or { below: number, color: color spec}
     };
@@ -134,10 +136,9 @@ You may need to check for this in hover events.
         plot.hooks.processDatapoints.push(processThresholds);
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'threshold',
         version: '1.2'
     });
-})(jQuery);

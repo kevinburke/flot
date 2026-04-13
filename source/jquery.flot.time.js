@@ -7,7 +7,10 @@ Set axis.mode to "time" to enable. See the section "Time series data" in
 API.txt for details.
 */
 
-(function($) {
+import $ from 'jquery';
+import { plugins } from './jquery.flot.js';
+import { saturated } from './jquery.flot.saturated.js';
+
     'use strict';
 
     var options = {
@@ -23,7 +26,7 @@ API.txt for details.
         }
     };
 
-    var floorInBase = $.plot.saturated.floorInBase;
+    var floorInBase = saturated.floorInBase;
 
     // Method to provide microsecond support to Date like classes.
     var CreateMicroSecondDate = function(DateType, microEpoch) {
@@ -73,7 +76,7 @@ API.txt for details.
     // Returns a string with the date d formatted according to fmt.
     // A subset of the Open Group's strftime format is supported.
 
-    function formatDate(d, fmt, monthNames, dayNames) {
+    export function formatDate(d, fmt, monthNames, dayNames) {
         if (typeof d.strftime === "function") {
             return d.strftime(fmt);
         }
@@ -168,7 +171,7 @@ API.txt for details.
     // of time zones.  This is done through a wrapper that only calls the UTC
     // versions of the accessor methods.
 
-    function makeUtcWrapper(d) {
+    export function makeUtcWrapper(d) {
         function addProxyMethod(sourceObj, sourceMethod, targetObj, targetMethod) {
             sourceObj[sourceMethod] = function() {
                 return targetObj[targetMethod].apply(targetObj, arguments);
@@ -199,7 +202,7 @@ API.txt for details.
 
     // select time zone strategy.  This returns a date-like object tied to the
     // desired timezone
-    function dateGenerator(ts, opts) {
+    export function dateGenerator(ts, opts) {
         var maxDateValue = 8640000000000000;
 
         if (opts && opts.timeBase === 'seconds') {
@@ -296,7 +299,7 @@ API.txt for details.
     var specQuarters = baseSpec.concat([[1, "quarter"], [2, "quarter"],
         [1, "year"]]);
 
-    function dateTickGenerator(axis) {
+    export function dateTickGenerator(axis) {
         var opts = axis.options,
             ticks = [],
             d = dateGenerator(axis.min, opts),
@@ -568,7 +571,7 @@ API.txt for details.
         });
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'time',
@@ -576,11 +579,5 @@ API.txt for details.
     });
 
     // Time-axis support used to be in Flot core, which exposed the
-    // formatDate function on the plot object.  Various plugins depend
-    // on the function, so we need to re-expose it here.
-
-    $.plot.formatDate = formatDate;
-    $.plot.dateGenerator = dateGenerator;
-    $.plot.dateTickGenerator = dateTickGenerator;
-    $.plot.makeUtcWrapper = makeUtcWrapper;
-})(jQuery);
+    // formatDate function on the plot object.  The entry point
+    // (index.js) wires these onto $.plot for backwards compatibility.

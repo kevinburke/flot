@@ -18,7 +18,9 @@ formatters and transformers to and from logarithmic representation.
 ### Methods and hooks
 */
 
-(function ($) {
+import $ from 'jquery';
+import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter } from './jquery.flot.js';
+
     'use strict';
 
     var options = {
@@ -130,7 +132,7 @@ formatters and transformers to and from logarithmic representation.
         } else {
             var tickSize = plot.computeTickSize(min, max, noTicks),
                 customAxis = {min: min, max: max, tickSize: tickSize};
-            ticks = $.plot.linearTickGenerator(customAxis);
+            ticks = linearTickGenerator(customAxis);
         }
 
         return ticks;
@@ -170,9 +172,9 @@ formatters and transformers to and from logarithmic representation.
 
         if (precision) {
             if ((tenExponent >= -4) && (tenExponent <= 7)) {
-                return $.plot.defaultTickFormatter(value, axis, precision);
+                return defaultTickFormatter(value, axis, precision);
             } else {
-                return $.plot.expRepTickFormatter(value, axis, precision);
+                return expRepTickFormatter(value, axis, precision);
             }
         }
         if ((tenExponent >= -4) && (tenExponent <= 7)) {
@@ -193,7 +195,7 @@ formatters and transformers to and from logarithmic representation.
             }
             return formattedValue;
         } else {
-            return $.plot.expRepTickFormatter(value, axis);
+            return expRepTickFormatter(value, axis);
         }
     };
 
@@ -286,13 +288,13 @@ formatters and transformers to and from logarithmic representation.
         });
     }
 
-    $.plot.plugins.push({
+    plugins.push({
         init: init,
         options: options,
         name: 'log',
         version: '0.1'
     });
 
-    $.plot.logTicksGenerator = logTickGenerator;
-    $.plot.logTickFormatter = logTickFormatter;
-})(jQuery);
+    export var logTicksGenerator = logTickGenerator;
+    export { logTickFormatter };
+
