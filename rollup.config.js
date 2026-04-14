@@ -72,6 +72,14 @@ const standalonePlugins = [
 const pluginBuilds = standalonePlugins.map((name) => ({
 	input: `source/${name}`,
 	external: [/\.\/jquery\./, /\.\.\/jquery\./, /\.\/helpers/],
+	onwarn(warning, warn) {
+		// Standalone plugins import from helpers.js and jquery.flot.js which
+		// are external. Rollup warns about missing globals for IIFE output
+		// but these plugins are loaded after the main bundle which provides
+		// everything they need on the Flot global.
+		if (warning.code === "MISSING_GLOBAL_NAME") return;
+		warn(warning);
+	},
 	output: [
 		{
 			file: `dist/plugins/${name}`,
