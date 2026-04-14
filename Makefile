@@ -8,7 +8,7 @@ BIOME := $(NODE_BIN)/biome
 # rebuild instead of always re-running terser.
 SOURCES := $(wildcard source/jquery.*.js)
 
-.PHONY: all build clean lint format test test-unit test-browser size ci install help
+.PHONY: all build clean lint format test test-unit test-browser size types ci install help
 
 all: build
 
@@ -45,7 +45,10 @@ test-browser: build ## run browser tests in playwright
 size: build node_modules ## check bundle size budget (brotli)
 	$(NODE_BIN)/size-limit
 
-ci: lint build test size ## run everything CI runs
+types: node_modules ## type-check the .d.ts files and compile test
+	$(NODE_BIN)/tsc --project types/tsconfig.json
+
+ci: lint build test size types ## run everything CI runs
 
 help: ## list available targets
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)

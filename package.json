@@ -5,18 +5,21 @@
 	"type": "module",
 	"main": "./dist/flot.js",
 	"module": "./dist/flot.mjs",
+	"types": "./types/index.d.ts",
 	"exports": {
 		".": {
+			"types": "./types/index.d.ts",
 			"import": "./dist/flot.mjs",
 			"require": "./dist/flot.js",
 			"default": "./dist/flot.js"
 		},
 		"./jquery": {
+			"types": "./types/jquery.d.ts",
 			"import": "./dist/jquery.flot.js",
 			"default": "./dist/jquery.flot.js"
 		}
 	},
-	"files": ["dist/", "source/", "docs/", "CHANGELOG.md", "LICENSE.txt", "README.md"],
+	"files": ["dist/", "source/", "types/", "docs/", "CHANGELOG.md", "LICENSE.txt", "README.md"],
 	"scripts": {
 		"prepack": "npx rollup --config rollup.config.js"
 	},
@@ -43,11 +46,13 @@
 		"@rollup/plugin-node-resolve": "^16.0.3",
 		"@rollup/plugin-terser": "^1.0.0",
 		"@size-limit/file": "^12.0.1",
+		"@types/jquery": "^4.0.0",
 		"happy-dom": "^15.11.7",
 		"jquery": "^3.7.1",
 		"rollup": "^4.60.1",
 		"size-limit": "^12.0.1",
 		"terser": "^5.36.0",
+		"typescript": "^6.0.2",
 		"vitest": "^2.1.9"
 	}
 }

@@ -40,3 +40,6 @@ jobs:
 
       - name: Size budget
         run: make size
+
+      - name: Type definitions
+        run: make types
