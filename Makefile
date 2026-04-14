@@ -8,7 +8,7 @@ BIOME := $(NODE_BIN)/biome
 # rebuild instead of always re-running terser.
 SOURCES := $(wildcard source/jquery.*.js)
 
-.PHONY: all build clean lint format test test-unit test-browser size types ci install help
+.PHONY: all build clean lint format test test-unit test-browser size types types-source publint ci install help
 
 all: build
 
@@ -48,7 +48,25 @@ size: build node_modules ## check bundle size budget (brotli)
 types: node_modules ## type-check the .d.ts files and compile test
 	$(NODE_BIN)/tsc --project types/tsconfig.json
 
-ci: lint build test size types ## run everything CI runs
+types-source: node_modules ## run tsc --checkJs on source; fail if error count exceeds baseline
+	@set -euo pipefail; \
+	count=$$($(NODE_BIN)/tsc --project tsconfig.json 2>&1 | grep -c "error TS" || true); \
+	baseline=$$(cat .tsc-baseline); \
+	echo "tsc source errors: $$count (baseline $$baseline)"; \
+	if [ "$$count" -gt "$$baseline" ]; then \
+		echo "ERROR: error count $$count exceeds baseline $$baseline."; \
+		echo "Fix new errors or update .tsc-baseline (only to decrease it)."; \
+		$(NODE_BIN)/tsc --project tsconfig.json 2>&1 | grep "error TS" | head -20; \
+		exit 1; \
+	fi; \
+	if [ "$$count" -lt "$$baseline" ]; then \
+		echo "Error count decreased — please update .tsc-baseline to $$count"; \
+	fi
+
+publint: build ## validate package.json fields and exports
+	npx --yes publint
+
+ci: lint build test size types types-source publint ## run everything CI runs
 
 help: ## list available targets
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)

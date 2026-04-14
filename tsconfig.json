@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "ES2019",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"lib": ["ES2019", "DOM"],
+		"allowJs": true,
+		"checkJs": true,
+		"noEmit": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"noImplicitAny": false,
+		"noImplicitThis": false,
+		"noImplicitReturns": false,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"types": ["jquery"]
+	},
+	"include": ["source/**/*.js", "source/globals.d.ts"],
+	"exclude": ["source/jquery.js"]
+}
