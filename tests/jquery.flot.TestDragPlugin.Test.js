@@ -1,4 +1,5 @@
-/* Test Flot plugin for purposes of testing in conjunction with other plugins that use drag events
+/* Test Flot plugin for purposes of testing in conjunction with other plugins
+   that use pointer-based drag interactions.
 
 Copyright (c) 2007-2014 IOLA and Ole Laursen.
 Licensed under the MIT license.
@@ -6,17 +7,7 @@ Licensed under the MIT license.
 
 (function () {
     function init(plot) {
-        function onDrag(e) {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-        }
-
-        function onDragStart(e) {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-        }
-
-        function onDragEnd(e) {
+        function onPointerDown(e) {
             e.stopImmediatePropagation();
             e.preventDefault();
         }
@@ -24,16 +15,12 @@ Licensed under the MIT license.
         plot.hooks.bindEvents.push(function(plot, eventHolder) {
             var o = plot.getOptions();
             if (o.testDrag.on === true) {
-                plot.addEventHandler("dragstart", onDragStart, eventHolder, 10);
-                plot.addEventHandler("drag", onDrag, eventHolder, 10);
-                plot.addEventHandler("dragend", onDragEnd, eventHolder, 10);
+                plot.addEventHandler("pointerdown", onPointerDown, eventHolder, 10);
             }
         });
 
         plot.hooks.shutdown.push(function (plot, eventHolder) {
-            eventHolder.removeEventListener("dragstart", onDragStart);
-            eventHolder.removeEventListener("drag", onDrag);
-            eventHolder.removeEventListener("dragend", onDragEnd);
+            eventHolder.removeEventListener("pointerdown", onPointerDown);
         });
     }
 
@@ -41,7 +28,7 @@ Licensed under the MIT license.
         init: init,
         options: {
             testDrag: {
-                on: false // true or false
+                on: false
             }
         },
         name: 'testDragPlugin',

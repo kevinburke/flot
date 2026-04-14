@@ -16,7 +16,7 @@
 			"default": "./dist/jquery.flot.js"
 		}
 	},
-	"files": ["dist/", "source/", "lib/", "docs/", "CHANGELOG.md", "LICENSE.txt", "README.md"],
+	"files": ["dist/", "source/", "docs/", "CHANGELOG.md", "LICENSE.txt", "README.md"],
 	"scripts": {
 		"prepack": "npx rollup --config rollup.config.js"
 	},

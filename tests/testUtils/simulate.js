@@ -10,9 +10,26 @@
     var buttonsToWhichMap = { 0: 0, 1: 1, 4: 2, 8: 3 };
     var buttonsToButtonMap = { 0: undefined, 1: 0, 2: 1, 4: 2 };
 
+    // Map mouse event types to their pointer event equivalents.
+    var mouseToPointer = {
+        mousedown: 'pointerdown',
+        mousemove: 'pointermove',
+        mouseup: 'pointerup'
+    };
+
     function mouseEvent(type, sx, sy, cx, cy, buttons, detail, key) {
         var e = buildMouseEventOptions(type, sx, sy, cx, cy, buttons, detail, key, undefined, undefined),
             evt = new MouseEvent(type, e);
+        // Also create the corresponding pointer event so plugins that
+        // listen for pointer events (navigate, selection) receive it.
+        if (mouseToPointer[type]) {
+            e.pointerId = 1;
+            e.pointerType = 'mouse';
+            e.isPrimary = true;
+            e.width = 1;
+            e.height = 1;
+            evt.__pointerEvent = new PointerEvent(mouseToPointer[type], e);
+        }
         return evt;
     }
 
@@ -61,6 +78,12 @@
 
     function dispatchEvent(el, evt) {
         if (el.dispatchEvent) {
+            // Dispatch the pointer event first (if present), then the mouse
+            // event. This mirrors real browser behavior where pointer events
+            // fire before the corresponding mouse events.
+            if (evt.__pointerEvent) {
+                el.dispatchEvent(evt.__pointerEvent);
+            }
             el.dispatchEvent(evt);
         }
         return evt;

@@ -245,22 +245,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
             return result;
         }
 
-        function onMouseDown(e) {
-            canDrag = true;
-        }
-
-        function onMouseUp(e) {
-            canDrag = false;
-        }
-
-        function isLeftMouseButtonPressed(e) {
-            return e.button === 0;
-        }
-
         function onDragStart(e) {
-            if (!canDrag || !isLeftMouseButtonPressed(e)) {
-                return false;
-            }
 
             isPanAction = true;
             var page = browser.getPageXY(e);
@@ -413,6 +398,31 @@ import { bind, unbind, trigger, css } from './helpers.js';
             }
         }
 
+        function onPointerDown(e) {
+            if (e.button !== 0) return;
+            var el = e.currentTarget;
+            canDrag = true;
+            onDragStart(e);
+
+            function onPointerMove(e) {
+                onDrag(e);
+            }
+
+            function onPointerUp(e) {
+                onDragEnd(e);
+                canDrag = false;
+                el.removeEventListener("pointermove", onPointerMove);
+                el.removeEventListener("pointerup", onPointerUp);
+                el.removeEventListener("pointercancel", onPointerUp);
+                el.releasePointerCapture(e.pointerId);
+            }
+
+            el.setPointerCapture(e.pointerId);
+            el.addEventListener("pointermove", onPointerMove);
+            el.addEventListener("pointerup", onPointerUp);
+            el.addEventListener("pointercancel", onPointerUp);
+        }
+
         function bindEvents(plot, eventHolder) {
             var o = plot.getOptions();
             if (o.zoom.interactive) {
@@ -420,11 +430,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
             }
 
             if (o.pan.interactive) {
-                plot.addEventHandler("dragstart", onDragStart, eventHolder, 0);
-                plot.addEventHandler("drag", onDrag, eventHolder, 0);
-                plot.addEventHandler("dragend", onDragEnd, eventHolder, 0);
-                bind(eventHolder, "mousedown", onMouseDown);
-                bind(eventHolder, "mouseup", onMouseUp);
+                bind(eventHolder, "pointerdown", onPointerDown);
             }
 
             bind(eventHolder, "dblclick", onDblClick);
@@ -752,11 +758,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
 
         function shutdown(plot, eventHolder) {
             unbind(eventHolder, "wheel", onMouseWheel);
-            unbind(eventHolder, "mousedown", onMouseDown);
-            unbind(eventHolder, "mouseup", onMouseUp);
-            unbind(eventHolder, "dragstart", onDragStart);
-            unbind(eventHolder, "drag", onDrag);
-            unbind(eventHolder, "dragend", onDragEnd);
+            unbind(eventHolder, "pointerdown", onPointerDown);
             unbind(eventHolder, "dblclick", onDblClick);
             unbind(eventHolder, "click", onClick);
 

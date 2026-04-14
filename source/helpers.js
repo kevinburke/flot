@@ -131,37 +131,19 @@ export function trigger(el, type, args) {
 // Bind an event listener, tracking it so unbindAll can remove it later.
 var listenerStore = new WeakMap();
 
-function usesJQuerySpecialEvent(type) {
-    if (typeof window === 'undefined' || !window.jQuery || !window.jQuery.event || !window.jQuery.event.special) {
-        return false;
-    }
-
-    return type === 'drag' || type === 'dragstart' || type === 'dragend' || type === 'mousewheel';
-}
-
 export function bind(el, type, handler) {
-    if (usesJQuerySpecialEvent(type)) {
-        window.jQuery(el).on(type, handler);
-    } else {
-        el.addEventListener(type, handler);
-    }
-
+    el.addEventListener(type, handler);
     var listeners = listenerStore.get(el);
     if (!listeners) {
         listeners = [];
         listenerStore.set(el, listeners);
     }
-    listeners.push({ type: type, handler: handler, jquery: usesJQuerySpecialEvent(type) });
+    listeners.push({ type: type, handler: handler });
 }
 
 export function unbind(el, type, handler) {
     if (type && handler) {
-        if (usesJQuerySpecialEvent(type)) {
-            window.jQuery(el).off(type, handler);
-        } else {
-            el.removeEventListener(type, handler);
-        }
-
+        el.removeEventListener(type, handler);
         var listeners = listenerStore.get(el);
         if (listeners) {
             listenerStore.set(el, listeners.filter(function(l) {
@@ -178,11 +160,7 @@ export function unbind(el, type, handler) {
             if (type && listeners[i].type !== type) {
                 remaining.push(listeners[i]);
             } else {
-                if (listeners[i].jquery) {
-                    window.jQuery(el).off(listeners[i].type, listeners[i].handler);
-                } else {
-                    el.removeEventListener(listeners[i].type, listeners[i].handler);
-                }
+                el.removeEventListener(listeners[i].type, listeners[i].handler);
             }
         }
         listenerStore.set(el, remaining);

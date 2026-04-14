@@ -93,7 +93,7 @@ The plugin allso adds the following methods to the plot object:
 import { plugins } from './jquery.flot.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
 import { color } from './jquery.colorhelpers.js';
-import { trigger, unbind } from './helpers.js';
+import { bind, trigger, unbind } from './helpers.js';
 
     function init(plot) {
         var selection = {
@@ -124,7 +124,7 @@ import { trigger, unbind } from './helpers.js';
         function onDragStart(e) {
             var o = plot.getOptions();
             // only accept left-click
-            if (e.which !== 1 || o.selection.mode === null) return;
+            if (e.button !== 0 || o.selection.mode === null) return;
 
             // reinitialize currentMode
             selection.currentMode = 'xy';
@@ -359,12 +359,33 @@ import { trigger, unbind } from './helpers.js';
         plot.setSelection = setSelection;
         plot.getSelection = getSelection;
 
+        function onPointerDown(e) {
+            if (e.button !== 0) return;
+            var el = e.currentTarget;
+            onDragStart(e);
+
+            function onPointerMove(e) {
+                onDrag(e);
+            }
+
+            function onPointerUp(e) {
+                onDragEnd(e);
+                el.removeEventListener("pointermove", onPointerMove);
+                el.removeEventListener("pointerup", onPointerUp);
+                el.removeEventListener("pointercancel", onPointerUp);
+                el.releasePointerCapture(e.pointerId);
+            }
+
+            el.setPointerCapture(e.pointerId);
+            el.addEventListener("pointermove", onPointerMove);
+            el.addEventListener("pointerup", onPointerUp);
+            el.addEventListener("pointercancel", onPointerUp);
+        }
+
         plot.hooks.bindEvents.push(function(plot, eventHolder) {
             var o = plot.getOptions();
             if (o.selection.mode != null) {
-                plot.addEventHandler("dragstart", onDragStart, eventHolder, 0);
-                plot.addEventHandler("drag", onDrag, eventHolder, 0);
-                plot.addEventHandler("dragend", onDragEnd, eventHolder, 0);
+                plot.addEventHandler("pointerdown", onPointerDown, eventHolder, 0);
             }
         });
 
@@ -510,9 +531,7 @@ import { trigger, unbind } from './helpers.js';
         });
 
         plot.hooks.shutdown.push(function (plot, eventHolder) {
-            unbind(eventHolder, "dragstart", onDragStart);
-            unbind(eventHolder, "drag", onDrag);
-            unbind(eventHolder, "dragend", onDragEnd);
+            unbind(eventHolder, "pointerdown", onPointerDown);
         });
     }
 
