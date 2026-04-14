@@ -2802,7 +2802,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
     // Plugin registry. Plugins push to this array to register themselves.
     export var plugins = [];
 
-    export var version = "5.0.0-alpha.0";
+    export var version = "5.0.0";
 
     // The main plot function.
     export function plot(placeholder, data, options) {

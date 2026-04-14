@@ -13,16 +13,13 @@ this fork modernizes the build toolchain, test infrastructure, and packaging.
   code.
 - **ES module output**: `import { plot } from '@kevinburke/flot'` works with
   modern bundlers. Tree-shakeable.
-- **Package**: published as `@kevinburke/flot` on npm (v5.0.0+).
-- **Build**: Rollup replaces gulp + babel + uglify. Source files are ES
-  modules.
-- **Tests**: Karma + Jasmine replaced with Vitest (unit) and Playwright
-  (browser). All original test assertions are preserved.
-- **Lint**: eslint-config-standard replaced with Biome.
-- **CI**: Travis CI and CircleCI replaced with GitHub Actions.
-- **Size budget**: size-limit gates the core bundle at 30 KB brotli.
-- **Install footprint**: dev dependency count reduced from ~1,000 packages to
-  ~90.
+- **No vendored dependencies**: `jquery.event.drag`, `jquery.mousewheel`, and
+  `globalize` replaced with native Pointer Events, `wheel` event, and `Intl`.
+- **Build**: Rollup produces ES module, IIFE, and minified outputs. Source
+  files are ES modules.
+- **Tests**: Vitest (unit) + Playwright (browser). All original assertions
+  preserved.
+- **CI**: GitHub Actions. Size budget enforced via size-limit (30 KB brotli).
 - **IE dropped**: minimum target is ES2019 (Chrome 73+, Firefox 67+, Safari
   12.1+, Edge 79+).
 
@@ -34,16 +31,18 @@ npm install @kevinburke/flot
 
 ## Usage without jQuery
 
+As an ES module:
+
 ```js
 import { plot } from '@kevinburke/flot';
 
 plot(document.getElementById('placeholder'), data, options);
 ```
 
-Or via `<script>` tag:
+Or via `<script>` tag from a CDN:
 
 ```html
-<script src="dist/flot.min.js"></script>
+<script src="https://unpkg.com/@kevinburke/flot@5.0.0/dist/flot.min.js"></script>
 <script>
   Flot.plot(document.getElementById('placeholder'), data, options);
 </script>
@@ -52,8 +51,8 @@ Or via `<script>` tag:
 ## Usage with jQuery (backwards compatible)
 
 ```html
-<script src="jquery.js"></script>
-<script src="dist/jquery.flot.min.js"></script>
+<script src="https://unpkg.com/jquery@3/dist/jquery.min.js"></script>
+<script src="https://unpkg.com/@kevinburke/flot@5.0.0/dist/jquery.flot.min.js"></script>
 <script>
   $.plot("#placeholder", data, options);
 </script>
@@ -104,6 +103,15 @@ make test        # run all tests (Vitest unit + Playwright browser)
 make size        # check bundle size budget (brotli)
 make ci          # lint + build + test + size (what CI runs)
 make help        # list all targets
+```
+
+## Releasing
+
+```bash
+# bump version in package.json + source/jquery.flot.js, update CHANGELOG
+make ci          # verify everything passes
+npm publish      # prepack hook runs the build automatically
+git tag v5.x.y && git push origin v5.x.y
 ```
 
 ## License

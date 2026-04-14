@@ -5,6 +5,65 @@ All notable changes to this project will be documented in this file.
 Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
 For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
 
+## [5.0.0] - 2026-04-14
+
+First stable release of the @kevinburke/flot fork. The plotting API is
+unchanged from flot 4.2.6; this release modernizes the build, removes
+the jQuery requirement, and eliminates all vendored dependencies.
+
+### Breaking Changes
+
+- **jQuery is no longer required.** The core library works standalone.
+  A jQuery adapter (`dist/jquery.flot.js`) is included for backwards
+  compatibility. Import the adapter if you need `$.plot()`.
+- **Renamed** from `flot` to `@kevinburke/flot`.
+- **Minimum browser target** is ES2019 (Chrome 73+, Firefox 67+,
+  Safari 12.1+, Edge 79+). IE is no longer supported.
+- **Build output paths changed:**
+  - `dist/flot.js` / `dist/flot.min.js` — core (no jQuery)
+  - `dist/flot.mjs` — ES module
+  - `dist/jquery.flot.js` / `dist/jquery.flot.min.js` — jQuery adapter
+  - `dist/plugins/` — standalone plugins
+- **Vendored libraries removed:** `jquery.event.drag.js` replaced with
+  native Pointer Events, `jquery.mousewheel.js` replaced with native
+  `wheel` event, `globalize.js` removed (was unused). The `lib/`
+  directory no longer exists.
+
+### Changed
+
+- Build toolchain: Rollup replaces gulp 4 + babel 7 + uglify-js. All
+  source files are ES modules with explicit imports/exports.
+- Test runner: Vitest (unit) + Playwright (browser) replace Karma +
+  Jasmine. All original assertions preserved.
+- Linter: Biome 1.9 replaces eslint-config-standard 7.
+- CI: GitHub Actions replaces Travis CI and CircleCI.
+- Navigate and selection plugins use Pointer Events instead of the
+  vendored jquery.event.drag plugin.
+- Dev dependency count reduced from ~1,000 packages to ~90.
+- Canonical build interface is Make.
+
+### Added
+
+- ES module output (`dist/flot.mjs`) with `package.json` `exports`
+  field for modern bundlers.
+- jQuery-free API: `import { plot } from '@kevinburke/flot'`.
+- `source/helpers.js` — vanilla DOM/utility functions replacing jQuery
+  internals.
+- `source/jquery-adapter.js` — optional jQuery adapter.
+- Bundle size budget: size-limit gates at 30 KB brotli.
+- Example smoke tests via Playwright.
+- Unit tests for `helpers.extend` edge cases.
+
+### Removed
+
+- jQuery as a required dependency (now optional peer dep).
+- `lib/` directory: `jquery.event.drag.js`, `jquery.mousewheel.js`,
+  `globalize.js`, `globalize.culture.en-US.js`.
+- gulp, babel, uglify-js, karma, jasmine, eslint, and all related
+  plugins and configs.
+- Travis CI and CircleCI configs.
+- `flot-2.1.3.tgz`, `build.js`, `build.mjs`, `.npmignore`.
+
 ## [5.0.0-alpha.0] - 2026-04-12
 
 This is the first release of the @kevinburke/flot fork. The plotting API is
