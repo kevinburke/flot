@@ -5,7 +5,7 @@ Licensed under the MIT license.
 
 */
 
-import $ from 'jquery';
+import { extend, width, height, css, data, removeData, trigger, bind, unbind } from './helpers.js';
 import { Canvas } from './jquery.canvaswrapper.js';
 import { color } from './jquery.colorhelpers.js';
 import { saturated } from './jquery.flot.saturated.js';
@@ -211,7 +211,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             },
             surface = null, // the canvas for the plot itself
             overlay = null, // canvas for interactive stuff on top of plot
-            eventHolder = null, // jQuery object that events should be bound to
+            eventHolder = null, // DOM element that events should be bound to
             ctx = null,
             octx = null,
             xaxes = [],
@@ -265,7 +265,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             return surface;
         };
         plot.getEventHolder = function() {
-            return eventHolder[0];
+            return eventHolder;
         };
         plot.getPlotOffset = function() {
             return plotOffset;
@@ -277,7 +277,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             return plotHeight;
         };
         plot.offset = function() {
-            var o = eventHolder.offset();
+            var rect = eventHolder.getBoundingClientRect();
+            var o = { left: rect.left + window.scrollX, top: rect.top + window.scrollY };
             o.left += plotOffset.left;
             o.top += plotOffset.top;
             return o;
@@ -287,7 +288,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         };
         plot.getAxes = function() {
             var res = {};
-            $.each(xaxes.concat(yaxes), function(_, axis) {
+            xaxes.concat(yaxes).forEach(function(axis) {
                 if (axis) {
                     res[axis.direction + (axis.n !== 1 ? axis.n : "") + "axis"] = axis;
                 }
@@ -315,7 +316,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         plot.shutdown = shutdown;
         plot.destroy = function() {
             shutdown();
-            placeholder.removeData("plot").empty();
+            removeData(placeholder, "plot");
+            placeholder.innerHTML = '';
 
             series = [];
             options = null;
@@ -331,12 +333,12 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         };
 
         plot.resize = function() {
-            var width = placeholder.width(),
-                height = placeholder.height();
-            surface.resize(width, height);
-            overlay.resize(width, height);
+            var w = width(placeholder),
+                h = height(placeholder);
+            surface.resize(w, h);
+            overlay.resize(w, h);
 
-            executeHooks(hooks.resize, [width, height]);
+            executeHooks(hooks.resize, [w, h]);
         };
 
         plot.clearTextCache = function () {
@@ -386,15 +388,15 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 var p = plugins[i];
                 p.init(plot, classes);
                 if (p.options) {
-                    $.extend(true, options, p.options);
+                    extend(true, options, p.options);
                 }
             }
         }
 
         function parseOptions(opts) {
-            $.extend(true, options, opts);
+            extend(true, options, opts);
 
-            // $.extend merges arrays, rather than replacing them.  When less
+            // extend merges arrays, rather than replacing them.  When less
             // colors are provided than the size of the default palette, we
             // end up with those colors plus the remaining defaults, which is
             // not expected behavior; avoid it by replacing them here.
@@ -436,14 +438,14 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             // since the rest of the code assumes that they exist.
 
             var i, axisOptions, axisCount,
-                fontSize = placeholder.css("font-size"),
+                fontSize = css(placeholder, "font-size"),
                 fontSizeDefault = fontSize ? +fontSize.replace("px", "") : 13,
                 fontDefaults = {
-                    style: placeholder.css("font-style"),
+                    style: css(placeholder, "font-style"),
                     size: Math.round(0.8 * fontSizeDefault),
-                    variant: placeholder.css("font-variant"),
-                    weight: placeholder.css("font-weight"),
-                    family: placeholder.css("font-family")
+                    variant: css(placeholder, "font-variant"),
+                    weight: css(placeholder, "font-weight"),
+                    family: css(placeholder, "font-family")
                 };
 
             axisCount = options.xaxes.length || 1;
@@ -453,11 +455,11 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                     axisOptions.tickColor = axisOptions.color;
                 }
 
-                axisOptions = $.extend(true, {}, options.xaxis, axisOptions);
+                axisOptions = extend(true, {}, options.xaxis, axisOptions);
                 options.xaxes[i] = axisOptions;
 
                 if (axisOptions.font) {
-                    axisOptions.font = $.extend({}, fontDefaults, axisOptions.font);
+                    axisOptions.font = extend({}, fontDefaults, axisOptions.font);
                     if (!axisOptions.font.color) {
                         axisOptions.font.color = axisOptions.color;
                     }
@@ -474,11 +476,11 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                     axisOptions.tickColor = axisOptions.color;
                 }
 
-                axisOptions = $.extend(true, {}, options.yaxis, axisOptions);
+                axisOptions = extend(true, {}, options.yaxis, axisOptions);
                 options.yaxes[i] = axisOptions;
 
                 if (axisOptions.font) {
-                    axisOptions.font = $.extend({}, fontDefaults, axisOptions.font);
+                    axisOptions.font = extend({}, fontDefaults, axisOptions.font);
                     if (!axisOptions.font.color) {
                         axisOptions.font.color = axisOptions.color;
                     }
@@ -498,7 +500,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             }
 
             //process boxPosition options used for axis.box size
-            $.each(allAxes(), function(_, axis) {
+            allAxes().forEach(function(axis) {
                 axis.boxPosition = axis.options.boxPosition || {centerX: 0, centerY: 0};
             });
 
@@ -522,13 +524,13 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         function parseData(d) {
             var res = [];
             for (var i = 0; i < d.length; ++i) {
-                var s = $.extend(true, {}, options.series);
+                var s = extend(true, {}, options.series);
 
                 if (d[i].data != null) {
                     s.data = d[i].data; // move the data instead of deep-copy
                     delete d[i].data;
 
-                    $.extend(true, s, d[i]);
+                    extend(true, s, d[i]);
 
                     d[i].data = s.data;
                 } else {
@@ -636,7 +638,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 axes[number - 1] = {
                     n: number, // save the number for future reference
                     direction: axes === xaxes ? "x" : "y",
-                    options: $.extend(true, {}, axes === xaxes ? options.xaxis : options.yaxis)
+                    options: extend(true, {}, axes === xaxes ? options.xaxis : options.yaxis)
                 };
             }
 
@@ -767,7 +769,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 return [];
             }
 
-            $.each(allAxes(), function(_, axis) {
+            allAxes().forEach(function(axis) {
                 // init axis
                 if (axis.options.growOnly !== true) {
                     axis.datamin = topSentry;
@@ -925,7 +927,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 updateAxis(s.yaxis, range.ymin, range.ymax);
             }
 
-            $.each(allAxes(), function(_, axis) {
+            allAxes().forEach(function(axis) {
                 if (axis.datamin === topSentry) {
                     axis.datamin = null;
                 }
@@ -940,27 +942,28 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             // Make sure the placeholder is clear of everything except canvases
             // from a previous plot in this container that we'll try to re-use.
 
-            placeholder.css("padding", 0) // padding messes up the positioning
-                .children().filter(function() {
-                    return !$(this).hasClass("flot-overlay") && !$(this).hasClass('flot-base');
-                }).remove();
+            css(placeholder, "padding", 0); // padding messes up the positioning
+            Array.from(placeholder.children).filter(function(child) {
+                return !child.classList.contains("flot-overlay") && !child.classList.contains('flot-base');
+            }).forEach(function(child) { child.remove(); });
 
-            if (placeholder.css("position") === 'static') {
-                placeholder.css("position", "relative"); // for positioning labels and overlay
+            if (css(placeholder, "position") === 'static') {
+                css(placeholder, "position", "relative"); // for positioning labels and overlay
             }
 
-            surface = new Canvas("flot-base", placeholder[0]);
-            overlay = new Canvas("flot-overlay", placeholder[0]); // overlay canvas for interactive features
+            surface = new Canvas("flot-base", placeholder);
+            overlay = new Canvas("flot-overlay", placeholder); // overlay canvas for interactive features
 
             ctx = surface.context;
             octx = overlay.context;
 
             // define which element we're listening for events on
-            eventHolder = $(overlay.element).unbind();
+            eventHolder = overlay.element;
+            unbind(eventHolder);
 
             // If we're re-using a plot object, shut down the old one
 
-            var existing = placeholder.data("plot");
+            var existing = data(placeholder, "plot");
 
             if (existing) {
                 existing.shutdown();
@@ -968,7 +971,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             }
 
             // save in case we get replotted
-            placeholder.data("plot", plot);
+            data(placeholder, "plot", plot);
         }
 
         function bindEvents() {
@@ -982,8 +985,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             eventList.push({"event": event, "handler": handler, "eventHolder": eventHolder, "priority": priority});
             eventList.sort((a, b) => b.priority - a.priority);
             eventList.forEach(eventData => {
-                eventData.eventHolder.unbind(eventData.event, eventData.handler);
-                eventData.eventHolder.bind(eventData.event, eventData.handler);
+                unbind(eventData.eventHolder, eventData.event, eventData.handler);
+                bind(eventData.eventHolder, eventData.event, eventData.handler);
             });
 
             eventManager[key] = eventList;
@@ -991,7 +994,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
 
         function shutdown() {
             if (redrawTimeout) {
-                clearTimeout(redrawTimeout);
+                window.clearTimeout(redrawTimeout);
             }
 
             executeHooks(hooks.shutdown, [eventHolder]);
@@ -1122,7 +1125,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
 
             // Determine the axis's position in its direction and on its side
 
-            $.each(isXAxis ? xaxes : yaxes, function(i, a) {
+            (isXAxis ? xaxes : yaxes).forEach(function(a) {
                 if (a && (a.show || a.reserveSpace)) {
                     if (a === axis) {
                         found = true;
@@ -1253,7 +1256,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             // check axis labels, note we don't check the actual
             // labels but instead use the overall width/height to not
             // jump as much around with replots
-            $.each(allAxes(), function(_, axis) {
+            allAxes().forEach(function(axis) {
                 if (axis.reserveSpace && axis.ticks && axis.ticks.length) {
                     if (axis.direction === "x") {
                         margins.left = Math.max(margins.left, axis.labelWidth / 2);
@@ -1268,7 +1271,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             for (a in margins) {
                 offset[a] = margins[a] - plotOffset[a];
             }
-            $.each(xaxes.concat(yaxes), function(_, axis) {
+            xaxes.concat(yaxes).forEach(function(axis) {
                 alignAxisWithGrid(axis, offset, function (offset) {
                     return offset > 0;
                 });
@@ -1319,7 +1322,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 }
             }
 
-            $.each(axes, function(_, axis) {
+            axes.forEach(function(axis) {
                 var axisOpts = axis.options;
                 axis.show = axisOpts.show == null ? axis.used : axisOpts.show;
                 axis.reserveSpace = axisOpts.reserveSpace == null ? axis.show : axisOpts.reserveSpace;
@@ -1332,11 +1335,11 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 plotWidth = surface.width - plotOffset.left - plotOffset.right;
                 plotHeight = surface.height - plotOffset.bottom - plotOffset.top;
 
-                var allocatedAxes = $.grep(axes, function(axis) {
+                var allocatedAxes = axes.filter(function(axis) {
                     return axis.show || axis.reserveSpace;
                 });
 
-                $.each(allocatedAxes, function(_, axis) {
+                allocatedAxes.forEach(function(axis) {
                     // make the ticks
                     setupTickGeneration(axis);
                     setMajorTicks(axis);
@@ -1361,7 +1364,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 // might stick out
                 adjustLayoutForThingsStickingOut();
 
-                $.each(allocatedAxes, function(_, axis) {
+                allocatedAxes.forEach(function(axis) {
                     allocateAxisBoxSecondPhase(axis);
                 });
             }
@@ -1372,7 +1375,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                     var margin = options.grid.margin || 0;
                     plotOffset[a] += typeof margin === "number" ? margin : (margin[a] || 0);
                 }
-                $.each(xaxes.concat(yaxes), function(_, axis) {
+                xaxes.concat(yaxes).forEach(function(axis) {
                     alignAxisWithGrid(axis, options.grid.margin, function(offset) {
                         return offset !== undefined && offset !== null;
                     });
@@ -1384,7 +1387,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             plotHeight = surface.height - plotOffset.bottom - plotOffset.top;
 
             // now we got the proper plot dimensions, we can compute the scaling
-            $.each(axes, function(_, axis) {
+            axes.forEach(function(axis) {
                 setTransformationHelpers(axis);
             });
 
@@ -1679,7 +1682,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             if (oticks == null || (typeof oticks === "number" && oticks > 0)) {
                 ticks = axis.tickGenerator(axis, plot);
             } else if (oticks) {
-                if ($.isFunction(oticks)) {
+                if (typeof oticks === 'function') {
                 // generate the ticks
                     ticks = oticks(axis);
                 } else {
@@ -1864,7 +1867,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 axes;
 
             if (markings) {
-                if ($.isFunction(markings)) {
+                if (typeof markings === 'function') {
                     axes = plot.getAxes();
                     // xmin etc. is backwards compatibility, to be
                     // removed in the future
@@ -2241,7 +2244,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         }
 
         function drawAxisLabels() {
-            $.each(allAxes(), function(_, axis) {
+            allAxes().forEach(function(axis) {
                 var box = axis.box,
                     legacyStyles = axis.direction + "Axis " + axis.direction + axis.n + "Axis",
                     layer = "flot-" + axis.direction + "-axis flot-" + axis.direction + axis.n + "-axis " + legacyStyles,
@@ -2746,7 +2749,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             }
 
             if (!redrawTimeout) {
-                redrawTimeout = setTimeout(function() {
+                redrawTimeout = window.setTimeout(function() {
                     drawOverlay(plot);
                 }, t);
             }
@@ -2762,7 +2765,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             executeHooks(hooks.drawOverlay, [octx, overlay]);
             var event = new CustomEvent('onDrawingDone');
             plot.getEventHolder().dispatchEvent(event);
-            plot.getPlaceholder().trigger('drawingdone');
+            trigger(plot.getPlaceholder(), 'drawingdone');
         }
 
         function getColorOrGradient(spec, bottom, top, defaultColor) {
@@ -2803,7 +2806,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
 
     // The main plot function.
     export function plot(placeholder, data, options) {
-        return new Plot($(placeholder), data, options, plugins);
+        var el = typeof placeholder === 'string' ? document.querySelector(placeholder) : placeholder;
+        return new Plot(el, data, options, plugins);
     }
 
     export var linearTickGenerator = defaultTickGenerator;

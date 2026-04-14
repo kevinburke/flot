@@ -10,9 +10,35 @@ const terserOpts = {
 	format: { comments: false },
 };
 
-// Main bundle: core + all bundled plugins.
-const main = {
+// Core bundle (no jQuery dependency).
+const core = {
 	input: "source/index.js",
+	output: [
+		{
+			file: "dist/flot.js",
+			format: "iife",
+			name: "Flot",
+			banner,
+		},
+		{
+			file: "dist/flot.min.js",
+			format: "iife",
+			name: "Flot",
+			banner,
+			sourcemap: true,
+			plugins: [terser(terserOpts)],
+		},
+		{
+			file: "dist/flot.mjs",
+			format: "es",
+			banner,
+		},
+	],
+};
+
+// jQuery adapter bundle: imports core + wires up $.plot.
+const jqueryAdapter = {
+	input: "source/jquery-adapter.js",
 	external: ["jquery"],
 	output: [
 		{
@@ -31,16 +57,10 @@ const main = {
 			sourcemap: true,
 			plugins: [terser(terserOpts)],
 		},
-		{
-			file: "dist/jquery.flot.mjs",
-			format: "es",
-			banner,
-		},
 	],
 };
 
-// Standalone plugins: each is a separate build that expects the main
-// bundle (and jQuery) to already be loaded.
+// Standalone plugins: each is a separate build.
 const standalonePlugins = [
 	"jquery.flot.crosshair.js",
 	"jquery.flot.image.js",
@@ -51,18 +71,16 @@ const standalonePlugins = [
 
 const pluginBuilds = standalonePlugins.map((name) => ({
 	input: `source/${name}`,
-	external: ["jquery", /\.\/jquery\./, /\.\.\/jquery\./],
+	external: [/\.\/jquery\./, /\.\.\/jquery\./, /\.\/helpers/],
 	output: [
 		{
 			file: `dist/plugins/${name}`,
 			format: "iife",
-			globals: { jquery: "jQuery" },
 			banner,
 		},
 		{
 			file: `dist/plugins/${name.replace(/\.js$/, ".min.js")}`,
 			format: "iife",
-			globals: { jquery: "jQuery" },
 			banner,
 			sourcemap: true,
 			plugins: [terser(terserOpts)],
@@ -70,4 +88,4 @@ const pluginBuilds = standalonePlugins.map((name) => ({
 	],
 }));
 
-export default [main, ...pluginBuilds];
+export default [core, jqueryAdapter, ...pluginBuilds];

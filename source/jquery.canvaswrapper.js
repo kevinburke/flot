@@ -13,6 +13,7 @@ don't work unless the canvas is attached to the DOM.
 */
 
 import { browser } from './jquery.flot.browser.js';
+import { width, height } from './helpers.js';
 
 var Canvas = function(cls, container) {
         var element = container.getElementsByClassName(cls)[0];
@@ -40,9 +41,9 @@ var Canvas = function(cls, container) {
         this.pixelRatio = browser.getPixelRatio(context);
 
         // Size the canvas to match the internal dimensions of its container
-        var width = $(container).width();
-        var height = $(container).height();
-        this.resize(width, height);
+        var w = width(container);
+        var h = height(container);
+        this.resize(w, h);
 
         // Collection of HTML div layers for text overlaid onto the canvas
 

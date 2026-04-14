@@ -52,7 +52,6 @@ Google Maps).
 
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 
     var options = {
@@ -72,7 +71,7 @@ import { plugins } from './jquery.flot.js';
 
         var defaultShow = options.series.images.show;
 
-        $.each(series, function (i, s) {
+        series.forEach(function (s) {
             if (!(defaultShow || s.images.show)) {
                 return;
             }
@@ -81,7 +80,7 @@ import { plugins } from './jquery.flot.js';
                 s = s.data;
             }
 
-            $.each(s, function (i, p) {
+            s.forEach(function (p) {
                 if (typeof p[0] === "string") {
                     urls.push(p[0]);
                     points.push(p);
@@ -90,7 +89,7 @@ import { plugins } from './jquery.flot.js';
         });
 
         image.load(urls, function (loadedImages) {
-            $.each(points, function (i, p) {
+            points.forEach(function (p) {
                 var url = p[0];
                 if (loadedImages[url]) {
                     p[0] = loadedImages[url];
@@ -107,7 +106,7 @@ import { plugins } from './jquery.flot.js';
             callback({});
         }
 
-        $.each(urls, function (i, url) {
+        urls.forEach(function (url) {
             var handler = function () {
                 --missing;
                 loaded[url] = this;
@@ -117,7 +116,10 @@ import { plugins } from './jquery.flot.js';
                 }
             };
 
-            $('<img />').load(handler).error(handler).attr('src', url);
+            var img = document.createElement('img');
+            img.onload = handler;
+            img.onerror = handler;
+            img.src = url;
         });
     };
 

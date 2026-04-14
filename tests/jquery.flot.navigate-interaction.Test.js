@@ -440,8 +440,8 @@ describe("flot navigate plugin interactions", function () {
 
         plot = $.plot(placeholder, [[]], options);
 
-        expect(spy).toHaveBeenCalledWith('mousewheel', jasmine.any(Function), jasmine.any(Boolean))
-        expect(spy).toHaveBeenCalledWith('dblclick', jasmine.any(Function), jasmine.any(Boolean));
+        expect(spy).toHaveBeenCalledWith('wheel', jasmine.any(Function))
+        expect(spy).toHaveBeenCalledWith('dblclick', jasmine.any(Function));
     });
 
     it('do recenter for double click by default', () => {

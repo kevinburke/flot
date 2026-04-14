@@ -8,23 +8,23 @@ this fork modernizes the build toolchain, test infrastructure, and packaging.
 
 ## Differences from flot/flot
 
+- **No jQuery required**: the core library works without jQuery. A jQuery
+  adapter is included for backwards compatibility with existing `$.plot()`
+  code.
+- **ES module output**: `import { plot } from '@kevinburke/flot'` works with
+  modern bundlers. Tree-shakeable.
 - **Package**: published as `@kevinburke/flot` on npm (v5.0.0+).
-- **Build**: gulp + babel + uglify replaced with terser (ES2019 target). Build
-  is a single `build.mjs` script with no framework dependencies.
+- **Build**: Rollup replaces gulp + babel + uglify. Source files are ES
+  modules.
 - **Tests**: Karma + Jasmine replaced with Vitest (unit) and Playwright
-  (browser). All original test assertions are preserved via a Jasmine
-  compatibility layer.
+  (browser). All original test assertions are preserved.
 - **Lint**: eslint-config-standard replaced with Biome.
 - **CI**: Travis CI and CircleCI replaced with GitHub Actions.
-- **Size budget**: size-limit gates the main bundle at 30 KB brotli.
+- **Size budget**: size-limit gates the core bundle at 30 KB brotli.
 - **Install footprint**: dev dependency count reduced from ~1,000 packages to
   ~90.
 - **IE dropped**: minimum target is ES2019 (Chrome 73+, Firefox 67+, Safari
   12.1+, Edge 79+).
-
-The `$.plot()` API, options, events, and plugin interface are unchanged. Code
-that works with flot/flot 3.x or 4.x should work with this fork without
-modification.
 
 ## Installation
 
@@ -32,16 +32,37 @@ modification.
 npm install @kevinburke/flot
 ```
 
-Or include the built file directly via a `<script>` tag:
+## Usage without jQuery
+
+```js
+import { plot } from '@kevinburke/flot';
+
+plot(document.getElementById('placeholder'), data, options);
+```
+
+Or via `<script>` tag:
+
+```html
+<script src="dist/flot.min.js"></script>
+<script>
+  Flot.plot(document.getElementById('placeholder'), data, options);
+</script>
+```
+
+## Usage with jQuery (backwards compatible)
 
 ```html
 <script src="jquery.js"></script>
 <script src="dist/jquery.flot.min.js"></script>
+<script>
+  $.plot("#placeholder", data, options);
+</script>
 ```
 
-jQuery >= 1.2.6 is required as a peer dependency.
+The jQuery adapter registers `$.plot()`, `$.color`, and `$.fn.plot()` so
+existing code works unchanged.
 
-## Basic usage
+## Basic example
 
 Create a placeholder div with explicit dimensions:
 
@@ -49,17 +70,15 @@ Create a placeholder div with explicit dimensions:
 <div id="placeholder" style="width:600px;height:300px"></div>
 ```
 
-Then call `$.plot`:
+Then call `plot`:
 
 ```js
-$.plot($("#placeholder"), data, options);
-```
+import { plot } from '@kevinburke/flot';
 
-Here, `data` is an array of data series and `options` is an object with
-settings. A quick example that draws a line from (0, 0) to (1, 1):
-
-```js
-$.plot($("#placeholder"), [[[0, 0], [1, 1]]], { yaxis: { max: 1 } });
+plot(document.getElementById('placeholder'), [
+  [[0, 0], [1, 1], [2, 4]],
+  [[0, 3], [4, 8], [8, 5]],
+], { yaxis: { max: 10 } });
 ```
 
 The plot function draws the chart immediately and returns a plot object. See

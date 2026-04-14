@@ -78,16 +78,16 @@ import { plugins } from './jquery.flot.js';
         }
 
         function bindEvents(plot, eventHolder) {
-            mainEventHolder = eventHolder[0];
-            eventHolder[0].addEventListener('touchstart', interpretGestures, false);
-            eventHolder[0].addEventListener('touchmove', interpretGestures, false);
-            eventHolder[0].addEventListener('touchend', interpretGestures, false);
+            mainEventHolder = eventHolder;
+            eventHolder.addEventListener('touchstart', interpretGestures, false);
+            eventHolder.addEventListener('touchmove', interpretGestures, false);
+            eventHolder.addEventListener('touchend', interpretGestures, false);
         }
 
         function shutdown(plot, eventHolder) {
-            eventHolder[0].removeEventListener('touchstart', interpretGestures);
-            eventHolder[0].removeEventListener('touchmove', interpretGestures);
-            eventHolder[0].removeEventListener('touchend', interpretGestures);
+            eventHolder.removeEventListener('touchstart', interpretGestures);
+            eventHolder.removeEventListener('touchmove', interpretGestures);
+            eventHolder.removeEventListener('touchend', interpretGestures);
             if (gestureState.longTapTriggerId) {
                 clearTimeout(gestureState.longTapTriggerId);
                 gestureState.longTapTriggerId = null;

@@ -104,11 +104,7 @@
         var clickX = bBox.left + x;
         var clickY = bBox.top + y;
 
-        // Different browsers or OSes are passing information about the scroll delta differently.
-        // Passing a numeric value to 'detail' is one of them. On MacOS the deltaY counts.
-        var detail = deltaY;
-
-        var evt = wheelEvent('DOMMouseScroll', clickX, clickY, clickX, clickY, 0, detail, undefined, deltaX, deltaY);
+        var evt = wheelEvent('wheel', clickX, clickY, clickX, clickY, 0, 0, undefined, deltaX, deltaY);
         return dispatchEvent(el, evt);
     }
 

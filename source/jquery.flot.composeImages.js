@@ -32,7 +32,6 @@ composition process. It requires to be asynchronous, because this is how
 temporary images load their data.
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 import { browser } from './jquery.flot.browser.js';
 

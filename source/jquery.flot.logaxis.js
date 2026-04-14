@@ -8,8 +8,6 @@ Licensed under the MIT license.
 Set axis.mode to "log" to enable.
 */
 
-/* global jQuery*/
-
 /**
 ## jquery.flot.logaxis
 This plugin is used to create logarithmic axis. This includes tick generation,
@@ -18,7 +16,6 @@ formatters and transformers to and from logarithmic representation.
 ### Methods and hooks
 */
 
-import $ from 'jquery';
 import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter } from './jquery.flot.js';
 
     'use strict';
@@ -266,7 +263,9 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
 
     function init(plot) {
         plot.hooks.processOptions.push(function (plot) {
-            $.each(plot.getAxes(), function (axisName, axis) {
+            var axes = plot.getAxes();
+            Object.keys(axes).forEach(function (axisName) {
+                var axis = axes[axisName];
                 var opts = axis.options;
                 if (opts.mode === 'log') {
                     axis.tickGenerator = function (axis) {

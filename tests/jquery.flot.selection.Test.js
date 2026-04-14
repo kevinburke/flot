@@ -130,6 +130,7 @@ describe("flot selection plugin", function() {
             var mouseEnd = { x: mouseStart.x + 100, y: mouseStart.y + 100 };
 
             $(placeholder).on('plotselected', function (e, ranges) {
+                ranges = ranges || (e.originalEvent && e.originalEvent.detail && e.originalEvent.detail[0]);
                 that.wasPlotSelectedCalled = true;
             });
     
@@ -293,6 +294,7 @@ describe("flot navigate plugin interactions", function () {
         var clientY = plot.getPlotOffset().top + yaxis.p2c(0);
 
         $(placeholder).on('plotselected', function (e, ranges) {
+            ranges = ranges || (e.originalEvent && e.originalEvent.detail && e.originalEvent.detail[0]);
             expect(ranges.xaxis.from).toBeCloseTo(0.9, 1);
             expect(ranges.xaxis.to).toBeCloseTo(1.2, 1);
             expect(ranges.yaxis.from).toEqual(0);
@@ -335,4 +337,3 @@ describe("flot navigate plugin interactions", function () {
         expect(ranges).toEqual(null);
     });
 });
-

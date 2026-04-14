@@ -105,11 +105,11 @@ can set the default in the options.
 */
 
 /* eslint-enable */
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 import { saturated } from './jquery.flot.saturated.js';
 import { browser } from './jquery.flot.browser.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
+import { bind, unbind, trigger, css } from './helpers.js';
 
     'use strict';
 
@@ -168,7 +168,8 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             c.left = page.X - c.left;
             c.top = page.Y - c.top;
 
-            var ec = plot.getPlaceholder().offset();
+            var placeholderRect = plot.getPlaceholder().getBoundingClientRect();
+            var ec = { left: placeholderRect.left + window.scrollX, top: placeholderRect.top + window.scrollY };
             ec.left = page.X - ec.left;
             ec.top = page.Y - ec.top;
 
@@ -206,12 +207,13 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             prevDragPosition = { x: 0, y: 0 },
             isPanAction = false;
 
-        function onMouseWheel(e, delta) {
+        function onMouseWheel(e) {
+            var delta = -e.deltaY;
             var maxAbsoluteDeltaOnMac = 1,
-                isMacScroll = Math.abs(e.originalEvent.deltaY) <= maxAbsoluteDeltaOnMac,
+                isMacScroll = Math.abs(e.deltaY) <= maxAbsoluteDeltaOnMac,
                 defaultNonMacScrollAmount = null,
                 macMagicRatio = 50,
-                amount = isMacScroll ? 1 + Math.abs(e.originalEvent.deltaY) / macMagicRatio : defaultNonMacScrollAmount;
+                amount = isMacScroll ? 1 + Math.abs(e.deltaY) / macMagicRatio : defaultNonMacScrollAmount;
 
             if (isPanAction) {
                 onDragEnd(e);
@@ -263,7 +265,8 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             isPanAction = true;
             var page = browser.getPageXY(e);
 
-            var ec = plot.getPlaceholder().offset();
+            var placeholderRect = plot.getPlaceholder().getBoundingClientRect();
+            var ec = { left: placeholderRect.left + window.scrollX, top: placeholderRect.top + window.scrollY };
             ec.left = page.X - ec.left;
             ec.top = page.Y - ec.top;
 
@@ -279,12 +282,12 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
                 panAxes = undefined;
             }
 
-            var c = plot.getPlaceholder().css('cursor');
+            var c = css(plot.getPlaceholder(), 'cursor');
             if (c) {
                 prevCursor = c;
             }
 
-            plot.getPlaceholder().css('cursor', plot.getOptions().pan.cursor);
+            css(plot.getPlaceholder(), 'cursor', plot.getOptions().pan.cursor);
 
             if (useSmartPan) {
                 plotState = plot.navigationState(page.X, page.Y);
@@ -322,7 +325,7 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
 
             if (panTimeout || !frameRate) return;
 
-            panTimeout = setTimeout(function() {
+            panTimeout = window.setTimeout(function() {
                 if (useSmartPan) {
                     plot.smartPan({
                         x: plotState.startPageX - page.X,
@@ -348,14 +351,14 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             }
 
             if (panTimeout) {
-                clearTimeout(panTimeout);
+                window.clearTimeout(panTimeout);
                 panTimeout = null;
             }
 
             isPanAction = false;
             var page = browser.getPageXY(e);
 
-            plot.getPlaceholder().css('cursor', prevCursor);
+            css(plot.getPlaceholder(), 'cursor', prevCursor);
 
             if (useSmartPan) {
                 plot.smartPan({
@@ -380,19 +383,15 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
 
             if (!o.recenter.interactive) { return; }
 
-            var axes = plot.getTouchedAxis(e.clientX, e.clientY),
-                event;
+            var axes = plot.getTouchedAxis(e.clientX, e.clientY);
 
             plot.recenter({ axes: axes[0] ? axes : null });
 
             if (axes[0]) {
-                event = new $.Event('re-center', { detail: {
-                    axisTouched: axes[0]
-                }});
+                trigger(plot.getPlaceholder(), 're-center', { axisTouched: axes[0] });
             } else {
-                event = new $.Event('re-center', { detail: e });
+                trigger(plot.getPlaceholder(), 're-center', e);
             }
-            plot.getPlaceholder().trigger(event);
         }
 
         function onClick(e) {
@@ -410,26 +409,26 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             if (!o.pan.active || !o.zoom.active) {
                 o.pan.active = true;
                 o.zoom.active = true;
-                plot.getPlaceholder().trigger("plotactivated", [plot]);
+                trigger(plot.getPlaceholder(), "plotactivated", [plot]);
             }
         }
 
         function bindEvents(plot, eventHolder) {
             var o = plot.getOptions();
             if (o.zoom.interactive) {
-                eventHolder.mousewheel(onMouseWheel);
+                bind(eventHolder, "wheel", onMouseWheel);
             }
 
             if (o.pan.interactive) {
                 plot.addEventHandler("dragstart", onDragStart, eventHolder, 0);
                 plot.addEventHandler("drag", onDrag, eventHolder, 0);
                 plot.addEventHandler("dragend", onDragEnd, eventHolder, 0);
-                eventHolder.bind("mousedown", onMouseDown);
-                eventHolder.bind("mouseup", onMouseUp);
+                bind(eventHolder, "mousedown", onMouseDown);
+                bind(eventHolder, "mouseup", onMouseUp);
             }
 
-            eventHolder.dblclick(onDblClick);
-            eventHolder.click(onClick);
+            bind(eventHolder, "dblclick", onDblClick);
+            bind(eventHolder, "click", onClick);
         }
 
         plot.zoomOut = function(args) {
@@ -522,7 +521,7 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             plot.draw();
 
             if (!args.preventEvent) {
-                plot.getPlaceholder().trigger("plotzoom", [plot, args]);
+                trigger(plot.getPlaceholder(), "plotzoom", [plot, args]);
             }
         };
 
@@ -535,7 +534,9 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             if (isNaN(delta.x)) delta.x = 0;
             if (isNaN(delta.y)) delta.y = 0;
 
-            $.each(args.axes || plot.getAxes(), function(_, axis) {
+            var panAxesOrAll = args.axes || plot.getAxes();
+            Object.keys(panAxesOrAll).forEach(function(key) {
+                var axis = panAxesOrAll[key];
                 var opts = axis.options,
                     d = delta[axis.direction];
 
@@ -574,16 +575,18 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             plot.setupGrid(true);
             plot.draw();
             if (!args.preventEvent) {
-                plot.getPlaceholder().trigger("plotpan", [plot, args]);
+                trigger(plot.getPlaceholder(), "plotpan", [plot, args]);
             }
         };
 
         plot.recenter = function(args) {
-            $.each(args.axes || plot.getAxes(), function(_, axis) {
+            var recenterAxes = args.axes || plot.getAxes();
+            Object.keys(recenterAxes).forEach(function(key) {
+                var axis = recenterAxes[key];
                 if (args.axes) {
-                    if (this.direction === 'x') {
+                    if (axis.direction === 'x') {
                         axis.options.offset = { below: 0 };
-                    } else if (this.direction === 'y') {
+                    } else if (axis.direction === 'y') {
                         axis.options.offset = { above: 0 };
                     }
                 } else {
@@ -736,7 +739,7 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             plot.draw();
 
             if (!preventEvent) {
-                plot.getPlaceholder().trigger("plotpan", [plot, delta, panAxes, initialState]);
+                trigger(plot.getPlaceholder(), "plotpan", [plot, delta, panAxes, initialState]);
             }
         };
 
@@ -748,16 +751,16 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
         }
 
         function shutdown(plot, eventHolder) {
-            eventHolder.unbind("mousewheel", onMouseWheel);
-            eventHolder.unbind("mousedown", onMouseDown);
-            eventHolder.unbind("mouseup", onMouseUp);
-            eventHolder.unbind("dragstart", onDragStart);
-            eventHolder.unbind("drag", onDrag);
-            eventHolder.unbind("dragend", onDragEnd);
-            eventHolder.unbind("dblclick", onDblClick);
-            eventHolder.unbind("click", onClick);
+            unbind(eventHolder, "wheel", onMouseWheel);
+            unbind(eventHolder, "mousedown", onMouseDown);
+            unbind(eventHolder, "mouseup", onMouseUp);
+            unbind(eventHolder, "dragstart", onDragStart);
+            unbind(eventHolder, "drag", onDrag);
+            unbind(eventHolder, "dragend", onDragEnd);
+            unbind(eventHolder, "dblclick", onDblClick);
+            unbind(eventHolder, "click", onClick);
 
-            if (panTimeout) clearTimeout(panTimeout);
+            if (panTimeout) window.clearTimeout(panTimeout);
         }
 
         function drawOverlay(plot, ctx) {
@@ -808,7 +811,8 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
         }
 
         plot.getTouchedAxis = function(touchPointX, touchPointY) {
-            var ec = plot.getPlaceholder().offset();
+            var placeholderRect = plot.getPlaceholder().getBoundingClientRect();
+            var ec = { left: placeholderRect.left + window.scrollX, top: placeholderRect.top + window.scrollY };
             ec.left = touchPointX - ec.left;
             ec.top = touchPointY - ec.top;
 

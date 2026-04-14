@@ -90,10 +90,10 @@ The plugin allso adds the following methods to the plot object:
 
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
 import { color } from './jquery.colorhelpers.js';
+import { trigger, unbind } from './helpers.js';
 
     function init(plot) {
         var selection = {
@@ -117,7 +117,7 @@ import { color } from './jquery.colorhelpers.js';
             if (selection.active) {
                 updateSelection(e);
 
-                plot.getPlaceholder().trigger("plotselecting", [ getSelection() ]);
+                trigger(plot.getPlaceholder(), "plotselecting", [ getSelection() ]);
             }
         }
 
@@ -165,8 +165,8 @@ import { color } from './jquery.colorhelpers.js';
                 triggerSelectedEvent();
             } else {
                 // this counts as a clear
-                plot.getPlaceholder().trigger("plotunselected", [ ]);
-                plot.getPlaceholder().trigger("plotselecting", [ null ]);
+                trigger(plot.getPlaceholder(), "plotunselected", [ ]);
+                trigger(plot.getPlaceholder(), "plotselecting", [ null ]);
             }
 
             return false;
@@ -191,7 +191,9 @@ import { color } from './jquery.colorhelpers.js';
                 c2.x = plot.width();
             }
 
-            $.each(plot.getAxes(), function (name, axis) {
+            var axes = plot.getAxes();
+            Object.keys(axes).forEach(function (name) {
+                var axis = axes[name];
                 if (axis.used) {
                     var p1 = axis.c2p(c1[axis.direction]), p2 = axis.c2p(c2[axis.direction]);
                     r[name] = { from: Math.min(p1, p2), to: Math.max(p1, p2) };
@@ -203,11 +205,11 @@ import { color } from './jquery.colorhelpers.js';
         function triggerSelectedEvent() {
             var r = getSelection();
 
-            plot.getPlaceholder().trigger("plotselected", [ r ]);
+            trigger(plot.getPlaceholder(), "plotselected", [ r ]);
 
             // backwards-compat stuff, to be removed in future
             if (r.xaxis && r.yaxis) {
-                plot.getPlaceholder().trigger("selected", [ { x1: r.xaxis.from, y1: r.yaxis.from, x2: r.xaxis.to, y2: r.yaxis.to } ]);
+                trigger(plot.getPlaceholder(), "selected", [ { x1: r.xaxis.from, y1: r.yaxis.from, x2: r.xaxis.to, y2: r.yaxis.to } ]);
             }
         }
 
@@ -243,7 +245,8 @@ import { color } from './jquery.colorhelpers.js';
         }
 
         function setSelectionPos(pos, e) {
-            var offset = plot.getPlaceholder().offset();
+            var placeholderRect = plot.getPlaceholder().getBoundingClientRect();
+            var offset = { left: placeholderRect.left + window.scrollX, top: placeholderRect.top + window.scrollY };
             var plotOffset = plot.getPlotOffset();
             pos.x = clamp(0, e.pageX - offset.left - plotOffset.left, plot.width());
             pos.y = clamp(0, e.pageY - offset.top - plotOffset.top, plot.height());
@@ -275,7 +278,7 @@ import { color } from './jquery.colorhelpers.js';
                 selection.currentMode = '';
                 plot.triggerRedrawOverlay();
                 if (!preventEvent) {
-                    plot.getPlaceholder().trigger("plotunselected", [ ]);
+                    trigger(plot.getPlaceholder(), "plotunselected", [ ]);
                 }
             }
         }
@@ -507,9 +510,9 @@ import { color } from './jquery.colorhelpers.js';
         });
 
         plot.hooks.shutdown.push(function (plot, eventHolder) {
-            eventHolder.unbind("dragstart", onDragStart);
-            eventHolder.unbind("drag", onDrag);
-            eventHolder.unbind("dragend", onDragEnd);
+            unbind(eventHolder, "dragstart", onDragStart);
+            unbind(eventHolder, "drag", onDrag);
+            unbind(eventHolder, "dragend", onDragEnd);
         });
     }
 

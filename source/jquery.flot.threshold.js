@@ -42,8 +42,8 @@ You may need to check for this in hover events.
 
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
+import { extend } from './helpers.js';
 
     var options = {
         series: { threshold: null } // or { below: number, color: color spec}
@@ -52,7 +52,7 @@ import { plugins } from './jquery.flot.js';
     function init(plot) {
         function thresholdData(plot, s, datapoints, below, color) {
             var ps = datapoints.pointsize, i, x, y, p, prevp,
-                thresholded = $.extend({}, s); // note: shallow copy
+                thresholded = extend({}, s); // note: shallow copy
 
             thresholded.datapoints = { points: [], pointsize: ps, format: datapoints.format };
             thresholded.label = null;
@@ -110,7 +110,7 @@ import { plugins } from './jquery.flot.js';
             thresholded.datapoints.points = threspoints;
 
             if (thresholded.datapoints.points.length > 0) {
-                var origIndex = $.inArray(s, plot.getData());
+                var origIndex = plot.getData().indexOf(s);
                 // Insert newly-generated series right after original one (to prevent it from becoming top-most)
                 plot.getData().splice(origIndex + 1, 0, thresholded);
             }
@@ -125,7 +125,7 @@ import { plugins } from './jquery.flot.js';
                     return a.below - b.below;
                 });
 
-                $(s.threshold).each(function(i, th) {
+                s.threshold.forEach(function(th) {
                     thresholdData(plot, s, datapoints, th.below, th.color);
                 });
             } else {

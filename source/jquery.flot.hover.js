@@ -24,11 +24,11 @@ handles this events by unhighlighting all of the previously highlighted points a
 the tooltip from webcharts).
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 import { browser } from './jquery.flot.browser.js';
 import { drawSeries } from './jquery.flot.drawSeries.js';
 import { color } from './jquery.colorhelpers.js';
+import { bind, unbind, trigger } from './helpers.js';
 
     'use strict';
 
@@ -52,33 +52,26 @@ import { color } from './jquery.colorhelpers.js';
             var o = plot.getOptions();
 
             if (o.grid.hoverable || o.grid.clickable) {
-                eventHolder[0].addEventListener('touchevent', triggerCleanupEvent, false);
-                eventHolder[0].addEventListener('tap', generatePlothoverEvent, false);
+                eventHolder.addEventListener('touchevent', triggerCleanupEvent, false);
+                eventHolder.addEventListener('tap', generatePlothoverEvent, false);
             }
 
             if (o.grid.clickable) {
-                eventHolder.bind("click", onClick);
+                bind(eventHolder, "click", onClick);
             }
 
             if (o.grid.hoverable) {
-                eventHolder.bind("mousemove", onMouseMove);
-
-                // Use bind, rather than .mouseleave, because we officially
-                // still support jQuery 1.2.6, which doesn't define a shortcut
-                // for mouseenter or mouseleave.  This was a bug/oversight that
-                // was fixed somewhere around 1.3.x.  We can return to using
-                // .mouseleave when we drop support for 1.2.6.
-
-                eventHolder.bind("mouseleave", onMouseLeave);
+                bind(eventHolder, "mousemove", onMouseMove);
+                bind(eventHolder, "mouseleave", onMouseLeave);
             }
         }
 
         function shutdown(plot, eventHolder) {
-            eventHolder[0].removeEventListener('tap', generatePlothoverEvent);
-            eventHolder[0].removeEventListener('touchevent', triggerCleanupEvent);
-            eventHolder.unbind("mousemove", onMouseMove);
-            eventHolder.unbind("mouseleave", onMouseLeave);
-            eventHolder.unbind("click", onClick);
+            eventHolder.removeEventListener('tap', generatePlothoverEvent);
+            eventHolder.removeEventListener('touchevent', triggerCleanupEvent);
+            unbind(eventHolder, "mousemove", onMouseMove);
+            unbind(eventHolder, "mouseleave", onMouseLeave);
+            unbind(eventHolder, "click", onClick);
             highlights = [];
         }
 
@@ -115,13 +108,13 @@ import { color } from './jquery.colorhelpers.js';
 
         function onMouseMove(e) {
             lastMouseMoveEvent = e;
-            plot.getPlaceholder()[0].lastMouseMoveEvent = e;
+            plot.getPlaceholder().lastMouseMoveEvent = e;
             doTriggerClickHoverEvent(e, eventType.hover);
         }
 
         function onMouseLeave(e) {
             lastMouseMoveEvent = undefined;
-            plot.getPlaceholder()[0].lastMouseMoveEvent = undefined;
+            plot.getPlaceholder().lastMouseMoveEvent = undefined;
             triggerClickHoverEvent("plothover", e,
                 function(i) {
                     return false;
@@ -134,7 +127,7 @@ import { color } from './jquery.colorhelpers.js';
 
         function triggerCleanupEvent() {
             plot.unhighlight();
-            plot.getPlaceholder().trigger('plothovercleanup');
+            trigger(plot.getPlaceholder(), 'plothovercleanup');
         }
 
         // trigger click or hover event (they send the same parameters
@@ -189,7 +182,7 @@ import { color } from './jquery.colorhelpers.js';
                 }
             }
 
-            plot.getPlaceholder().trigger(eventname, [pos, item, items]);
+            trigger(plot.getPlaceholder(), eventname, [pos, item, items]);
         }
 
         function highlight(s, point, auto) {
@@ -345,7 +338,7 @@ import { color } from './jquery.colorhelpers.js';
                 plot.hooks.setupGrid.push(setupGrid);
             }
 
-            lastMouseMoveEvent = plot.getPlaceholder()[0].lastMouseMoveEvent;
+            lastMouseMoveEvent = plot.getPlaceholder().lastMouseMoveEvent;
         }
 
         plot.hooks.bindEvents.push(bindEvents);

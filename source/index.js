@@ -1,14 +1,14 @@
 // Main entry point for @kevinburke/flot.
 //
-// Imports all core modules and bundled plugins, wires up the $.plot
-// namespace for backwards compatibility with <script> tag users.
+// This module has NO jQuery dependency. It exports the core plot
+// function and all bundled plugins. Use it directly:
 //
-// ESM consumers can import individual pieces:
-//   import { plot, color, saturated } from '@kevinburke/flot';
+//   import { plot } from '@kevinburke/flot';
+//   plot(document.getElementById('ph'), data, options);
 //
-// IIFE consumers get $.plot() registered on jQuery as before.
-
-import $ from 'jquery';
+// For jQuery backwards compatibility ($.plot), import the adapter:
+//
+//   import '@kevinburke/flot/jquery';
 
 // Core modules
 import { Canvas } from './jquery.canvaswrapper.js';
@@ -46,42 +46,7 @@ import './jquery.flot.selection.js';
 import { composeImages } from './jquery.flot.composeImages.js';
 import './jquery.flot.legend.js';
 
-// Wire up the jQuery namespace for backwards compatibility.
-// <script> tag users expect $.plot(...) to work.
-if (typeof $ === 'function') {
-    $.plot = plot;
-    $.plot.plugins = plugins;
-    $.plot.version = version;
-    $.plot.saturated = saturated;
-    $.plot.browser = browser;
-    $.plot.uiConstants = uiConstants;
-    $.plot.drawSeries = drawSeriesModule;
-    $.plot.linearTickGenerator = linearTickGenerator;
-    $.plot.defaultTickFormatter = defaultTickFormatter;
-    $.plot.expRepTickFormatter = expRepTickFormatter;
-    $.plot.logTicksGenerator = logTicksGenerator;
-    $.plot.logTickFormatter = logTickFormatter;
-    $.plot.formatDate = formatDate;
-    $.plot.makeUtcWrapper = makeUtcWrapper;
-    $.plot.dateGenerator = dateGenerator;
-    $.plot.dateTickGenerator = dateTickGenerator;
-    $.plot.composeImages = composeImages;
-    $.color = color;
-
-    // Also add the plot function as a chainable property
-    $.fn.plot = function(data, options) {
-        return this.each(function() {
-            plot(this, data, options);
-        });
-    };
-
-    if (!window.Flot) {
-        window.Flot = {};
-    }
-    window.Flot.Canvas = Canvas;
-}
-
-// Named exports for ESM consumers.
+// Named exports.
 export {
     Canvas,
     color,

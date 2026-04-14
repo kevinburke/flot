@@ -814,7 +814,10 @@ describe("flot navigate plugin", function () {
 
             expect(spyRecenter).toHaveBeenCalled();
 
-            expect(spyRecenter.calls.all()[0].args[0].detail.axisTouched).toEqual(xaxis);
+            var firstEvent = spyRecenter.calls.all()[0].args[0];
+            var detail = firstEvent.detail || (firstEvent.originalEvent && firstEvent.originalEvent.detail);
+
+            expect(detail.axisTouched).toEqual(xaxis);
         });
     });
 });

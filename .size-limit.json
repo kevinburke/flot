@@ -1,7 +1,7 @@
 [
 	{
-		"name": "main bundle (brotli)",
-		"path": "dist/jquery.flot.min.js",
+		"name": "core bundle (brotli, no jQuery)",
+		"path": "dist/flot.min.js",
 		"brotli": true,
 		"limit": "30 kB"
 	}

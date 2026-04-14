@@ -2,7 +2,6 @@
 
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 
     var defaultOptions = {
@@ -20,9 +19,12 @@ import { plugins } from './jquery.flot.js';
     function insertLegend(plot, options, placeholder, legendEntries) {
         // clear before redraw
         if (options.legend.container != null) {
-            $(options.legend.container).html('');
+            options.legend.container.innerHTML = '';
         } else {
-            placeholder.find('.legend').remove();
+            var oldLegends = placeholder.querySelectorAll('.legend');
+            for (var li = 0; li < oldLegends.length; li++) {
+                oldLegends[li].remove();
+            }
         }
 
         if (!options.legend.show) {
@@ -147,12 +149,16 @@ import { plugins } from './jquery.flot.js';
         var legendEl,
             height = Math.ceil(entries.length / options.legend.noColumns) * 1.6;
         if (!options.legend.container) {
-            legendEl = $('<div class="legend" style="position:absolute;' + pos + '">' + html.join('') + '</div>').appendTo(placeholder);
-            legendEl.css('width', width + 'px');
-            legendEl.css('height', height + 'em');
-            legendEl.css('pointerEvents', 'none');
+            legendEl = document.createElement('div');
+            legendEl.className = 'legend';
+            legendEl.style.cssText = 'position:absolute;' + pos;
+            legendEl.innerHTML = html.join('');
+            legendEl.style.width = width + 'px';
+            legendEl.style.height = height + 'em';
+            legendEl.style.pointerEvents = 'none';
+            placeholder.appendChild(legendEl);
         } else {
-            legendEl = $(html.join('')).appendTo(options.legend.container)[0];
+            options.legend.container.innerHTML = html.join('');
             options.legend.container.style.width = width + 'px';
             options.legend.container.style.height = height + 'em';
         }
@@ -336,7 +342,7 @@ import { plugins } from './jquery.flot.js';
 
         // Sort the legend using either the default or a custom comparator
         if (sorted) {
-            if ($.isFunction(sorted)) {
+            if (typeof sorted === 'function') {
                 legendEntries.sort(sorted);
             } else if (sorted === 'reverse') {
                 legendEntries.reverse();

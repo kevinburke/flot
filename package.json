@@ -3,12 +3,16 @@
 	"version": "5.0.0-alpha.0",
 	"description": "JavaScript plotting library for engineering and scientific applications.",
 	"type": "module",
-	"main": "./dist/jquery.flot.js",
-	"module": "./dist/jquery.flot.mjs",
+	"main": "./dist/flot.js",
+	"module": "./dist/flot.mjs",
 	"exports": {
 		".": {
-			"import": "./dist/jquery.flot.mjs",
-			"require": "./dist/jquery.flot.js",
+			"import": "./dist/flot.mjs",
+			"require": "./dist/flot.js",
+			"default": "./dist/flot.js"
+		},
+		"./jquery": {
+			"import": "./dist/jquery.flot.js",
 			"default": "./dist/jquery.flot.js"
 		}
 	},
@@ -27,6 +31,11 @@
 	"homepage": "https://github.com/kevinburke/flot#readme",
 	"peerDependencies": {
 		"jquery": ">=1.2.6"
+	},
+	"peerDependenciesMeta": {
+		"jquery": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",

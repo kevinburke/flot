@@ -1,8 +1,6 @@
-/* global jQuery */
-
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
+import { trigger } from './helpers.js';
 
     'use strict';
 
@@ -49,30 +47,30 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
             var o = plot.getOptions();
 
             if (o.zoom.interactive && o.zoom.enableTouch) {
-                eventHolder[0].addEventListener('pinchstart', pinch.start, false);
-                eventHolder[0].addEventListener('pinchdrag', pinch.drag, false);
-                eventHolder[0].addEventListener('pinchend', pinch.end, false);
+                eventHolder.addEventListener('pinchstart', pinch.start, false);
+                eventHolder.addEventListener('pinchdrag', pinch.drag, false);
+                eventHolder.addEventListener('pinchend', pinch.end, false);
             }
 
             if (o.pan.interactive && o.pan.enableTouch) {
-                eventHolder[0].addEventListener('panstart', pan.start, false);
-                eventHolder[0].addEventListener('pandrag', pan.drag, false);
-                eventHolder[0].addEventListener('panend', pan.end, false);
+                eventHolder.addEventListener('panstart', pan.start, false);
+                eventHolder.addEventListener('pandrag', pan.drag, false);
+                eventHolder.addEventListener('panend', pan.end, false);
             }
 
             if ((o.recenter.interactive && o.recenter.enableTouch)) {
-                eventHolder[0].addEventListener('doubletap', doubleTap.recenterPlot, false);
+                eventHolder.addEventListener('doubletap', doubleTap.recenterPlot, false);
             }
         }
 
         function shutdown(plot, eventHolder) {
-            eventHolder[0].removeEventListener('panstart', pan.start);
-            eventHolder[0].removeEventListener('pandrag', pan.drag);
-            eventHolder[0].removeEventListener('panend', pan.end);
-            eventHolder[0].removeEventListener('pinchstart', pinch.start);
-            eventHolder[0].removeEventListener('pinchdrag', pinch.drag);
-            eventHolder[0].removeEventListener('pinchend', pinch.end);
-            eventHolder[0].removeEventListener('doubletap', doubleTap.recenterPlot);
+            eventHolder.removeEventListener('panstart', pan.start);
+            eventHolder.removeEventListener('pandrag', pan.drag);
+            eventHolder.removeEventListener('panend', pan.end);
+            eventHolder.removeEventListener('pinchstart', pinch.start);
+            eventHolder.removeEventListener('pinchdrag', pinch.drag);
+            eventHolder.removeEventListener('pinchend', pinch.end);
+            eventHolder.removeEventListener('doubletap', doubleTap.recenterPlot);
         }
 
         pan = {
@@ -201,16 +199,13 @@ import { uiConstants } from './jquery.flot.uiConstants.js';
         if ((navigationState.currentTouchedAxis === 'x' && navigationState.prevTouchedAxis === 'x') ||
             (navigationState.currentTouchedAxis === 'y' && navigationState.prevTouchedAxis === 'y') ||
             (navigationState.currentTouchedAxis === 'none' && navigationState.prevTouchedAxis === 'none')) {
-            var event;
-
             plot.recenter({ axes: navigationState.touchedAxis });
 
             if (navigationState.touchedAxis) {
-                event = new $.Event('re-center', { detail: { axisTouched: navigationState.touchedAxis } });
+                trigger(plot.getPlaceholder(), 're-center', { axisTouched: navigationState.touchedAxis });
             } else {
-                event = new $.Event('re-center', { detail: e });
+                trigger(plot.getPlaceholder(), 're-center', e);
             }
-            plot.getPlaceholder().trigger(event);
         }
     }
 

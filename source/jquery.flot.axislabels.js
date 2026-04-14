@@ -29,7 +29,6 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 
     "use strict";
@@ -173,7 +172,7 @@ import { plugins } from './jquery.flot.js';
                 if (!axisLabel) {
                     axisLabel = new AxisLabel(axisName,
                         opts.position, padding,
-                        plot.getPlaceholder()[0], opts.axisLabel, plot.getSurface());
+                        plot.getPlaceholder(), opts.axisLabel, plot.getSurface());
                     axisLabels[axisName] = axisLabel;
                 }
 
@@ -186,7 +185,9 @@ import { plugins } from './jquery.flot.js';
 
             // TODO - use the drawAxis hook
             plot.hooks.draw.push(function(plot, ctx) {
-                $.each(plot.getAxes(), function(flotAxisName, axis) {
+                var axes = plot.getAxes();
+                Object.keys(axes).forEach(function(flotAxisName) {
+                    var axis = axes[flotAxisName];
                     var opts = axis.options;
                     if (!opts || !opts.axisLabel || !axis.show) {
                         return;

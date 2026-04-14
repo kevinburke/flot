@@ -4,7 +4,7 @@ Copyright (c) 2007-2014 IOLA and Ole Laursen.
 Licensed under the MIT license.
 */
 
-(function ($) {
+(function () {
     function init(plot) {
         function onDrag(e) {
             e.stopImmediatePropagation();
@@ -31,13 +31,13 @@ Licensed under the MIT license.
         });
 
         plot.hooks.shutdown.push(function (plot, eventHolder) {
-            eventHolder.unbind("dragstart", onDragStart);
-            eventHolder.unbind("drag", onDrag);
-            eventHolder.unbind("dragend", onDragEnd);
+            eventHolder.removeEventListener("dragstart", onDragStart);
+            eventHolder.removeEventListener("drag", onDrag);
+            eventHolder.removeEventListener("dragend", onDragEnd);
         });
     }
 
-    $.plot.plugins.push({
+    jQuery.plot.plugins.push({
         init: init,
         options: {
             testDrag: {
@@ -47,4 +47,4 @@ Licensed under the MIT license.
         name: 'testDragPlugin',
         version: '1.1'
     });
-})(jQuery);
+})();

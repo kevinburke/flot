@@ -74,20 +74,21 @@ color.make = function (r, g, b, a) {
 }
 
 // extract CSS color property from element, going up in the DOM
-// if it's "transparent". Takes a jQuery-wrapped element.
+// if it's "transparent". Takes a raw DOM element.
 color.extract = function (elem, css) {
     var c;
 
     do {
-        c = elem.css(css).toLowerCase();
+        var camel = css.replace(/-([a-z])/g, function(_, ch) { return ch.toUpperCase(); });
+        c = (elem.style[camel] || getComputedStyle(elem)[css] || '').toLowerCase();
         // keep going until we find an element that has color, or
         // we hit the body or root (have no parent)
         if (c !== '' && c !== 'transparent') {
             break;
         }
 
-        elem = elem.parent();
-    } while (elem.length && elem.get(0).nodeName.toLowerCase() !== "body");
+        elem = elem.parentElement;
+    } while (elem != null && elem.nodeName.toLowerCase() !== "body");
 
     // catch Safari's way of signalling transparent
     if (c === "rgba(0, 0, 0, 0)") {

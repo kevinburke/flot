@@ -55,8 +55,8 @@ More detail and specific examples can be found in the included HTML file.
 
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
+import { extend, bind, unbind, trigger, width, height } from './helpers.js';
 
     // Maximum redraw attempts when fitting labels within the plot
 
@@ -120,19 +120,21 @@ import { plugins } from './jquery.flot.js';
             var options = plot.getOptions();
             if (options.series.pie.show) {
                 if (options.grid.hoverable) {
-                    eventHolder.unbind("mousemove").mousemove(onMouseMove);
-                    eventHolder.bind("mouseleave", onMouseMove);
+                    unbind(eventHolder, "mousemove");
+                    bind(eventHolder, "mousemove", onMouseMove);
+                    bind(eventHolder, "mouseleave", onMouseMove);
                 }
                 if (options.grid.clickable) {
-                    eventHolder.unbind("click").click(onClick);
+                    unbind(eventHolder, "click");
+                    bind(eventHolder, "click", onClick);
                 }
             }
         });
 
         plot.hooks.shutdown.push(function (plot, eventHolder) {
-            eventHolder.unbind("mousemove", onMouseMove);
-            eventHolder.unbind("mouseleave", onMouseMove);
-            eventHolder.unbind("click", onClick);
+            unbind(eventHolder, "mousemove", onMouseMove);
+            unbind(eventHolder, "mouseleave", onMouseMove);
+            unbind(eventHolder, "click", onClick);
             highlights = [];
         });
 
@@ -161,7 +163,7 @@ import { plugins } from './jquery.flot.js';
             if (!processed) {
                 processed = true;
                 canvas = plot.getCanvas();
-                target = $(canvas).parent();
+                target = canvas.parentElement;
                 options = plot.getOptions();
                 plot.setData(combine(plot.getData()));
             }
@@ -188,11 +190,11 @@ import { plugins } from './jquery.flot.js';
                 // new one; this is more efficient and preserves any extra data
                 // that the user may have stored in higher indexes.
 
-                if ($.isArray(value) && value.length === 1) {
+                if (Array.isArray(value) && value.length === 1) {
                     value = value[0];
                 }
 
-                if ($.isArray(value)) {
+                if (Array.isArray(value)) {
                     // Equivalent to $.isNumeric() but compatible with jQuery < 1.7
                     if (!isNaN(parseFloat(value[1])) && isFinite(value[1])) {
                         value[1] = +value[1];
@@ -232,7 +234,7 @@ import { plugins } from './jquery.flot.js';
                 value = data[i].data[0][1];
                 if (numCombined < 2 || value / total > options.series.pie.combine.threshold) {
                     newdata.push(
-                        $.extend(data[i], {     /* extend to allow keeping all other original data values
+                        extend(data[i], {     /* extend to allow keeping all other original data values
                                                    and using them e.g. in labelFormatter. */
                             data: [[1, value]],
                             color: data[i].color,
@@ -262,9 +264,10 @@ import { plugins } from './jquery.flot.js';
                 return; // if no series were passed
             }
 
-            var canvasWidth = plot.getPlaceholder().width(),
-                canvasHeight = plot.getPlaceholder().height(),
-                legendWidth = target.children().filter(".legend").children().width() || 0;
+            var canvasWidth = width(plot.getPlaceholder()),
+                canvasHeight = height(plot.getPlaceholder()),
+                legendEl = target.querySelector(".legend"),
+                legendWidth = legendEl && legendEl.firstElementChild ? legendEl.firstElementChild.clientWidth : 0;
 
             ctx = newCtx;
 
@@ -329,7 +332,10 @@ import { plugins } from './jquery.flot.js';
 
             if (attempts >= REDRAW_ATTEMPTS) {
                 clear();
-                target.prepend("<div class='error'>Could not draw pie with labels contained inside canvas</div>");
+                var errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = 'Could not draw pie with labels contained inside canvas';
+                target.insertBefore(errorDiv, target.firstChild);
             }
 
             if (plot.setSeries && plot.insertLegend) {
@@ -340,7 +346,10 @@ import { plugins } from './jquery.flot.js';
             // we're actually done at this point, just defining internal functions at this point
             function clear() {
                 ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                target.children().filter(".pieLabel, .pieLabelBackground").remove();
+                var labels = target.querySelectorAll(".pieLabel, .pieLabelBackground");
+                for (var li = 0; li < labels.length; li++) {
+                    labels[li].remove();
+                }
             }
 
             function drawShadow() {
@@ -486,18 +495,24 @@ import { plugins } from './jquery.flot.js';
                         var x = centerLeft + Math.round(Math.cos(halfAngle) * radius);
                         var y = centerTop + Math.round(Math.sin(halfAngle) * radius) * options.series.pie.tilt;
 
-                        var html = "<span class='pieLabel' id='pieLabel" + index + "' style='position:absolute;top:" + y + "px;left:" + x + "px;'>" + text + "</span>";
-                        target.append(html);
+                        var labelSpan = document.createElement('span');
+                        labelSpan.className = 'pieLabel';
+                        labelSpan.id = 'pieLabel' + index;
+                        labelSpan.style.position = 'absolute';
+                        labelSpan.style.top = y + 'px';
+                        labelSpan.style.left = x + 'px';
+                        labelSpan.innerHTML = text;
+                        target.appendChild(labelSpan);
 
-                        var label = target.children("#pieLabel" + index);
-                        var labelTop = (y - label.height() / 2);
-                        var labelLeft = (x - label.width() / 2);
+                        var label = target.querySelector("#pieLabel" + index);
+                        var labelTop = (y - label.clientHeight / 2);
+                        var labelLeft = (x - label.clientWidth / 2);
 
-                        label.css("top", labelTop);
-                        label.css("left", labelLeft);
+                        label.style.top = labelTop + 'px';
+                        label.style.left = labelLeft + 'px';
 
                         // check to make sure that the label is not outside the canvas
-                        if (0 - labelTop > 0 || 0 - labelLeft > 0 || canvasHeight - (labelTop + label.height()) < 0 || canvasWidth - (labelLeft + label.width()) < 0) {
+                        if (0 - labelTop > 0 || 0 - labelLeft > 0 || canvasHeight - (labelTop + label.clientHeight) < 0 || canvasWidth - (labelLeft + label.clientWidth) < 0) {
                             return false;
                         }
 
@@ -508,10 +523,11 @@ import { plugins } from './jquery.flot.js';
                                 c = slice.color;
                             }
 
-                            var pos = "top:" + labelTop + "px;left:" + labelLeft + "px;";
-                            $("<div class='pieLabelBackground' style='position:absolute;width:" + label.width() + "px;height:" + label.height() + "px;" + pos + "background-color:" + c + ";'></div>")
-                                .css("opacity", options.series.pie.label.background.opacity)
-                                .insertBefore(label);
+                            var bgDiv = document.createElement('div');
+                            bgDiv.className = 'pieLabelBackground';
+                            bgDiv.style.cssText = 'position:absolute;width:' + label.clientWidth + 'px;height:' + label.clientHeight + 'px;top:' + labelTop + 'px;left:' + labelLeft + 'px;background-color:' + c + ';';
+                            bgDiv.style.opacity = options.series.pie.label.background.opacity;
+                            label.parentNode.insertBefore(bgDiv, label);
                         }
 
                         return true;
@@ -659,7 +675,7 @@ import { plugins } from './jquery.flot.js';
             // trigger any hover bind events
 
             var pos = { pageX: e.pageX, pageY: e.pageY };
-            target.trigger(eventname, [pos, item]);
+            trigger(target, eventname, [pos, item]);
         }
 
         function highlight(s, auto) {

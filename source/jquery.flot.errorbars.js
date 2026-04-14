@@ -62,7 +62,6 @@ shadowSize and lineWidth are derived as well from the points series.
 
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 
     var options = {
@@ -323,7 +322,7 @@ import { plugins } from './jquery.flot.js';
             if (err.upperCap === '-') {
                 if (err.err === 'x') drawPath(ctx, [[upper, y - radius], [upper, y + radius]]);
                 else drawPath(ctx, [[x - radius, upper], [x + radius, upper]]);
-            } else if ($.isFunction(err.upperCap)) {
+            } else if (typeof err.upperCap === 'function') {
                 if (err.err === 'x') err.upperCap(ctx, upper, y, radius);
                 else err.upperCap(ctx, x, upper, radius);
             }
@@ -333,7 +332,7 @@ import { plugins } from './jquery.flot.js';
             if (err.lowerCap === '-') {
                 if (err.err === 'x') drawPath(ctx, [[lower, y - radius], [lower, y + radius]]);
                 else drawPath(ctx, [[x - radius, lower], [x + radius, lower]]);
-            } else if ($.isFunction(err.lowerCap)) {
+            } else if (typeof err.lowerCap === 'function') {
                 if (err.err === 'x') err.lowerCap(ctx, lower, y, radius);
                 else err.lowerCap(ctx, x, lower, radius);
             }
@@ -355,7 +354,7 @@ import { plugins } from './jquery.flot.js';
 
         ctx.save();
         ctx.translate(plotOffset.left, plotOffset.top);
-        $.each(plot.getData(), function (i, s) {
+        plot.getData().forEach(function (s) {
             if (s.points.errorbars && (s.points.xerr.show || s.points.yerr.show)) {
                 drawSeriesErrors(plot, ctx, s);
             }

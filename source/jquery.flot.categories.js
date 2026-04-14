@@ -43,7 +43,6 @@ as "categories" on the axis object, e.g. plot.getAxes().xaxis.categories.
 
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 
     var options = {
@@ -134,7 +133,7 @@ import { plugins } from './jquery.flot.js';
         if (!series[axis].categories) {
             // parse options
             var c = {}, o = series[axis].options.categories || {};
-            if ($.isArray(o)) {
+            if (Array.isArray(o)) {
                 for (var i = 0; i < o.length; ++i) {
                     c[o[i]] = i;
                 }

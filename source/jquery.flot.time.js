@@ -7,7 +7,6 @@ Set axis.mode to "time" to enable. See the section "Time series data" in
 API.txt for details.
 */
 
-import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 import { saturated } from './jquery.flot.saturated.js';
 
@@ -478,7 +477,9 @@ import { saturated } from './jquery.flot.saturated.js';
 
     function init(plot) {
         plot.hooks.processOptions.push(function (plot) {
-            $.each(plot.getAxes(), function(axisName, axis) {
+            var axes = plot.getAxes();
+            Object.keys(axes).forEach(function(axisName) {
+                var axis = axes[axisName];
                 var opts = axis.options;
                 if (opts.mode === "time") {
                     axis.tickGenerator = dateTickGenerator;

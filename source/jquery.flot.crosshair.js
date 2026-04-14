@@ -59,6 +59,7 @@ The plugin also adds four public methods:
 */
 
 import { plugins } from './jquery.flot.js';
+import { bind, unbind } from './helpers.js';
 
     var options = {
         crosshair: {
@@ -145,8 +146,8 @@ import { plugins } from './jquery.flot.js';
                 return;
             }
 
-            eventHolder.mouseout(onMouseOut);
-            eventHolder.mousemove(onMouseMove);
+            bind(eventHolder, "mouseout", onMouseOut);
+            bind(eventHolder, "mousemove", onMouseMove);
         });
 
         plot.hooks.drawOverlay.push(function (plot, ctx) {
@@ -189,8 +190,8 @@ import { plugins } from './jquery.flot.js';
         });
 
         plot.hooks.shutdown.push(function (plot, eventHolder) {
-            eventHolder.unbind("mouseout", onMouseOut);
-            eventHolder.unbind("mousemove", onMouseMove);
+            unbind(eventHolder, "mouseout", onMouseOut);
+            unbind(eventHolder, "mousemove", onMouseMove);
         });
     }
 

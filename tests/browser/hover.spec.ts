@@ -371,9 +371,10 @@ test.describe("flot hover plugin", () => {
 
 			win.__hoverPortState.hovered = false;
 			const plot = $.plot(placeholder, [[[0, 0], [2, 3], [10, 10]]], options);
+			const lastMouseMoveEvent = plot.getPlaceholder().lastMouseMoveEvent;
 			return {
-				actualX: plot.getPlaceholder()[0].lastMouseMoveEvent.originalEvent.x,
-				actualY: plot.getPlaceholder()[0].lastMouseMoveEvent.originalEvent.y,
+				actualX: lastMouseMoveEvent.x,
+				actualY: lastMouseMoveEvent.y,
 				expectedX: win.__hoverPortState.event.x,
 				expectedY: win.__hoverPortState.event.y,
 				hovered: win.__hoverPortState.hovered,
@@ -413,7 +414,6 @@ test.describe("flot hover plugin", () => {
 	});
 
 	test("should correctly highlight bars with bottom points specified", async ({ page }) => {
-		await page.clock.install({ time: new Date("2026-04-12T00:00:00.000Z") });
 		await page.evaluate(() => {
 			const win = window as any;
 			const $ = win.jQuery;
@@ -437,7 +437,7 @@ test.describe("flot hover plugin", () => {
 			win.simulate.mouseMove(eventHolder, win.__hoverPortState.x, win.__hoverPortState.y1, 0);
 		});
 
-		await page.clock.runFor(100);
+		await page.waitForTimeout(100);
 		const firstHoverContainsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
 			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
@@ -449,7 +449,7 @@ test.describe("flot hover plugin", () => {
 			win.simulate.mouseMove(win.__hoverPortState.canvas, win.__hoverPortState.x, win.__hoverPortState.y2, 0);
 		});
 
-		await page.clock.runFor(100);
+		await page.waitForTimeout(100);
 		const secondHoverContainsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
 			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
@@ -486,7 +486,6 @@ test.describe("flot hover plugin", () => {
 	});
 
 	test("should pass item returned from hook in items", async ({ page }) => {
-		await page.clock.install({ time: new Date("2026-04-12T00:00:00.000Z") });
 		await page.evaluate(() => {
 			const win = window as any;
 			const $ = win.jQuery;
@@ -505,8 +504,12 @@ test.describe("flot hover plugin", () => {
 			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
 			$(plot.getPlaceholder()).on(
 				"plothover",
-				(_event: unknown, _pos: unknown, _item: unknown, items: unknown[]) => {
-					win.__hoverPortState.seenTestItem = items.includes(testItem);
+				(event: { originalEvent?: { detail?: unknown[] } }, _pos: unknown, _item: unknown, items: unknown[]) => {
+					const detailItems = event.originalEvent?.detail?.[2] as unknown[] | undefined;
+					win.__hoverPortState.seenTestItem = Array.isArray(items) && items.includes(testItem);
+					if (!win.__hoverPortState.seenTestItem && detailItems) {
+						win.__hoverPortState.seenTestItem = detailItems.includes(testItem);
+					}
 				},
 			);
 
@@ -518,13 +521,12 @@ test.describe("flot hover plugin", () => {
 			win.simulate.mouseMove(eventHolder, axisx.p2c(2) + offset.left, axisy.p2c(3) + offset.top, 0);
 		});
 
-		await page.clock.runFor(100);
-		const seenTestItem = await page.evaluate(() => (window as any).__hoverPortState.seenTestItem);
-		expect(seenTestItem).toBe(true);
+		await expect
+			.poll(async () => await page.evaluate(() => (window as any).__hoverPortState.seenTestItem))
+			.toBe(true);
 	});
 
 	test("should choose closest item from items returned by hooks", async ({ page }) => {
-		await page.clock.install({ time: new Date("2026-04-12T00:00:00.000Z") });
 		await page.evaluate(() => {
 			const win = window as any;
 			const $ = win.jQuery;
@@ -544,8 +546,10 @@ test.describe("flot hover plugin", () => {
 			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
 			$(plot.getPlaceholder()).on(
 				"plothover",
-				(_event: unknown, _pos: unknown, item: { distance: number }) => {
-					win.__hoverPortState.closerThanHookItem = item.distance < distance;
+				(event: { originalEvent?: { detail?: unknown[] } }, _pos: unknown, item: { distance: number }) => {
+					const detailItem = event.originalEvent?.detail?.[1] as { distance: number } | undefined;
+					const hoverItem = item || detailItem;
+					win.__hoverPortState.closerThanHookItem = hoverItem.distance < distance;
 				},
 			);
 
@@ -557,10 +561,8 @@ test.describe("flot hover plugin", () => {
 			win.simulate.mouseMove(eventHolder, axisx.p2c(2) + offset.left, axisy.p2c(3) + offset.top, 0);
 		});
 
-		await page.clock.runFor(100);
-		const closerThanHookItem = await page.evaluate(
-			() => (window as any).__hoverPortState.closerThanHookItem,
-		);
-		expect(closerThanHookItem).toBe(true);
+		await expect
+			.poll(async () => await page.evaluate(() => (window as any).__hoverPortState.closerThanHookItem))
+			.toBe(true);
 	});
 });
