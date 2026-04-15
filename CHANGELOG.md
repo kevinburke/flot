@@ -9,6 +9,48 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ### Fixed
 
+- `jquery.flot.pie.js`: `drawDonutHole` and `triggerClickHoverEvent`
+  now read `options` via `plot.getOptions()` instead of relying on
+  the closure-scoped value, which is `null` until the
+  `processDatapoints` hook runs. Ports
+  [flot/flot#1559](https://github.com/flot/flot/pull/1559)
+  (duplicate of
+  [flot/flot#1547](https://github.com/flot/flot/pull/1547)).
+- `jquery.flot.legend.js`: accept a jQuery-wrapped legend container,
+  not just a DOM element. Matches the intent of
+  [flot/flot#1750](https://github.com/flot/flot/pull/1750) (fixing
+  [flot/flot#1698](https://github.com/flot/flot/issues/1698)) but
+  inlines the unwrap since this fork is jQuery-optional.
+- `jquery.flot.legend.js`: render a fallback "box" icon for plugin-
+  drawn series (e.g. pie, errorbars) that don't turn on
+  `lines.show`, `bars.show`, or `points.show`. Previously these
+  legend entries showed the label with no icon. Ports the
+  substantive half of
+  [flot/flot#1641](https://github.com/flot/flot/pull/1641) (fixing
+  [flot/flot#1640](https://github.com/flot/flot/issues/1640)); the
+  upstream PR also switched the icon-selection chain to `else if`,
+  which would regress series that intentionally overlay (e.g. lines
+  with points) — that part is deliberately not ported.
+- `jquery.canvaswrapper.js`: guard against `positions == null` in
+  the text-cache iteration in `removeText`. Ports
+  [flot/flot#1444](https://github.com/flot/flot/pull/1444).
+
+### Not ported (already fixed or declined)
+
+- [flot/flot#1744](https://github.com/flot/flot/pull/1744)
+  (time-tick milliseconds reset) — already in our source via
+  upstream commit `0429a1e6` (2022-08-01).
+- [flot/flot#1672](https://github.com/flot/flot/pull/1672)
+  (`drawSeries` trailing-step interpolation) — superseded by
+  upstream
+  [PR #1830](https://github.com/flot/flot/pull/1830), which is
+  already in our source.
+- [flot/flot#1528](https://github.com/flot/flot/pull/1528)
+  (label-gap in multi-axis plots) — declined. The PR changes
+  per-series range-update semantics to update every axis in the
+  direction rather than only the series' assigned axis, which is a
+  substantive behavior change with no regression test and an
+  unclear correctness rationale.
 - `jquery.flot.js`: guard `getColorOrGradient` against non-finite
   coordinates. `ctx.createLinearGradient(0, top, 0, bottom)` throws
   `Uncaught TypeError: Argument 4 is not finite floating-point value`

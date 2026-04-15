@@ -539,6 +539,11 @@ import { extend, bind, unbind, trigger, width, height } from './helpers.js';
         // Placed here because it needs to be accessed from multiple locations
 
         function drawDonutHole(layer) {
+            // The closure-scoped `options` is set by the processDatapoints
+            // hook on first draw, but drawDonutHole can be reached from
+            // paths that fire before that hook, leaving `options` null.
+            // Read it eagerly. Upstream flot/flot#1559.
+            var options = plot.getOptions();
             if (options.series.pie.innerRadius > 0) {
                 // subtract the center
                 layer.save();
@@ -651,6 +656,9 @@ import { extend, bind, unbind, trigger, width, height } from './helpers.js';
         // trigger click or hover event (they send the same parameters so we share their code)
 
         function triggerClickHoverEvent(eventname, e) {
+            // See drawDonutHole above: read `options` fresh in case the
+            // event fires before processDatapoints has run.
+            var options = plot.getOptions();
             var offset = plot.offset();
             var canvasX = parseInt(e.pageX - offset.left);
             var canvasY = parseInt(e.pageY - offset.top);

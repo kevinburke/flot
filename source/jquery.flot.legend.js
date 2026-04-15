@@ -119,6 +119,17 @@ import { plugins } from './jquery.flot.js';
                 shape.strokeWidth = entry.options.points.lineWidth;
                 iconHtml += getEntryIconHtml(shape);
             }
+            // fallback for plugin-drawn series (pie, errorbars, etc.)
+            // that don't turn on any of lines/bars/points — without
+            // this the legend entry has a label but no icon. Upstream
+            // flot/flot#1641, minus the switch to `else if` so series
+            // that deliberately overlay (e.g. lines + points) keep
+            // rendering both icons.
+            if (iconHtml === '') {
+                shape.name = 'box';
+                shape.fillColor = entry.color;
+                iconHtml += getEntryIconHtml(shape);
+            }
 
             labelHtml = '<text x="' + shape.xPos + '" y="' + shape.yPos + '" text-anchor="start"><tspan dx="2em" dy="1.2em">' + shape.label + '</tspan></text>'
             html[j++] = '<g>' + iconHtml + labelHtml + '</g>';
@@ -158,9 +169,17 @@ import { plugins } from './jquery.flot.js';
             legendEl.style.pointerEvents = 'none';
             placeholder.appendChild(legendEl);
         } else {
-            options.legend.container.innerHTML = html.join('');
-            options.legend.container.style.width = width + 'px';
-            options.legend.container.style.height = height + 'em';
+            // Accept either a DOM Element or a jQuery-wrapped container.
+            // Upstream flot/flot#1750 switched to `$(container).get(0)` to
+            // always land on the underlying element; since this fork is
+            // jQuery-optional, do the unwrap inline.
+            var container = options.legend.container;
+            if (container && typeof container.get === 'function' && container[0]) {
+                container = container[0];
+            }
+            container.innerHTML = html.join('');
+            container.style.width = width + 'px';
+            container.style.height = height + 'em';
         }
     }
 
@@ -254,6 +273,14 @@ import { plugins } from './jquery.flot.js';
                     'width="1.5em" height="1.5em"' +
                     '/>';
                 break;
+            case 'box':
+                html = '<use xlink:href="#box" class="legendIcon" ' +
+                    'x="' + x + '" ' +
+                    'y="' + y + '" ' +
+                    'fill="' + fill + '" ' +
+                    'width="1.5em" height="1.5em"' +
+                    '/>';
+                break;
             default:
                 // default is circle
                 html = '<use xlink:href="#circle" class="legendIcon" ' +
@@ -274,6 +301,12 @@ import { plugins } from './jquery.flot.js';
         '<defs>' +
             '<symbol id="line" fill="none" viewBox="-5 -5 25 25">' +
                 '<polyline points="0,15 5,5 10,10 15,0"/>' +
+            '</symbol>' +
+
+            // Fallback icon for plugin-drawn series that don't turn on
+            // any of lines / bars / points. Upstream flot/flot#1641.
+            '<symbol id="box" stroke-width="1" viewBox="-5 -5 25 25">' +
+                '<rect x="0" y="0" width="15" height="15"/>' +
             '</symbol>' +
 
             '<symbol id="area" stroke-width="1" viewBox="-5 -5 25 25">' +

@@ -50,30 +50,43 @@ feasible, and reference the upstream issue/PR number in the commit.
 Older but still legitimate; port after verifying the reported bug still
 reproduces against current `source/`.
 
-- [ ] **upstream PR #1744** — time-tick milliseconds reset. Two-line
-  fix. Pair with issue #1743 for repro steps.
+- [skip] **upstream PR #1744** — already present in our source as of
+  upstream commit `0429a1e6` (2022-08-01). No action needed.
   - https://github.com/flot/flot/pull/1744
 
-- [ ] **upstream PR #1672** — `drawSeries` trailing-step interpolation
-  bug. Steps mode draws the final segment incorrectly in some
-  configurations.
+- [skip] **upstream PR #1672** — superseded by upstream PR #1830
+  ("Fix drawSeries step mode to connect last two points when middle
+  point is present"), which is in our source. No action needed.
   - https://github.com/flot/flot/pull/1672
 
-- [ ] **upstream PR #1559 / #1547** — pie plugin undefined reference
-  (duplicates of each other; pick one).
+- [x] **upstream PR #1559 / #1547** — pie plugin read `options` from
+  closure that was `null` until `processDatapoints` ran. Added a
+  local `var options = plot.getOptions();` at the top of
+  `drawDonutHole` and `triggerClickHoverEvent`.
   - https://github.com/flot/flot/pull/1559
 
-- [ ] **upstream PR #1750** — legend container fix (#1698).
+- [x] **upstream PR #1750** — legend container could be a jQuery
+  wrapper rather than a DOM element. Inlined the unwrap
+  (`container.get(0)` → `container[0]`) inside
+  `insertLegend` since this fork is jQuery-optional.
   - https://github.com/flot/flot/pull/1750
 
-- [ ] **upstream PR #1528** — label-gap bug in multiple-axes layout.
+- [skip] **upstream PR #1528** — the PR changes range-update semantics
+  for multi-axis plots in a way that isn't clearly a bug fix (and has
+  no unit test). Leaving alone.
   - https://github.com/flot/flot/pull/1528
 
-- [ ] **upstream PR #1444** — `positions` undefined error.
+- [x] **upstream PR #1444** — `positions == null` guard added in
+  `canvaswrapper.removeText` to avoid a crash when the text cache
+  contains entries without a `positions` array.
   - https://github.com/flot/flot/pull/1444
 
-- [ ] **upstream PR #1641** — legend icons missing for series types
-  other than lines/bars/points.
+- [x] **upstream PR #1641** — legend entries for plugin-drawn series
+  (pie, errorbars, custom symbols) now render a `#box` fallback icon
+  instead of label-only. Added a new `#box` SVG symbol and a `case
+  'box'` in `getEntryIconHtml`. The upstream `else if` chain was
+  *not* ported because it regresses intentional overlay combos
+  (e.g. lines + points).
   - https://github.com/flot/flot/pull/1641
 
 ## Tier 3 — investigate, possibly synthesize

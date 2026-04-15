@@ -496,10 +496,16 @@ var Canvas = function(cls, container) {
                         var styleCache = layerCache[styleKey];
                         for (var key in styleCache) {
                             if (Object.prototype.hasOwnProperty.call(styleCache, key)) {
+                                // styleCache entries can exist without a
+                                // positions array (e.g. when a Flot plugin
+                                // populates the cache outside the normal
+                                // addText path). Upstream flot/flot#1444.
                                 var positions = styleCache[key].positions;
-                                positions.forEach(function(position) {
-                                    position.active = false;
-                                });
+                                if (positions != null) {
+                                    positions.forEach(function(position) {
+                                        position.active = false;
+                                    });
+                                }
                             }
                         }
                     }
