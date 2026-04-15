@@ -362,7 +362,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         // initialize
         var MINOR_TICKS_COUNT_CONSTANT = uiConstants.MINOR_TICKS_COUNT_CONSTANT;
         var TICK_LENGTH_CONSTANT = uiConstants.TICK_LENGTH_CONSTANT;
-        initPlugins(plot);
+        initPlugins();
         setupCanvases();
         parseOptions(options_);
         setData(data_);
@@ -1879,6 +1879,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                     markings = markings(axes);
                 }
 
+                if (!markings) return;
+
                 var i;
                 for (i = 0; i < markings.length; ++i) {
                     var m = markings[i],
@@ -2231,7 +2233,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 }
 
                 if (axis.gridLines === true) {
-                    drawGridLines(axis, bw);
+                    drawGridLines(axis);
                 }
             }
 

@@ -127,7 +127,7 @@ var Canvas = function(cls, container) {
         // already been rendered, and remove those that are no longer active.
 
         for (var layerKey in cache) {
-            if (hasOwnProperty.call(cache, layerKey)) {
+            if (Object.prototype.hasOwnProperty.call(cache, layerKey)) {
                 var layer = this.getSVGLayer(layerKey),
                     layerCache = cache[layerKey];
 
@@ -135,10 +135,10 @@ var Canvas = function(cls, container) {
                 layer.style.display = 'none';
 
                 for (var styleKey in layerCache) {
-                    if (hasOwnProperty.call(layerCache, styleKey)) {
+                    if (Object.prototype.hasOwnProperty.call(layerCache, styleKey)) {
                         var styleCache = layerCache[styleKey];
                         for (var key in styleCache) {
-                            if (hasOwnProperty.call(styleCache, key)) {
+                            if (Object.prototype.hasOwnProperty.call(styleCache, key)) {
                                 var val = styleCache[key],
                                     positions = val.positions;
 
@@ -492,10 +492,10 @@ var Canvas = function(cls, container) {
             var layerCache = this._textCache[layer];
             if (layerCache != null) {
                 for (var styleKey in layerCache) {
-                    if (hasOwnProperty.call(layerCache, styleKey)) {
+                    if (Object.prototype.hasOwnProperty.call(layerCache, styleKey)) {
                         var styleCache = layerCache[styleKey];
                         for (var key in styleCache) {
-                            if (hasOwnProperty.call(styleCache, key)) {
+                            if (Object.prototype.hasOwnProperty.call(styleCache, key)) {
                                 var positions = styleCache[key].positions;
                                 positions.forEach(function(position) {
                                     position.active = false;
@@ -528,7 +528,7 @@ var Canvas = function(cls, container) {
     Canvas.prototype.clearCache = function() {
         var cache = this._textCache;
         for (var layerKey in cache) {
-            if (hasOwnProperty.call(cache, layerKey)) {
+            if (Object.prototype.hasOwnProperty.call(cache, layerKey)) {
                 var layer = this.getSVGLayer(layerKey);
                 while (layer.firstChild) {
                     layer.removeChild(layer.firstChild);

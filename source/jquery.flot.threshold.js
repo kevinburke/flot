@@ -76,7 +76,7 @@ import { extend } from './helpers.js';
                 if (y < below) p = threspoints;
                 else p = newpoints;
 
-                if (addCrossingPoints && prevp !== p &&
+                if (addCrossingPoints && prevp !== undefined && prevp !== p &&
                     x !== null && i > 0 &&
                     origpoints[i - ps] != null) {
                     var interx = x + (below - y) * (x - origpoints[i - ps]) / (y - origpoints[i - ps + 1]);

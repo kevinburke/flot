@@ -180,7 +180,7 @@ import { browser } from './jquery.flot.browser.js';
 
         // Encode the string as UTF-8 and convert it to a binary string. The UTF-8 encoding is required to
         // capture unicode characters correctly.
-        utf8BinaryString = buildBinaryString(new (TextEncoder || TextEncoderLite)('utf-8').encode(source));
+        utf8BinaryString = buildBinaryString(new (TextEncoder || TextEncoderLite)().encode(source));
 
         data = "data:image/svg+xml;base64," + btoa(utf8BinaryString);
         img.src = data;

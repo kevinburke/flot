@@ -20,7 +20,9 @@ export var browser = {
     },
 
     isSafari: function() {
-        return /constructor/i.test(window.top.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window.top['safari'] || (typeof window.top.safari !== 'undefined' && window.top.safari.pushNotification));
+        var top = window.top;
+        if (!top) return false;
+        return /constructor/i.test(top.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!top['safari'] || (typeof top.safari !== 'undefined' && top.safari.pushNotification));
     },
 
     isMobileSafari: function() {
@@ -28,7 +30,7 @@ export var browser = {
     },
 
     isOpera: function() {
-        return (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        return (!!window.opr && !!window.opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
     },
 
     isFirefox: function() {

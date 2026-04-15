@@ -141,7 +141,7 @@ import { extend, bind, unbind, trigger, width, height } from './helpers.js';
         plot.hooks.processDatapoints.push(function(plot, series, data, datapoints) {
             var options = plot.getOptions();
             if (options.series.pie.show) {
-                processDatapoints(plot, series, data, datapoints);
+                processDatapoints(plot, series, datapoints);
             }
         });
 
