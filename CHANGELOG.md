@@ -9,6 +9,13 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ### Fixed
 
+- `jquery.flot.js`: guard `getColorOrGradient` against non-finite
+  coordinates. `ctx.createLinearGradient(0, top, 0, bottom)` throws
+  `Uncaught TypeError: Argument 4 is not finite floating-point value`
+  when `top` or `bottom` is `NaN` or `±Infinity`, which can happen
+  when the plot container has zero size or when bogus axis bounds
+  flow in. Fall back to `defaultColor` in that case. Fixes upstream
+  [flot/flot#1867](https://github.com/flot/flot/issues/1867).
 - `jquery.flot.js`: enforce `mouseActiveRadius` in `findNearbyPoint`
   even when the pre-filter is disabled. Previously, seeding
   `smallestDistance` with `+Infinity` meant the hover radius was only

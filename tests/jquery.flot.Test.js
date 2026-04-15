@@ -1343,6 +1343,69 @@ describe('flot', function() {
         });
     });
 
+    // Regression test for upstream flot/flot#1867. getColorOrGradient used
+    // to call ctx.createLinearGradient(0, top, 0, bottom) without
+    // validating the coordinates. A zero-sized container or corrupted
+    // axis could leave top/bottom as NaN or ±Infinity, and Chrome
+    // throws "Argument 4 is not finite floating-point value" from the
+    // gradient constructor. The fix falls back to defaultColor when
+    // any coordinate is non-finite.
+    describe('gradient fill with non-finite coordinates (upstream #1867)', function() {
+        var gradientPlaceholder;
+
+        beforeEach(function () {
+            var fixture = setFixtures('<div id="demo-gradient" style="width: 600px;height: 400px">')
+                .find('#demo-gradient').get(0);
+            gradientPlaceholder = $('<div id="placeholder-gradient" style="width: 100%;height: 100%">');
+            gradientPlaceholder.appendTo(fixture);
+        });
+
+        it('does not throw when drawing a bar series whose y-axis range is infinite', function() {
+            var plot = $.plot(gradientPlaceholder, [{
+                data: [[0, 1], [1, 2], [2, 3]],
+                bars: {
+                    show: true,
+                    fillColor: {
+                        colors: [
+                            { opacity: 0.1 },
+                            { opacity: 1.0 }
+                        ]
+                    }
+                }
+            }], {});
+
+            // Corrupt the y-axis so plotHeight-derived top/bottom values
+            // flow through as non-finite and hit the gradient path.
+            var yaxis = plot.getYAxes()[0];
+            yaxis.max = Infinity;
+            yaxis.scale = Infinity;
+            yaxis.p2c = function() { return Infinity; };
+
+            expect(function() {
+                plot.draw();
+            }).not.toThrow();
+        });
+
+        it('does not throw when the grid background is a gradient and the y-axis is corrupted', function() {
+            var plot = $.plot(gradientPlaceholder, [[[0, 1], [1, 2]]], {
+                grid: {
+                    backgroundColor: {
+                        colors: ['#fff', '#eee']
+                    }
+                }
+            });
+
+            // Force a redraw with a non-finite plotHeight by corrupting
+            // the canvas dimensions the plot caches internally.
+            var yaxis = plot.getYAxes()[0];
+            yaxis.p2c = function() { return NaN; };
+
+            expect(function() {
+                plot.draw();
+            }).not.toThrow();
+        });
+    });
+
     // Regression test for upstream flot/flot#1869 (PR #1870): plotting a
     // series where every point has the same y value and a secondary axis
     // is aligned to it used to throw because axis.delta was 0, giving

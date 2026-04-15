@@ -32,11 +32,17 @@ feasible, and reference the upstream issue/PR number in the commit.
   - Upstream PR: https://github.com/flot/flot/pull/1872
   - Upstream issue: https://github.com/flot/flot/issues/1871
 
-- [ ] **upstream #1867** — `createLinearGradient` throws
-  `Argument 4 is not finite`. No upstream PR. Add `Number.isFinite`
-  guard around the call site(s) in `source/jquery.flot.drawSeries.js`
-  (and wherever else we build gradients) to skip gradient construction
-  when any coordinate is NaN/Infinity.
+- [x] **upstream #1867** — `ctx.createLinearGradient` threw
+  `Argument 4 is not finite floating-point value` when `top` or
+  `bottom` reached `NaN` or `±Infinity`. No upstream PR. Added
+  `isFinite` guard in the single `createLinearGradient` call site
+  (`getColorOrGradient` in `source/jquery.flot.js`) that falls back
+  to `defaultColor`. Global `isFinite` coerces `null → 0`, preserving
+  behavior for the `drawSeriesPoints` path that passes `(null, null)`.
+  Regression tests in `tests/jquery.flot.Test.js` corrupt an axis to
+  force non-finite coordinates and assert `plot.draw()` does not
+  throw, both for a bar series with gradient fill and for the grid
+  background.
   - Upstream issue: https://github.com/flot/flot/issues/1867
 
 ## Tier 2 — port if Tier 1 lands cleanly

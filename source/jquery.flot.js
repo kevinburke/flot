@@ -2785,7 +2785,16 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             } else {
                 // assume this is a gradient spec; IE currently only
                 // supports a simple vertical gradient properly, so that's
-                // what we support too
+                // what we support too.
+                // createLinearGradient throws if any coordinate is NaN or
+                // ±Infinity (e.g. when the plot container has zero size
+                // or the user supplies bogus bounds) — fall back to the
+                // default solid color instead. Global isFinite coerces
+                // null → 0 (finite), matching the drawSeriesPoints path
+                // that passes (null, null). Upstream flot/flot#1867.
+                if (!isFinite(top) || !isFinite(bottom)) {
+                    return defaultColor;
+                }
                 var gradient = ctx.createLinearGradient(0, top, 0, bottom);
 
                 for (var i = 0, l = spec.colors.length; i < l; ++i) {
