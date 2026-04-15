@@ -192,6 +192,55 @@ test.describe("flot hover plugin", () => {
 		expect(containsHighlight).toBe(true);
 	});
 
+	// Regression for upstream flot/flot#1871 (PR #1872). When an axis has
+	// transform/inverseTransform set, findNearbyPoint skips the maxx/maxy
+	// coordinate-space pre-filter. With smallestDistance seeded at
+	// +Infinity, no check enforced mouseActiveRadius, so hovering anywhere
+	// in the plot could highlight a point arbitrarily far away. The fix
+	// seeds smallestDistance at maxDistance (squared, for the default
+	// metric) so points outside the radius are rejected.
+	test("should not highlight a point further than mouseActiveRadius when an axis uses inverseTransform", async ({
+		page,
+	}) => {
+		await page.clock.install({ time: new Date("2026-04-12T00:00:00.000Z") });
+		await page.evaluate(() => {
+			const win = window as any;
+			const $ = win.jQuery;
+			const options = win.__hoverPortHelpers.createMouseHoverOptions();
+			options.grid.mouseActiveRadius = 10;
+			options.xaxis = {
+				transform: (v: number) => v,
+				inverseTransform: (v: number) => v,
+			};
+			options.yaxis = {
+				transform: (v: number) => v,
+				inverseTransform: (v: number) => v,
+			};
+
+			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const eventHolder = plot.getEventHolder();
+			const offset = plot.getPlotOffset();
+			const axisx = plot.getXAxes()[0];
+			const axisy = plot.getYAxes()[0];
+			const epsilon = options.grid.mouseActiveRadius + 1;
+
+			win.__hoverPortState = { canvas: eventHolder };
+			win.simulate.mouseMove(
+				eventHolder,
+				axisx.p2c(2) + offset.left + epsilon,
+				axisy.p2c(3) + offset.top,
+				0,
+			);
+		});
+
+		await page.clock.runFor(100);
+		const containsHighlight = await page.evaluate((highlightColor) => {
+			const win = window as any;
+			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+		}, HIGHLIGHT_RGBA);
+		expect(containsHighlight).toBe(false);
+	});
+
 	test("should not highlight the point when hovered and the grid is not hoverable", async ({
 		page,
 	}) => {

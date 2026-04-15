@@ -2579,7 +2579,13 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 maxy = maxDistance / series.yaxis.scale,
                 points = series.datapoints.points,
                 ps = series.datapoints.pointsize,
-                smallestDistance = Number.POSITIVE_INFINITY;
+                // Seed with maxDistance (or its square, matching the
+                // default squared-distance metric) so points outside
+                // the hover radius are never selected. Without this,
+                // the maxx/maxy coordinate-space pre-filter is the
+                // only radius check, and it's disabled for axes with
+                // inverseTransform — see upstream flot/flot#1871.
+                smallestDistance = computeDistance ? maxDistance : maxDistance * maxDistance;
 
             // with inverse transforms, we can't use the maxx/maxy
             // optimization, sadly

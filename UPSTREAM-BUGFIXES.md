@@ -20,14 +20,15 @@ feasible, and reference the upstream issue/PR number in the commit.
   - Upstream PR: https://github.com/flot/flot/pull/1870
   - Upstream issue: https://github.com/flot/flot/issues/1869
 
-- [ ] **upstream #1871 / PR #1872** — Hover highlights points outside
+- [x] **upstream #1871 / PR #1872** — Hover highlights points outside
   `mouseActiveRadius` when an axis has `transform`/`inverseTransform`.
   Root cause: `smallestDistance` was seeded with `+Infinity`, so when
   the `maxx`/`maxy` coordinate-space pre-filter is skipped (which it
   is for transformed axes) nothing ever enforces the radius. Seed with
-  `maxDistance` (or `maxDistance ** 2` in the squared-distance branch)
-  so the radius is always an upper bound. Fix plus a regression test
-  that uses identity transform + a hover past the radius.
+  `maxDistance` (or `maxDistance * maxDistance` for the default
+  squared-distance metric). Regression test in
+  `tests/browser/hover.spec.ts` uses identity transform on both axes
+  and hovers past the radius.
   - Upstream PR: https://github.com/flot/flot/pull/1872
   - Upstream issue: https://github.com/flot/flot/issues/1871
 

@@ -9,6 +9,17 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ### Fixed
 
+- `jquery.flot.js`: enforce `mouseActiveRadius` in `findNearbyPoint`
+  even when the pre-filter is disabled. Previously, seeding
+  `smallestDistance` with `+Infinity` meant the hover radius was only
+  enforced via the `maxx`/`maxy` coordinate-space pre-filter, which
+  is explicitly skipped for axes with `transform` /
+  `inverseTransform`. As a result, hovering anywhere in the plot
+  could highlight an arbitrarily distant point. Seed with
+  `maxDistance` (or its square, matching the default squared-distance
+  metric) so the radius is always an upper bound. Ports
+  [flot/flot#1872](https://github.com/flot/flot/pull/1872) for
+  [flot/flot#1871](https://github.com/flot/flot/issues/1871).
 - `jquery.flot.js`: skip the `extraDec` branch in `setupTickGeneration`
   when `axis.delta` is zero. Previously, a second `setupGrid()` call
   (for example from the resize plugin) on an axis with `min === max`
