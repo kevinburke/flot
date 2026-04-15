@@ -93,19 +93,51 @@ reproduces against current `source/`.
 
 Competing patches or reports without PRs; need judgment.
 
-- [ ] **upstream #1789 / PR #1790 / PR #1793** — pan gets locked at
-  `panRange[0]` for y-axis. #1793 is a minimal 4-line swap for y-axis.
-  #1790 is more thorough (handles inverted axes) and ships with tests,
-  but is 190 lines. Evaluate whether #1790 supersedes #1793 cleanly;
-  if so port #1790. If not, port #1793 as the minimal fix.
+- [x] **upstream #1789 / PR #1790 / PR #1793** — pan gets locked at
+  `panRange[0]` for y-axis. Ported the minimal form of PR #1793 into
+  both `plot.pan` and `plot.smartPan`: when `axis.direction === 'y'`,
+  swap `minD` and `maxD` before clamping, because screen y
+  coordinates run opposite to data y. Regression test plots a data
+  range of `[0, 10]` with `panRange: [-50, 50]`, pans 20px, and
+  asserts the axis shifts by a small amount rather than snapping to
+  the panRange edge. PR #1790 bundled additional inverted-axis
+  handling (~190 lines) that isn't tied to any reported bug in this
+  fork; not ported.
+  - https://github.com/flot/flot/pull/1793
 
-- [ ] **upstream #1838** — legend `Cannot set properties of undefined`
-  when the container element isn't in the DOM yet. Reporter proposes
-  writing `legendEl.style` instead of `options.legend.container.style`.
-  Verify this doesn't regress the external-container use case.
+- [partial] **upstream #1838** — legend `Cannot set properties of
+  undefined`. The common case (jQuery-wrapped container) is covered
+  by the tier-2 unwrap in `insertLegend`. The reporter's remaining
+  case is a jQuery wrapper of an element not yet in the DOM, where
+  `.get(0)` still returns `undefined`; arguably user error and no
+  regression test available.
+  - https://github.com/flot/flot/issues/1838
 
-- [ ] **upstream #1773** — `Cannot read property 'floorInBase'` crash.
-  Needs a repro; log-axis territory.
+- [skip] **upstream #1773** — `Cannot read property 'floorInBase'`
+  crash. Reporter's own follow-up traces the issue to script-load
+  order and a corrupted data file on a very old (Ubuntu 14.04)
+  environment. Not a library bug.
+  - https://github.com/flot/flot/issues/1773
+
+## Coverage gap
+
+The initial triage used `gh issue list --limit 200`, which caps at 200
+items. Upstream has 459 open issues and 172 open PRs as of
+2026-04-15. The 259 missed issues are almost entirely pre-2015
+archive items (IE6/7 bugs, 2012–2014 feature requests, old
+environment issues). A keyword scan for bug terms surfaced a handful
+worth re-examining if another patch pass happens:
+
+- [flot/flot#710](https://github.com/flot/flot/issues/710) — plot
+  throws when all data points share a y-value. Related to but
+  possibly distinct from the #1869 fix already ported.
+- [flot/flot#833](https://github.com/flot/flot/issues/833) —
+  non-time axis tick generation broken on plot reuse.
+- [flot/flot#977](https://github.com/flot/flot/issues/977) —
+  `toFixed(axis.tickDecimals)` error with custom ticks.
+
+Full slim summaries are checked out locally in
+`/tmp/flot-triage/issues-all.json` / `prs-all.json`.
 
 ## Explicitly skipped
 

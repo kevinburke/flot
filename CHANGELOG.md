@@ -9,6 +9,18 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ### Fixed
 
+- `jquery.flot.navigate.js`: panning on the y-axis with
+  `panRange` set no longer clamps the axis origin to
+  `panRange[0]`. Screen y coordinates run opposite to data y, so
+  the `minD` / `maxD` clamp bounds in `plot.pan` and `plot.smartPan`
+  needed to be swapped for y-axes. Fixes upstream
+  [flot/flot#1789](https://github.com/flot/flot/issues/1789);
+  ports the minimal form of
+  [flot/flot#1793](https://github.com/flot/flot/pull/1793). The
+  alternative upstream
+  [PR #1790](https://github.com/flot/flot/pull/1790) bundled
+  additional inverted-axis handling (~190 lines) that was not
+  separately reported as a bug here, so it is not ported.
 - `jquery.flot.pie.js`: `drawDonutHole` and `triggerClickHoverEvent`
   now read `options` via `plot.getOptions()` instead of relying on
   the closure-scoped value, which is `null` until the
@@ -51,6 +63,21 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   direction rather than only the series' assigned axis, which is a
   substantive behavior change with no regression test and an
   unclear correctness rationale.
+- [flot/flot#1790](https://github.com/flot/flot/pull/1790)
+  (panRange handling across inverted axes) — partially covered by
+  the minimal PR #1793 fix above. The additional inverted-axis
+  handling isn't tied to a reported bug in this fork's issue
+  tracker; revisit if one shows up.
+- [flot/flot#1838](https://github.com/flot/flot/issues/1838)
+  (legend `Cannot set properties of undefined`) — mostly covered
+  by the jQuery-unwrap above. The reporter's remaining case
+  (jQuery wrapper of an element not yet in the DOM) is arguably
+  user error; no regression test available.
+- [flot/flot#1773](https://github.com/flot/flot/issues/1773)
+  (`Cannot read property 'floorInBase'`) — declined. Reporter's
+  own follow-up traces the issue to script-load order and a
+  corrupted data file on a very old environment; not a library
+  bug.
 - `jquery.flot.js`: guard `getColorOrGradient` against non-finite
   coordinates. `ctx.createLinearGradient(0, top, 0, bottom)` throws
   `Uncaught TypeError: Argument 4 is not finite floating-point value`

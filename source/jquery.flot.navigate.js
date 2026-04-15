@@ -555,6 +555,17 @@ import { bind, unbind, trigger, css } from './helpers.js';
                 var minD = axis.p2c(opts.panRange[0]) - axis.p2c(axis.min);
                 // calc max delta (revealing right edge of plot)
                 var maxD = axis.p2c(opts.panRange[1]) - axis.p2c(axis.max);
+                // For the y-axis, screen coordinates are inverted
+                // (p2c(smaller v) > p2c(larger v)), so minD/maxD end up
+                // with the opposite signs from the x-axis case. Swap
+                // them so the clamp comparisons below keep their
+                // x-axis semantics. Upstream flot/flot#1789, ports the
+                // minimal form of PR #1793.
+                if (axis.direction === 'y') {
+                    var swap = minD;
+                    minD = maxD;
+                    maxD = swap;
+                }
                 // limit delta to min or max if enabled
                 if (opts.panRange[0] !== undefined && d >= maxD) d = maxD;
                 if (opts.panRange[1] !== undefined && d <= minD) d = minD;
@@ -719,6 +730,13 @@ import { bind, unbind, trigger, css } from './helpers.js';
                 var minD = p + axis.p2c(opts.panRange[0]) - axis.p2c(axisMin);
                 // calc max delta (revealing right edge of plot)
                 var maxD = p + axis.p2c(opts.panRange[1]) - axis.p2c(axisMax);
+                // Same y-axis swap as plot.pan — see comment there.
+                // Upstream flot/flot#1789 / PR #1793.
+                if (axis.direction === 'y') {
+                    var swap = minD;
+                    minD = maxD;
+                    maxD = swap;
+                }
                 // limit delta to min or max if enabled
                 if (opts.panRange[0] !== undefined && d >= maxD) d = maxD;
                 if (opts.panRange[1] !== undefined && d <= minD) d = minD;

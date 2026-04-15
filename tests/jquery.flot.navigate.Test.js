@@ -690,6 +690,41 @@ describe("flot navigate plugin", function () {
         })
     });
 
+    describe('pan with panRange on the y-axis (upstream #1789)', function() {
+        it('pans within panRange without locking the y origin to panRange[0]', function() {
+            // Reporter's example: pan the y-axis with panRange set.
+            // Before PR #1793, minD / maxD swapped roles for y because
+            // screen y coordinates run opposite to data y, and the
+            // code assumed x-axis semantics. The observed symptom was
+            // that yaxis.min got pinned to panRange[0] on any pan.
+            plot = $.plot(placeholder, [[[0, 0], [10, 10]]], {
+                xaxes: [{ autoScale: 'exact' }],
+                yaxes: [{ autoScale: 'exact', panRange: [-50, 50] }],
+                zoom: { interactive: false },
+                pan: { interactive: true, active: true, frameRate: -1 }
+            });
+
+            var yaxis = plot.getYAxes()[0];
+            expect(yaxis.min).toBe(0);
+            expect(yaxis.max).toBe(10);
+
+            // Pan by a small screen delta (20px) that corresponds to a
+            // data shift well inside panRange. With the bug, minD and
+            // maxD are on the wrong sides for the y-axis and d gets
+            // clamped to a huge value, snapping the axis far out. With
+            // the fix, the pan converts cleanly to the equivalent
+            // data-space delta.
+            plot.pan({ left: 0, top: 20 });
+
+            // 20px over a ~360px plot with data range [0, 10] is
+            // roughly a 0.5-unit shift. Allow some wiggle for plot
+            // margins, but reject any large-magnitude snap.
+            expect(Math.abs(yaxis.min)).toBeLessThan(5);
+            expect(Math.abs(yaxis.max - 10)).toBeLessThan(5);
+            expect(yaxis.min).not.toBe(0);
+        });
+    });
+
     describe('mousePan', function() {
         it ('pans on xaxis only', function () {
             plot = $.plot(placeholder, [
