@@ -1660,8 +1660,11 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                     };
 
                     // we might need an extra decimal since forced
-                    // ticks don't necessarily fit naturally
-                    if (!axis.mode && opts.tickDecimals == null) {
+                    // ticks don't necessarily fit naturally.
+                    // Guard against axis.delta <= 0 (min == max): Math.log(0)
+                    // is -Infinity, so extraDec would be +Infinity and
+                    // toFixed(Infinity) throws. Upstream #1869 / PR #1870.
+                    if (!axis.mode && opts.tickDecimals == null && axis.delta > 0) {
                         var extraDec = Math.max(0, -Math.floor(Math.log(axis.delta) / Math.LN10) + 1),
                             ts = axis.tickGenerator(axis, plot);
 

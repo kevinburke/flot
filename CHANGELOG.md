@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
 For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
 
+## Unreleased
+
+### Fixed
+
+- `jquery.flot.js`: skip the `extraDec` branch in `setupTickGeneration`
+  when `axis.delta` is zero. Previously, a second `setupGrid()` call
+  (for example from the resize plugin) on an axis with `min === max`
+  and another axis using `alignTicksWithAxis` produced
+  `extraDec = +Infinity`, left `axis.tickDecimals` as `Infinity`, and
+  could throw `RangeError: toFixed() digits argument must be between
+  0 and 100` during tick formatting. Ports
+  [flot/flot#1870](https://github.com/flot/flot/pull/1870) for
+  [flot/flot#1869](https://github.com/flot/flot/issues/1869).
+
 ## [5.1.0] - 2026-04-14
 
 ### Added

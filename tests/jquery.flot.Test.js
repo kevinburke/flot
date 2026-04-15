@@ -1342,4 +1342,48 @@ describe('flot', function() {
             expect(plot2.height()).toBe(plot1.height() - 20 - 20);
         });
     });
+
+    // Regression test for upstream flot/flot#1869 (PR #1870): plotting a
+    // series where every point has the same y value and a secondary axis
+    // is aligned to it used to throw because axis.delta was 0, giving
+    // extraDec = +Infinity and .toFixed(Infinity) in setupTickGeneration.
+    describe('setupTickGeneration with zero delta (upstream #1869)', function() {
+        var zeroDeltaPlaceholder;
+
+        beforeEach(function () {
+            var fixture = setFixtures('<div id="demo-container-zero-delta" style="width: 600px;height: 400px">')
+                .find('#demo-container-zero-delta').get(0);
+            zeroDeltaPlaceholder = $('<div id="placeholder-zero-delta" style="width: 100%;height: 100%">');
+            zeroDeltaPlaceholder.appendTo(fixture);
+        });
+
+        it('does not throw when setupGrid runs without widening and delta is 0', function() {
+            // Regression for upstream flot/flot#1869 (PR #1870). The first
+            // $.plot() call uses setupGrid(true) which widens min==max to
+            // avoid a zero-width axis. Subsequent setupGrid() calls (e.g.
+            // from the resize plugin) pass autoScale=false, so min/max
+            // come straight from options and the degenerate widen step
+            // is skipped. With alignTicksWithAxis in play on the other
+            // axis, setupTickGeneration then hits the extraDec branch
+            // with axis.delta === 0, and the old code did
+            // .toFixed(+Infinity), throwing.
+            var plot = $.plot(zeroDeltaPlaceholder, [
+                { data: [[0, 5], [1, 5]], yaxis: 1 },
+                { data: [[0, 7], [1, 7]], yaxis: 2 }
+            ], {
+                yaxes: [
+                    { autoScale: 'none', min: 5, max: 5 },
+                    { autoScale: 'none', min: 7, max: 7, alignTicksWithAxis: 1, position: 'right' }
+                ],
+                series: { lines: { show: true } }
+            });
+            // The fix skips the extraDec branch when axis.delta is 0.
+            // Without the fix, y2.tickDecimals ends up as +Infinity, and
+            // subsequent tick formatting would call toFixed(Infinity)
+            // (throwing) or emit meaningless labels.
+            plot.setupGrid();
+            var y2 = plot.getYAxes()[1];
+            expect(Number.isFinite(y2.tickDecimals)).toBe(true);
+        });
+    });
 });
