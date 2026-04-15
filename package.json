@@ -1,6 +1,6 @@
 {
 	"name": "@kevinburke/flot",
-	"version": "5.0.0",
+	"version": "5.1.0",
 	"description": "JavaScript plotting library for engineering and scientific applications.",
 	"type": "module",
 	"main": "./dist/flot.js",

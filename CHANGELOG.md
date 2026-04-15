@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
 For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
 
+## [5.1.0] - 2026-04-14
+
+### Added
+
+- **TypeScript type definitions.** Hand-written `.d.ts` files now ship
+  with the package. `import { plot, type PlotOptions } from '@kevinburke/flot'`
+  gives full autocomplete and type-checking. The jQuery adapter types
+  augment `JQueryStatic` so `$.plot()` is also typed.
+- Package validation via `publint` in CI.
+- Source code type-checking via TypeScript `checkJs` mode with a
+  ratchet (`.tsc-baseline`) that enforces the error count doesn't
+  grow.
+
+### Fixed
+
+- `jquery.canvaswrapper.js`: replace bare `hasOwnProperty.call(...)`
+  with `Object.prototype.hasOwnProperty.call(...)`. The bare form
+  would `ReferenceError` in strict mode — a latent bug in the SVG
+  text rendering path.
+- `jquery.flot.composeImages.js`: drop the ignored `"utf-8"` argument
+  from `new TextEncoder()`.
+- `jquery.flot.browser.js`: cache `window.top` and null-check it
+  before accessing browser-detection properties.
+- `jquery.flot.js`: add null guard after the `options.grid.markings`
+  callback in case the user returns `null`/`undefined`.
+- Remove dead arguments from a few internal function calls.
+
+### Internal
+
+- Added GitHub Actions Dependabot configuration.
+- Added `RELEASING.md` documenting the release process.
+- Removed `TEST-PORTING.md` (test migration plan completed with v5.0.0).
+- Suppressed benign Rollup missing-global warnings on standalone
+  plugin builds.
+
 ## [5.0.0] - 2026-04-14
 
 First stable release of the @kevinburke/flot fork. The plotting API is
