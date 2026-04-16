@@ -165,7 +165,7 @@ import { browser } from './jquery.flot.browser.js';
             const utf8Array = new Uint8Array(arrayBuffer);
             const blockSize = 16384;
             for (var i = 0; i < utf8Array.length; i = i + blockSize) {
-                const binarySubString = String.fromCharCode.apply(null, utf8Array.subarray(i, i + blockSize));
+                const binarySubString = String.fromCharCode.apply(null, /** @type {any} */ (utf8Array.subarray(i, i + blockSize)));
                 binaryString = binaryString + binarySubString;
             }
             return binaryString;

@@ -790,7 +790,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
                 ctx.lineJoin = "round";
                 var startx = Math.round(panHint.start.x),
                     starty = Math.round(panHint.start.y),
-                    endx, endy;
+                    endx = 0, endy = 0;
 
                 if (panAxes) {
                     if (panAxes[0].direction === 'x') {

@@ -203,6 +203,7 @@ import { bind, trigger, unbind } from './helpers.js';
         }
 
         function triggerSelectedEvent() {
+            /** @type {any} */
             var r = getSelection();
 
             trigger(plot.getPlaceholder(), "plotselected", [ r ]);
@@ -285,7 +286,7 @@ import { bind, trigger, unbind } from './helpers.js';
 
         // function taken from markings support in Flot
         function extractRange(ranges, coord) {
-            var axis, from, to, key, axes = plot.getAxes();
+            var axis, from, to, /** @type {string|undefined} */ key, axes = plot.getAxes();
 
             for (var k in axes) {
                 axis = axes[k];
@@ -305,7 +306,7 @@ import { bind, trigger, unbind } from './helpers.js';
             }
 
             // backwards-compat stuff - to be removed in future
-            if (!ranges[key]) {
+            if (key && !ranges[key]) {
                 axis = coord === "x" ? plot.getXAxes()[0] : plot.getYAxes()[0];
                 from = ranges[coord + "1"];
                 to = ranges[coord + "2"];

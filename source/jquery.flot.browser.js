@@ -22,7 +22,7 @@ export var browser = {
     isSafari: function() {
         var top = window.top;
         if (!top) return false;
-        return /constructor/i.test(top.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!top['safari'] || (typeof top.safari !== 'undefined' && top.safari.pushNotification));
+        return /constructor/i.test(/** @type {any} */ (top.HTMLElement)) || (function (/** @type {any} */ p) { return p.toString() === "[object SafariRemoteNotification]"; })(!(/** @type {any} */ (top))['safari'] || (typeof (/** @type {any} */ (top)).safari !== 'undefined' && (/** @type {any} */ (top)).safari.pushNotification));
     },
 
     isMobileSafari: function() {

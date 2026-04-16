@@ -54,7 +54,7 @@ import { plugins } from './jquery.flot.js';
 
         var left = 0;
         var columnWidths = [];
-        var style = window.getComputedStyle(document.querySelector('body'));
+        var style = window.getComputedStyle(document.body);
         for (i = 0; i < entries.length; ++i) {
             let columnIndex = i % options.legend.noColumns;
             entry = entries[i];

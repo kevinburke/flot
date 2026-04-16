@@ -80,10 +80,10 @@ import { bind, unbind, trigger } from './helpers.js';
                 newEvent = new CustomEvent('mouseevent');
 
             //transform from touch event to mouse event format
-            newEvent.pageX = e.detail.changedTouches[0].pageX;
-            newEvent.pageY = e.detail.changedTouches[0].pageY;
-            newEvent.clientX = e.detail.changedTouches[0].clientX;
-            newEvent.clientY = e.detail.changedTouches[0].clientY;
+            /** @type {any} */ (newEvent).pageX = e.detail.changedTouches[0].pageX;
+            /** @type {any} */ (newEvent).pageY = e.detail.changedTouches[0].pageY;
+            /** @type {any} */ (newEvent).clientX = e.detail.changedTouches[0].clientX;
+            /** @type {any} */ (newEvent).clientY = e.detail.changedTouches[0].clientY;
 
             if (o.grid.hoverable) {
                 doTriggerClickHoverEvent(newEvent, eventType.hover, 30);

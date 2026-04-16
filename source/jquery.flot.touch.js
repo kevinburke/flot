@@ -14,6 +14,7 @@ import { plugins } from './jquery.flot.js';
     }
 
     function initTouchNavigation(plot, options) {
+        /** @type {{ twoTouches: boolean, currentTapStart: {x: number, y: number}, currentTapEnd: {x: number, y: number}, prevTap: {x: number, y: number}, currentTap: {x: number, y: number}, interceptedLongTap: boolean, isUnsupportedGesture: boolean, prevTapTime: number | null, tapStartTime: number | null, longTapTriggerId: ReturnType<typeof setTimeout> | null }} */
         var gestureState = {
                 twoTouches: false,
                 currentTapStart: { x: 0, y: 0 },
@@ -167,6 +168,7 @@ import { plugins } from './jquery.flot.js';
             },
 
             isLongTap: function(e) {
+                if (gestureState.tapStartTime == null) return false;
                 var currentTime = new Date().getTime(),
                     tapDuration = currentTime - gestureState.tapStartTime;
                 if (tapDuration >= minLongTapDuration && !gestureState.interceptedLongTap) {
@@ -207,6 +209,7 @@ import { plugins } from './jquery.flot.js';
             },
 
             isTap: function(e) {
+                if (gestureState.tapStartTime == null) return false;
                 var currentTime = new Date().getTime(),
                     tapDuration = currentTime - gestureState.tapStartTime;
                 if (tapDuration <= pressedTapDuration) {
@@ -259,7 +262,9 @@ import { plugins } from './jquery.flot.js';
 
         function isDoubleTap(e) {
             var currentTime = new Date().getTime(),
-                intervalBetweenTaps = currentTime - gestureState.prevTapTime;
+                intervalBetweenTaps = gestureState.prevTapTime != null
+                    ? currentTime - gestureState.prevTapTime
+                    : Infinity;
 
             if (intervalBetweenTaps >= 0 && intervalBetweenTaps < maxIntervalBetweenTaps) {
                 if (distance(gestureState.prevTap.x, gestureState.prevTap.y, gestureState.currentTap.x, gestureState.currentTap.y) < maxDistanceBetweenTaps) {

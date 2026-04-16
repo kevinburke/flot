@@ -221,7 +221,9 @@ var Canvas = function(cls, container) {
             layer.style.left = '0px';
             layer.style.bottom = '0px';
             layer.style.right = '0px';
-            svgElement.appendChild(layer);
+            if (svgElement) {
+                svgElement.appendChild(layer);
+            }
             this.SVG[classes] = layer;
         }
 
@@ -315,8 +317,8 @@ var Canvas = function(cls, container) {
 
             element.style.position = 'absolute';
             element.style.maxWidth = width;
-            element.setAttributeNS(null, 'x', -9999);
-            element.setAttributeNS(null, 'y', -9999);
+            element.setAttributeNS(null, 'x', String(-9999));
+            element.setAttributeNS(null, 'y', String(-9999));
 
             if (typeof font === 'object') {
                 element.style.font = textStyle;
@@ -340,7 +342,9 @@ var Canvas = function(cls, container) {
             while (element.firstChild) {
                 element.removeChild(element.firstChild);
             }
-            element.parentNode.removeChild(element);
+            if (element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
         }
 
         info.measured = true;

@@ -24,6 +24,7 @@ import { trigger } from './helpers.js';
     }
 
     function initTouchNavigation(plot, options) {
+        /** @type {{ zoomEnable: boolean, prevDistance: number | null, prevTapTime: number, prevPanPosition: {x: number, y: number}, prevTapPosition: {x: number, y: number} }} */
         var gestureState = {
                 zoomEnable: false,
                 prevDistance: null,
@@ -31,6 +32,7 @@ import { trigger } from './helpers.js';
                 prevPanPosition: { x: 0, y: 0 },
                 prevTapPosition: { x: 0, y: 0 }
             },
+            /** @type {{ prevTouchedAxis: string, currentTouchedAxis: string, touchedAxis: any, navigationConstraint: string, initialState: any }} */
             navigationState = {
                 prevTouchedAxis: 'none',
                 currentTouchedAxis: 'none',
@@ -87,7 +89,7 @@ import { trigger } from './helpers.js';
             drag: function(e) {
                 presetNavigationState(e, 'pan', gestureState);
 
-                if (useSmartPan) {
+                if (useSmartPan && navigationState.initialState) {
                     var point = getPoint(e, 'pan');
                     plot.smartPan({
                         x: navigationState.initialState.startPageX - point.x,
@@ -111,7 +113,7 @@ import { trigger } from './helpers.js';
                 }
 
                 if (wasPinchEvent(e, gestureState)) {
-                    updateprevPanPosition(e, 'pan', gestureState, navigationState);
+                    updatePrevPanPosition(e, 'pan', gestureState, navigationState);
                 }
             }
         };
@@ -143,7 +145,7 @@ import { trigger } from './helpers.js';
 
                     var dist = pinchDistance(e);
 
-                    if (gestureState.zoomEnable || Math.abs(dist - gestureState.prevDistance) > ZOOM_DISTANCE_MARGIN) {
+                    if (gestureState.zoomEnable || (gestureState.prevDistance != null && Math.abs(dist - gestureState.prevDistance) > ZOOM_DISTANCE_MARGIN)) {
                         zoomPlot(plot, e, gestureState, navigationState);
 
                         //activate zoom mode

@@ -329,9 +329,9 @@ import { saturated } from './jquery.flot.saturated.js';
         }
 
         for (var i = 0; i < spec.length - 1; ++i) {
-            if (axis.delta < (spec[i][0] * timeUnitSize[spec[i][1]] +
-                spec[i + 1][0] * timeUnitSize[spec[i + 1][1]]) / 2 &&
-                spec[i][0] * timeUnitSize[spec[i][1]] >= minSize) {
+            if (axis.delta < (Number(spec[i][0]) * timeUnitSize[spec[i][1]] +
+                Number(spec[i + 1][0]) * timeUnitSize[spec[i + 1][1]]) / 2 &&
+                Number(spec[i][0]) * timeUnitSize[spec[i][1]] >= minSize) {
                 break;
             }
         }
