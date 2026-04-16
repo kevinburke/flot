@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
 For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
 
-## Unreleased
+## [5.1.1] - 2026-04-15
 
 ### Fixed
 
-All fixes in this release are ports or re-implementations of
+All bug fixes in this release are ports or re-implementations of
 existing upstream work. Thanks to the reporters and submitters
 credited below.
 
@@ -81,37 +81,16 @@ credited below.
   [flot/flot#1444](https://github.com/flot/flot/pull/1444)
   (@andig).
 
-### Not ported (already fixed or declined)
+### Changed
 
-- [flot/flot#1744](https://github.com/flot/flot/pull/1744)
-  (time-tick milliseconds reset) — already in our source via
-  upstream commit `0429a1e6` (2022-08-01).
-- [flot/flot#1672](https://github.com/flot/flot/pull/1672)
-  (`drawSeries` trailing-step interpolation) — superseded by
-  upstream
-  [PR #1830](https://github.com/flot/flot/pull/1830), which is
-  already in our source.
-- [flot/flot#1528](https://github.com/flot/flot/pull/1528)
-  (label-gap in multi-axis plots) — declined. The PR changes
-  per-series range-update semantics to update every axis in the
-  direction rather than only the series' assigned axis, which is a
-  substantive behavior change with no regression test and an
-  unclear correctness rationale.
-- [flot/flot#1790](https://github.com/flot/flot/pull/1790)
-  (panRange handling across inverted axes) — partially covered by
-  the minimal PR #1793 fix above. The additional inverted-axis
-  handling isn't tied to a reported bug in this fork's issue
-  tracker; revisit if one shows up.
-- [flot/flot#1838](https://github.com/flot/flot/issues/1838)
-  (legend `Cannot set properties of undefined`) — mostly covered
-  by the jQuery-unwrap above. The reporter's remaining case
-  (jQuery wrapper of an element not yet in the DOM) is arguably
-  user error; no regression test available.
-- [flot/flot#1773](https://github.com/flot/flot/issues/1773)
-  (`Cannot read property 'floorInBase'`) — declined. Reporter's
-  own follow-up traces the issue to script-load order and a
-  corrupted data file on a very old environment; not a library
-  bug.
+- Dev dependency: jQuery 3.7.1 -> 4.0.0.
+- Dev dependency: Biome 1.9.4 -> 2.4.12 (includes config migration
+  to v2 format).
+- Dev dependency: Vitest 2.1.9 -> 4.1.4.
+- Dev dependency: happy-dom 15.11.7 -> 20.9.0.
+- Dev dependency: size-limit 12.0.1 -> 12.1.0,
+  @size-limit/file 12.0.1 -> 12.1.0.
+- CI: actions/checkout v4 -> v6, actions/setup-node v4 -> v6.
 
 ### Thanks
 
