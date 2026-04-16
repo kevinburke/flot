@@ -9,28 +9,60 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ### Fixed
 
+All fixes in this release are ports or re-implementations of
+existing upstream work. Thanks to the reporters and submitters
+credited below.
+
+- `jquery.flot.js`: skip the `extraDec` branch in `setupTickGeneration`
+  when `axis.delta` is zero. Previously, a second `setupGrid()` call
+  (for example from the resize plugin) on an axis with `min === max`
+  and another axis using `alignTicksWithAxis` produced
+  `extraDec = +Infinity`, left `axis.tickDecimals` as `Infinity`, and
+  could throw `RangeError: toFixed() digits argument must be between
+  0 and 100` during tick formatting. Ports
+  [flot/flot#1870](https://github.com/flot/flot/pull/1870)
+  (@LYarnall) for
+  [flot/flot#1869](https://github.com/flot/flot/issues/1869).
+- `jquery.flot.js`: enforce `mouseActiveRadius` in `findNearbyPoint`
+  even when the pre-filter is disabled. Previously, seeding
+  `smallestDistance` with `+Infinity` meant the hover radius was only
+  enforced via the `maxx`/`maxy` coordinate-space pre-filter, which
+  is explicitly skipped for axes with `transform` /
+  `inverseTransform`. As a result, hovering anywhere in the plot
+  could highlight an arbitrarily distant point. Seed with
+  `maxDistance` (or its square, matching the default squared-distance
+  metric) so the radius is always an upper bound. Ports
+  [flot/flot#1872](https://github.com/flot/flot/pull/1872)
+  (@ErikSievers) for
+  [flot/flot#1871](https://github.com/flot/flot/issues/1871).
+- `jquery.flot.js`: guard `getColorOrGradient` against non-finite
+  coordinates. `ctx.createLinearGradient(0, top, 0, bottom)` throws
+  `Uncaught TypeError: Argument 4 is not finite floating-point value`
+  when `top` or `bottom` is `NaN` or `±Infinity`, which can happen
+  when the plot container has zero size or when bogus axis bounds
+  flow in. Fall back to `defaultColor` in that case. Fixes upstream
+  [flot/flot#1867](https://github.com/flot/flot/issues/1867)
+  (reported by @jzabate).
 - `jquery.flot.navigate.js`: panning on the y-axis with
   `panRange` set no longer clamps the axis origin to
   `panRange[0]`. Screen y coordinates run opposite to data y, so
   the `minD` / `maxD` clamp bounds in `plot.pan` and `plot.smartPan`
   needed to be swapped for y-axes. Fixes upstream
-  [flot/flot#1789](https://github.com/flot/flot/issues/1789);
-  ports the minimal form of
-  [flot/flot#1793](https://github.com/flot/flot/pull/1793). The
-  alternative upstream
-  [PR #1790](https://github.com/flot/flot/pull/1790) bundled
-  additional inverted-axis handling (~190 lines) that was not
-  separately reported as a bug here, so it is not ported.
+  [flot/flot#1789](https://github.com/flot/flot/issues/1789)
+  (reported by @mjmlopes, diagnosed by @ecsv); ports the minimal
+  form of [flot/flot#1793](https://github.com/flot/flot/pull/1793)
+  (@netbymatt).
 - `jquery.flot.pie.js`: `drawDonutHole` and `triggerClickHoverEvent`
   now read `options` via `plot.getOptions()` instead of relying on
   the closure-scoped value, which is `null` until the
   `processDatapoints` hook runs. Ports
   [flot/flot#1559](https://github.com/flot/flot/pull/1559)
-  (duplicate of
+  (@mnofresno; duplicate of
   [flot/flot#1547](https://github.com/flot/flot/pull/1547)).
 - `jquery.flot.legend.js`: accept a jQuery-wrapped legend container,
   not just a DOM element. Matches the intent of
-  [flot/flot#1750](https://github.com/flot/flot/pull/1750) (fixing
+  [flot/flot#1750](https://github.com/flot/flot/pull/1750)
+  (@netbymatt, fixing
   [flot/flot#1698](https://github.com/flot/flot/issues/1698)) but
   inlines the unwrap since this fork is jQuery-optional.
 - `jquery.flot.legend.js`: render a fallback "box" icon for plugin-
@@ -38,14 +70,16 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   `lines.show`, `bars.show`, or `points.show`. Previously these
   legend entries showed the label with no icon. Ports the
   substantive half of
-  [flot/flot#1641](https://github.com/flot/flot/pull/1641) (fixing
+  [flot/flot#1641](https://github.com/flot/flot/pull/1641)
+  (@faizalluthfi, fixing
   [flot/flot#1640](https://github.com/flot/flot/issues/1640)); the
   upstream PR also switched the icon-selection chain to `else if`,
   which would regress series that intentionally overlay (e.g. lines
   with points) — that part is deliberately not ported.
 - `jquery.canvaswrapper.js`: guard against `positions == null` in
   the text-cache iteration in `removeText`. Ports
-  [flot/flot#1444](https://github.com/flot/flot/pull/1444).
+  [flot/flot#1444](https://github.com/flot/flot/pull/1444)
+  (@andig).
 
 ### Not ported (already fixed or declined)
 
@@ -78,33 +112,13 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   own follow-up traces the issue to script-load order and a
   corrupted data file on a very old environment; not a library
   bug.
-- `jquery.flot.js`: guard `getColorOrGradient` against non-finite
-  coordinates. `ctx.createLinearGradient(0, top, 0, bottom)` throws
-  `Uncaught TypeError: Argument 4 is not finite floating-point value`
-  when `top` or `bottom` is `NaN` or `±Infinity`, which can happen
-  when the plot container has zero size or when bogus axis bounds
-  flow in. Fall back to `defaultColor` in that case. Fixes upstream
-  [flot/flot#1867](https://github.com/flot/flot/issues/1867).
-- `jquery.flot.js`: enforce `mouseActiveRadius` in `findNearbyPoint`
-  even when the pre-filter is disabled. Previously, seeding
-  `smallestDistance` with `+Infinity` meant the hover radius was only
-  enforced via the `maxx`/`maxy` coordinate-space pre-filter, which
-  is explicitly skipped for axes with `transform` /
-  `inverseTransform`. As a result, hovering anywhere in the plot
-  could highlight an arbitrarily distant point. Seed with
-  `maxDistance` (or its square, matching the default squared-distance
-  metric) so the radius is always an upper bound. Ports
-  [flot/flot#1872](https://github.com/flot/flot/pull/1872) for
-  [flot/flot#1871](https://github.com/flot/flot/issues/1871).
-- `jquery.flot.js`: skip the `extraDec` branch in `setupTickGeneration`
-  when `axis.delta` is zero. Previously, a second `setupGrid()` call
-  (for example from the resize plugin) on an axis with `min === max`
-  and another axis using `alignTicksWithAxis` produced
-  `extraDec = +Infinity`, left `axis.tickDecimals` as `Infinity`, and
-  could throw `RangeError: toFixed() digits argument must be between
-  0 and 100` during tick formatting. Ports
-  [flot/flot#1870](https://github.com/flot/flot/pull/1870) for
-  [flot/flot#1869](https://github.com/flot/flot/issues/1869).
+
+### Thanks
+
+Thanks to everyone upstream who investigated, reported, and patched
+these bugs — the fixes in this release are direct ports of their
+work: @LYarnall, @ErikSievers, @jzabate, @mjmlopes, @ecsv,
+@netbymatt, @mnofresno, @faizalluthfi, @andig.
 
 ## [5.1.0] - 2026-04-14
 
