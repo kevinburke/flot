@@ -2,10 +2,10 @@
 // sensible types. Run `npx tsc --noEmit types/test.ts` to check.
 
 import {
+	color,
 	type DataSeries,
 	type Plot,
 	type PlotOptions,
-	color,
 	plot,
 	saturated,
 	version,
@@ -44,11 +44,11 @@ const p: Plot = plot(el, data, options);
 // Plot methods
 p.getData();
 p.setData(data);
-const offset = p.getPlotOffset();
-const width: number = p.width();
-const height: number = p.height();
-const axes = p.getAxes();
-const xAxes = p.getXAxes();
+const _offset = p.getPlotOffset();
+const _width: number = p.width();
+const _height: number = p.height();
+const _axes = p.getAxes();
+const _xAxes = p.getXAxes();
 
 // Plugin methods (optional)
 p.highlight?.(0, 0);
@@ -66,7 +66,7 @@ saturated.floorInBase(17, 5);
 saturated.multiplyAdd(1e300, 10, 5);
 
 // Version string
-const v: string = version;
+const _v: string = version;
 
 // String placeholder also works
 plot("#placeholder", data);

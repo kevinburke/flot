@@ -1,29 +1,28 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignore": [
-			"dist/**",
-			"node_modules/**",
-			"examples/**",
-			"docs/**",
-			"lib/**",
-			"source/**",
-			"tests/**",
-			"coverage/**",
-			"*.tgz",
-			"package-lock.json",
-			"flot-*.tgz",
-			"legend.css"
+		"includes": [
+			"**",
+			"!**/dist",
+			"!**/node_modules",
+			"!**/examples",
+			"!**/docs",
+			"!**/lib",
+			"!**/source",
+			"!**/tests",
+			"!**/coverage",
+			"!**/*.tgz",
+			"!**/package-lock.json",
+			"!**/flot-*.tgz",
+			"!**/legend.css"
 		]
 	},
-	"organizeImports": {
-		"enabled": true
-	},
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
