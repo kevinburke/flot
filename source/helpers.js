@@ -47,6 +47,9 @@ export function extend(deep, target) {
         var keys = Object.keys(src);
         for (var k = 0; k < keys.length; k++) {
             var key = keys[k];
+            if (key === '__proto__' || key === 'constructor') {
+                continue;
+            }
             var val = src[key];
             if (val === undefined) {
                 continue;

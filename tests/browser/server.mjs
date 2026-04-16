@@ -13,6 +13,7 @@ const allowedRoots = new Map([
 	["/lib/", join(root, "lib")],
 	["/tests/", join(root, "tests")],
 	["/examples/", join(root, "examples")],
+	["/node_modules/jquery/", join(root, "node_modules/jquery")],
 ]);
 
 const mimeTypes = {
@@ -49,7 +50,7 @@ http
 			res.writeHead(500, {
 				"content-type": "text/plain; charset=utf-8",
 			});
-			res.end(error instanceof Error ? error.message : String(error));
+			res.end("internal server error");
 		}
 	})
 	.listen(port, () => {

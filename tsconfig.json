@@ -16,6 +16,5 @@
 		"allowSyntheticDefaultImports": true,
 		"types": ["jquery"]
 	},
-	"include": ["source/**/*.js", "source/globals.d.ts", "types/index.d.ts", "types/jquery.d.ts"],
-	"exclude": ["source/jquery.js"]
+	"include": ["source/**/*.js", "source/globals.d.ts", "types/index.d.ts", "types/jquery.d.ts"]
 }
