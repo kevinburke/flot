@@ -29,6 +29,20 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   Added a browser regression test (`plothover handler receives pos
   and item positional args`) that would have caught this.
 
+### Documentation
+
+- `API.md` / `CHANGELOG.md` (2.0.1 section): document the `bars.barWidth`
+  semantics correctly. `API.md` still described the pre-2.0 contract
+  (a plain number interpreted as an absolute width in axis units),
+  while since 2.0 a plain number has been a multiplier of the minimum
+  point spacing, and absolute widths require `[width, true]`. Code
+  ported from flot 0.x / 1.x silently produced bars many orders of
+  magnitude too wide; in time mode with per-point spacing of a day
+  (86_400_000 ms) this also inflated `axis.datamin` / `axis.datamax`
+  enough to push the time-axis tick generator into its year branch
+  with multi-thousand-year tick steps. The 2.0.1 migration note now
+  lists `barWidth` alongside the existing `timeBase` entry.
+
 ## [5.1.1] - 2026-04-15
 
 ### Fixed
@@ -424,6 +438,24 @@ After:
     });
 
 Note: A new capability allows for data (and min/max settings of axes) to be specified with a `timeBase` of either seconds or milliseconds. So, a range from 1-10 can either represent 9 milliseconds of data, or 9 seconds of data, depending on the setting of `timeBase` (whose default is "seconds").
+
+### `bars.barWidth`:
+Before:
+
+    bars: { show: true, barWidth: 24 * 60 * 60 * 1000 }  // one day, time mode
+
+After:
+
+    bars: { show: true, barWidth: [24 * 60 * 60 * 1000, true] }  // one day, absolute
+
+Note: A plain-number `barWidth` is now interpreted as a *multiplier* of
+the minimum distance between consecutive x-values in the series (so
+`barWidth: 0.8` means "80% of the point spacing"). To keep the pre-2.0
+behavior where `barWidth` is an absolute width in axis units, pass
+`[width, true]`. Code ported from 0.x / 1.x that used absolute widths
+(typical in time-mode bar charts) will silently produce bars many
+orders of magnitude too wide, which can also inflate `axis.datamin` /
+`axis.datamax` enough to break the time-axis tick generator.
 
 ### Script Locations:
 

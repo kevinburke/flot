@@ -757,7 +757,7 @@ series: {
     }
 
     bars: {
-        barWidth: number
+        barWidth: number or [number, absolute: boolean]
         align: "left", "right" or "center"
         horizontal: boolean
     }
@@ -808,16 +808,34 @@ setting fill to a number between 0 (fully transparent) and 1 (fully
 opaque).
 
 For bars, fillColor can be a gradient, see the gradient documentation
-below. "barWidth" is the width of the bars in units of the x axis (or
-the y axis if "horizontal" is true), contrary to most other measures
-that are specified in pixels. For instance, for time series the unit
-is milliseconds so 24 * 60 * 60 * 1000 produces bars with the width of
-a day. "align" specifies whether a bar should be left-aligned
-(default), right-aligned or centered on top of the value it represents. 
-When "horizontal" is on, the bars are drawn horizontally, i.e. from the 
-y axis instead of the x axis; note that the bar end points are still
-defined in the same way so you'll probably want to swap the
-coordinates if you've been plotting vertical bars first.
+below. "barWidth" controls the width of each bar, and accepts two forms:
+
+  * `barWidth: number` — a *relative* width, multiplied by the minimum
+    distance between consecutive x-values in the series. For example,
+    `barWidth: 0.8` produces bars that cover 80% of the spacing between
+    adjacent points, leaving 20% as a gap. This is the default (0.8) and
+    is useful when you don't know the data spacing ahead of time.
+
+  * `barWidth: [number, true]` — an *absolute* width in units of the x
+    axis (y axis if `horizontal` is true), contrary to most other
+    measures which are specified in pixels. For time-mode axes the unit
+    is whatever `xaxis.timeBase` is configured for (milliseconds by
+    default on versions of flot prior to 2.0; seconds from flot 2.0
+    onward), so e.g. with `timeBase: "milliseconds"` a value of
+    `24 * 60 * 60 * 1000` produces bars one day wide.
+
+**Compatibility note.** Prior to flot 2.0, passing `barWidth: number`
+meant an *absolute* width; the multiplier form did not exist. Code
+ported from flot 0.x / 1.x will silently produce inflated bars (and
+correspondingly inflated axis ranges, which can wreck the tick
+generator) unless converted to the `[number, true]` form.
+
+"align" specifies whether a bar should be left-aligned (default),
+right-aligned or centered on top of the value it represents. When
+"horizontal" is on, the bars are drawn horizontally, i.e. from the y
+axis instead of the x axis; note that the bar end points are still
+defined in the same way so you'll probably want to swap the coordinates
+if you've been plotting vertical bars first.
 
 Area and bar charts normally start from zero, regardless of the data's range.
 This is because they convey information through size, and starting from a
