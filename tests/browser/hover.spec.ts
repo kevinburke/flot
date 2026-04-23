@@ -96,6 +96,53 @@ test.describe("flot hover plugin", () => {
 		expect(plothoverCount).toBe(1);
 	});
 
+	// Regression: flot's internal trigger() briefly dispatched a native
+	// CustomEvent instead of jQuery.trigger(). Native dispatchEvent does not
+	// spread extra args into jQuery handler positional parameters, so
+	// function(event, pos, item) handlers silently received `undefined` for
+	// pos and item. Upstream flot/flot's contract is that pos has x/y/pageX/
+	// pageY and item is an object (or null) on plothover.
+	test("plothover handler receives pos and item positional args", async ({ page }) => {
+		await page.clock.install({ time: new Date("2026-04-12T00:00:00.000Z") });
+		await page.evaluate(() => {
+			const win = window as any;
+			const $ = win.jQuery;
+			const options = win.__hoverPortHelpers.createMouseHoverOptions();
+			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const eventHolder = plot.getEventHolder();
+			const offset = plot.getPlotOffset();
+			const axisx = plot.getXAxes()[0];
+			const axisy = plot.getYAxes()[0];
+
+			win.__hoverPortState = { captured: null };
+			$(plot.getPlaceholder()).on(
+				"plothover",
+				(_event: unknown, pos: any, item: any, items: unknown) => {
+					if (win.__hoverPortState.captured !== null) return;
+					win.__hoverPortState.captured = {
+						posType: typeof pos,
+						posHasX: pos !== null && typeof pos === "object" && "x" in pos,
+						posHasY: pos !== null && typeof pos === "object" && "y" in pos,
+						itemIsObjectOrNull:
+							item === null || (typeof item === "object" && item !== undefined),
+						itemsIsArray: Array.isArray(items),
+					};
+				},
+			);
+
+			win.simulate.mouseMove(eventHolder, axisx.p2c(2) + offset.left, axisy.p2c(3) + offset.top, 0);
+		});
+
+		await page.clock.runFor(100);
+		const captured = await page.evaluate(() => (window as any).__hoverPortState.captured);
+		expect(captured).not.toBeNull();
+		expect(captured.posType).toBe("object");
+		expect(captured.posHasX).toBe(true);
+		expect(captured.posHasY).toBe(true);
+		expect(captured.itemIsObjectOrNull).toBe(true);
+		expect(captured.itemsIsArray).toBe(true);
+	});
+
 	test("pan plot triggers plothovercleanup event", async ({ page }) => {
 		const plothovercleanupCount = await page.evaluate(() => {
 			const win = window as any;

@@ -35,6 +35,25 @@ import {
     dateTickGenerator,
     composeImages,
 } from './index.js';
+import { setTrigger } from './helpers.js';
+
+// Route flot's internal trigger() through jQuery so plugin handlers bound
+// via $(el).on(type, fn) see the same data shape as upstream flot/flot.
+// Two conventions coexist in the plugins, matching upstream:
+//   - trigger(el, type, [arg0, arg1, ...])  →  $(el).trigger(type, [args])
+//     jQuery spreads the array into handler positional params, so
+//     function(event, pos, item, items) works (plothover, plotzoom, ...).
+//   - trigger(el, type, <non-array>)        →  $.Event(type, { detail: x })
+//     Handlers read event.detail, matching upstream's re-center contract
+//     where a plain object (or Event) is attached to event.detail.
+setTrigger(function(el, type, args) {
+    if (args === undefined || Array.isArray(args)) {
+        $(el).trigger(type, args || []);
+        return;
+    }
+    var event = $.Event(type, { detail: args });
+    $(el).trigger(event);
+});
 
 // Register $.plot and $.color on the jQuery object.
 $.plot = function(placeholder, data, options) {

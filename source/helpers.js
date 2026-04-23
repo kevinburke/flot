@@ -118,10 +118,11 @@ export function removeData(el, key) {
     }
 }
 
-// Trigger a custom event on an element. Extra args are passed as the
-// event's `detail` property (an array). For jQuery adapter compatibility,
-// the adapter re-dispatches these as jQuery events so $(el).on() works.
-export function trigger(el, type, args) {
+// Default trigger: dispatches a native CustomEvent with extra args stashed
+// on `event.detail` (an array). The jQuery adapter overrides this via
+// setTrigger so handlers bound with $(el).on(type, fn) receive the extra
+// args as positional parameters, matching upstream flot/flot behavior.
+var triggerImpl = function(el, type, args) {
     var event = new CustomEvent(type, {
         detail: args || [],
         bubbles: true,
@@ -129,6 +130,14 @@ export function trigger(el, type, args) {
     });
     el.dispatchEvent(event);
     return event;
+};
+
+export function trigger(el, type, args) {
+    return triggerImpl(el, type, args);
+}
+
+export function setTrigger(fn) {
+    triggerImpl = fn;
 }
 
 // Bind an event listener, tracking it so unbindAll can remove it later.

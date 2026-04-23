@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
 For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
 
+## [5.1.2] - 2026-04-22
+
+### Fixed
+
+- `jquery-adapter.js`: restore upstream flot/flot event-dispatch
+  semantics for consumers using `@kevinburke/flot/jquery` (or the
+  `jquery.flot.min.js` bundle). In 5.0.0, the fork's core switched to
+  native `CustomEvent` with extra args stashed on `event.detail`. That
+  is correct for the jQuery-free core, but broke every handler bound
+  through jQuery — `$(el).on("plothover", function(event, pos, item))`
+  silently received `undefined` for `pos` and `item`, because native
+  `dispatchEvent` does not spread args into jQuery handler positional
+  parameters. Same for `plotclick`, `plotselected`, `plotunselected`,
+  `plotselecting`, `plotzoom`, `plotpan`, `plotactivated`, and the pie
+  plugin's events.
+  Fixed by adding a `setTrigger()` hook in `helpers.js` and having the
+  jQuery adapter install a jQuery-aware trigger: arrays are dispatched
+  as `$(el).trigger(type, args)` (spreading into handler params);
+  non-array args are wrapped in a `$.Event` with `detail`, matching
+  upstream's `re-center` contract. The jQuery-free core path is
+  unchanged.
+  Added a browser regression test (`plothover handler receives pos
+  and item positional args`) that would have caught this.
+
 ## [5.1.1] - 2026-04-15
 
 ### Fixed
