@@ -57,12 +57,12 @@ setTrigger(function(el, type, args) {
 });
 
 // Register $.plot and $.color on the jQuery object.
-$.plot = function(placeholder, data, options) {
+$.plot = /** @type {typeof $.plot} */ (function(placeholder, data, options) {
     var el = typeof placeholder === 'string'
         ? document.querySelector(placeholder)
         : (placeholder instanceof $ ? placeholder[0] : placeholder);
     return plot(el, data, options);
-};
+});
 
 $.plot.plugins = plugins;
 $.plot.version = version;

@@ -23,11 +23,12 @@ declare global {
 			dateGenerator: unknown;
 			dateTickGenerator: unknown;
 			composeImages: unknown;
+			image?: unknown;
 		};
 		color: {
 			make(r: number, g: number, b: number, a?: number): unknown;
 			parse(str: string): unknown;
-			extract(elem: JQuery, cssProp: string): unknown;
+			extract(elem: HTMLElement | JQuery, cssProp: string): unknown;
 		};
 	}
 

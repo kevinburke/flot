@@ -15,6 +15,11 @@ interface Window {
     StyleMedia?: unknown;
     safari?: { pushNotification?: unknown };
     HTMLElement: typeof HTMLElement;
+    Flot?: {
+        Canvas?: unknown;
+        plugins?: unknown;
+        helpers?: unknown;
+    };
 }
 
 interface Document {

@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
 For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
 
+## [5.1.3] - 2026-04-22
+
+### Fixed
+
+- `rollup.config.js` / `jquery-adapter.js` / `jquery.flot.image.js`:
+  fix the standalone plugin bundles so they resolve their external
+  imports against `window.Flot` and `window.Flot.helpers` at runtime
+  instead of referencing missing Rollup-generated identifiers. This
+  restores loading for the broken standalone IIFE plugins, including
+  `jquery.flot.image.js`, `jquery.flot.crosshair.js`,
+  `jquery.flot.pie.js`, `jquery.flot.resize.js`, and
+  `jquery.flot.threshold.js`.
+
+### Documentation
+
+- `API.md` / `CHANGELOG.md` (2.0.1 section): document the
+  `bars.barWidth` semantics correctly. Since 2.0, a plain numeric
+  `barWidth` is a multiplier of the minimum point spacing and absolute
+  widths require `[width, true]`.
+
 ## [5.1.2] - 2026-04-22
 
 ### Fixed
@@ -28,20 +48,6 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   unchanged.
   Added a browser regression test (`plothover handler receives pos
   and item positional args`) that would have caught this.
-
-### Documentation
-
-- `API.md` / `CHANGELOG.md` (2.0.1 section): document the `bars.barWidth`
-  semantics correctly. `API.md` still described the pre-2.0 contract
-  (a plain number interpreted as an absolute width in axis units),
-  while since 2.0 a plain number has been a multiplier of the minimum
-  point spacing, and absolute widths require `[width, true]`. Code
-  ported from flot 0.x / 1.x silently produced bars many orders of
-  magnitude too wide; in time mode with per-point spacing of a day
-  (86_400_000 ms) this also inflated `axis.datamin` / `axis.datamax`
-  enough to push the time-axis tick generator into its year branch
-  with multi-thousand-year tick steps. The 2.0.1 migration note now
-  lists `barWidth` alongside the existing `timeBase` entry.
 
 ## [5.1.1] - 2026-04-15
 
