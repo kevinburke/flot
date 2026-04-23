@@ -35,7 +35,8 @@ import {
     dateTickGenerator,
     composeImages,
 } from './index.js';
-import { setTrigger } from './helpers.js';
+import * as helpers from './helpers.js';
+var setTrigger = helpers.setTrigger;
 
 // Route flot's internal trigger() through jQuery so plugin handlers bound
 // via $(el).on(type, fn) see the same data shape as upstream flot/flot.
@@ -99,4 +100,9 @@ if (typeof window !== 'undefined') {
         window.Flot = {};
     }
     window.Flot.Canvas = Canvas;
+    // Exposed so standalone plugin bundles (dist/plugins/*.js) can resolve
+    // their `import { plugins } from './jquery.flot.js'` and
+    // `import { ... } from './helpers.js'` to live objects on this global.
+    window.Flot.plugins = plugins;
+    window.Flot.helpers = helpers;
 }

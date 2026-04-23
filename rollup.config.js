@@ -69,28 +69,38 @@ const standalonePlugins = [
 	"jquery.flot.threshold.js",
 ];
 
+// Plugin bundles run in the browser after dist/jquery.flot.js. They import
+// from the (external) jQuery-adapter bundle and from helpers.js, and those
+// imports must resolve to live values the adapter exposes on window.Flot:
+//   - import { plugins } from './jquery.flot.js'  →  Flot.plugins
+//   - import { bind, ... } from './helpers.js'    →  Flot.helpers
+//   - import $ from 'jquery'                      →  jQuery
+// Using a function for external/globals (rather than a plain object) lets us
+// match resolved absolute paths, since Rollup has already resolved `./foo.js`
+// to /abs/.../source/foo.js by the time these hooks run.
+function pluginGlobal(id) {
+	if (id === "jquery") return "jQuery";
+	if (id.endsWith("jquery.flot.js")) return "Flot";
+	if (id.endsWith("helpers.js")) return "Flot.helpers";
+	return null;
+}
+
 const pluginBuilds = standalonePlugins.map((name) => ({
 	input: `source/${name}`,
-	external: [/\.\/jquery\./, /\.\.\/jquery\./, /\.\/helpers/],
-	onwarn(warning, warn) {
-		// Standalone plugins import from helpers.js and jquery.flot.js which
-		// are external. Rollup warns about missing globals for IIFE output
-		// but these plugins are loaded after the main bundle which provides
-		// everything they need on the Flot global.
-		if (warning.code === "MISSING_GLOBAL_NAME") return;
-		warn(warning);
-	},
+	external: (id) => pluginGlobal(id) !== null,
 	output: [
 		{
 			file: `dist/plugins/${name}`,
 			format: "iife",
 			banner,
+			globals: pluginGlobal,
 		},
 		{
 			file: `dist/plugins/${name.replace(/\.js$/, ".min.js")}`,
 			format: "iife",
 			banner,
 			sourcemap: true,
+			globals: pluginGlobal,
 			plugins: [terser(terserOpts)],
 		},
 	],

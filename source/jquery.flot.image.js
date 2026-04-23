@@ -52,6 +52,7 @@ Google Maps).
 
 */
 
+import $ from 'jquery';
 import { plugins } from './jquery.flot.js';
 
     var options = {
@@ -64,7 +65,7 @@ import { plugins } from './jquery.flot.js';
         }
     };
 
-    export var image = {};
+    var image = {};
 
     image.loadDataImages = function (series, options, callback) {
         var urls = [], points = [];
@@ -250,3 +251,7 @@ import { plugins } from './jquery.flot.js';
         name: 'image',
         version: '1.1'
     });
+
+    // Expose the image helpers as $.plot.image so example code can call
+    // $.plot.image.loadDataImages(...) / $.plot.image.load(...).
+    $.plot.image = image;
