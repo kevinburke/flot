@@ -13,6 +13,120 @@ import { browser } from './jquery.flot.browser.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
 import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
 
+/**
+ * @typedef {{ [key: string]: any }} PluginOptions
+ */
+
+/**
+ * @typedef {PluginOptions & {
+ *   points: PluginOptions,
+ *   lines: PluginOptions,
+ *   bars: PluginOptions,
+ *   shadowSize: number,
+ *   highlightColor: string | null
+ * }} InternalSeriesOptions
+ */
+
+/**
+ * @typedef {PluginOptions & {
+ *   position?: string,
+ *   color?: string | number | null,
+ *   tickColor?: string | number | null,
+ *   font?: PluginOptions | null,
+ *   autoScale?: string,
+ *   offset?: PluginOptions,
+ *   boxPosition?: AxisBoxPosition
+ * }} InternalAxisOptions
+ */
+
+/**
+ * @typedef {{ top: number, right: number, bottom: number, left: number }} BorderWidth
+ */
+
+/**
+ * @typedef {{ top: string, right: string, bottom: string, left: string }} BorderColor
+ */
+
+/**
+ * @typedef {{ left: number, top: number, width: number, height: number, padding: number }} AxisBox
+ */
+
+/**
+ * @typedef {{ centerX: number, centerY: number }} AxisBoxPosition
+ */
+
+/**
+ * @typedef {PluginOptions & {
+ *   n: number,
+ *   direction: "x" | "y",
+ *   options: InternalAxisOptions,
+ *   used: boolean,
+ *   show: boolean,
+ *   reserveSpace: boolean,
+ *   labelWidth: number,
+ *   labelHeight: number,
+ *   box: AxisBox,
+ *   boxPosition: AxisBoxPosition,
+ *   min: number,
+ *   max: number,
+ *   datamin: number | null,
+ *   datamax: number | null,
+ *   scale: number,
+ *   tickSize: number,
+ *   tickDecimals: number,
+ *   ticks: Array<PluginOptions>,
+ *   p2c: function(string | number): number,
+ *   c2p: function(string | number): number
+ * }} InternalAxis
+ */
+
+/**
+ * @typedef {PluginOptions & {
+ *   show: boolean,
+ *   aboveData: boolean,
+ *   color: string,
+ *   backgroundColor: string | PluginOptions | null,
+ *   borderColor: string | BorderColor | null,
+ *   tickColor: string | null,
+ *   margin: number | PluginOptions,
+ *   borderWidth: number | BorderWidth,
+ *   minBorderMargin: number | null,
+ *   markings: any,
+ *   markingsColor: string,
+ *   markingsLineWidth: number,
+ *   clickable: boolean,
+ *   hoverable: boolean,
+ *   autoHighlight: boolean,
+ *   mouseActiveRadius: number
+ * }} InternalGridOptions
+ */
+
+/**
+ * @typedef {PluginOptions & {
+ *   colors: string[],
+ *   xaxis: InternalAxisOptions,
+ *   yaxis: InternalAxisOptions,
+ *   xaxes: InternalAxisOptions[],
+ *   yaxes: InternalAxisOptions[],
+ *   series: InternalSeriesOptions,
+ *   grid: InternalGridOptions,
+ *   interaction: PluginOptions,
+ *   hooks: PluginOptions
+ * }} InternalOptions
+ */
+
+/**
+ * @typedef {{ [key: string]: Array<function(...any): any> }} HookRegistry
+ */
+
+/**
+ * @typedef {PluginOptions} InternalPlot
+ */
+
+/**
+ * @typedef {{ from?: number, to?: number, axis: InternalAxis }} ExtractedRange
+ */
+
     function defaultTickGenerator(axis) {
         var ticks = [],
             start = saturated.saturate(saturated.floorInBase(axis.min, axis.tickSize)),
@@ -102,6 +216,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         // or { data: [ [x1, y1], [x2, y2], ... ], label: "some label", ... }
 
         var series = [],
+            /** @type {InternalOptions} */
             options = {
                 // the color theme used for graphs
                 colors: ["#edc240", "#afd8f8", "#cb4b4b", "#4da74d", "#9440ed"],
@@ -214,7 +329,9 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             eventHolder = null, // DOM element that events should be bound to
             ctx = null,
             octx = null,
+            /** @type {InternalAxis[]} */
             xaxes = [],
+            /** @type {InternalAxis[]} */
             yaxes = [],
             plotOffset = {
                 left: 0,
@@ -224,6 +341,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             },
             plotWidth = 0,
             plotHeight = 0,
+            /** @type {HookRegistry} */
             hooks = {
                 processOptions: [],
                 processRawData: [],
@@ -243,6 +361,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 resize: [],
                 shutdown: []
             },
+            /** @type {InternalPlot} */
             plot = this;
 
         var eventManager = {};
@@ -309,8 +428,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         plot.triggerRedrawOverlay = triggerRedrawOverlay;
         plot.pointOffset = function(point) {
             return {
-                left: parseInt(xaxes[axisNumber(point, "x") - 1].p2c(+point.x) + plotOffset.left, 10),
-                top: parseInt(yaxes[axisNumber(point, "y") - 1].p2c(+point.y) + plotOffset.top, 10)
+                left: parseInt(String(xaxes[axisNumber(point, "x") - 1].p2c(+point.x) + plotOffset.left), 10),
+                top: parseInt(String(yaxes[axisNumber(point, "y") - 1].p2c(+point.y) + plotOffset.top), 10)
             };
         };
         plot.shutdown = shutdown;
@@ -320,6 +439,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             placeholder.innerHTML = '';
 
             series = [];
+            // @ts-expect-error destroy clears closure references after shutdown.
             options = null;
             surface = null;
             overlay = null;
@@ -328,7 +448,9 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             octx = null;
             xaxes = [];
             yaxes = [];
+            // @ts-expect-error destroy clears closure references after shutdown.
             hooks = null;
+            // @ts-expect-error destroy clears closure references after shutdown.
             plot = null;
         };
 
@@ -557,6 +679,9 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             return a;
         }
 
+        /**
+         * @returns {InternalAxis[]}
+         */
         function allAxes() {
             // return flat array without annoying null entries
             return xaxes.concat(yaxes).filter(function(a) {
@@ -635,14 +760,21 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
 
         function getOrCreateAxis(axes, number) {
             if (!axes[number - 1]) {
-                axes[number - 1] = {
+                axes[number - 1] = /** @type {InternalAxis} */ (/** @type {unknown} */ ({
                     n: number, // save the number for future reference
                     direction: axes === xaxes ? "x" : "y",
                     options: extend(true, {}, axes === xaxes ? options.xaxis : options.yaxis)
-                };
+                }));
             }
 
             return axes[number - 1];
+        }
+
+        function firstAxis(axes) {
+            if (!axes[0]) {
+                throw new Error("missing first axis");
+            }
+            return axes[0];
         }
 
         function fillInSeriesOptions() {
@@ -1405,9 +1537,11 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             if (delta === 0.0) {
                 // degenerate case
                 var widen = max === 0 ? 1 : 0.01;
-                var wmin = null;
+                var wmin = 0;
+                var wminSet = false;
                 if (min == null) {
-                    wmin -= widen;
+                    wmin = -widen;
+                    wminSet = true;
                 }
 
                 // always widen max if we couldn't widen min to ensure we
@@ -1416,7 +1550,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                     max += widen;
                 }
 
-                if (wmin != null) {
+                if (wminSet) {
                     min = wmin;
                 }
             }
@@ -1814,8 +1948,13 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             triggerRedrawOverlay();
         }
 
+        /**
+         * @returns {ExtractedRange}
+         */
         function extractRange(ranges, coord) {
-            var axis, from, to, key, axes = allAxes();
+            var axis, from, to, axes = allAxes();
+            var key = "";
+            var keyFound = false;
 
             for (var i = 0; i < axes.length; ++i) {
                 axis = axes[i];
@@ -1827,6 +1966,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                     }
 
                     if (ranges[key]) {
+                        keyFound = true;
                         from = ranges[key].from;
                         to = ranges[key].to;
                         break;
@@ -1835,8 +1975,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             }
 
             // backwards-compat stuff - to be removed in future
-            if (!ranges[key]) {
-                axis = coord === "x" ? xaxes[0] : yaxes[0];
+            if (!keyFound) {
+                axis = firstAxis(coord === "x" ? xaxes : yaxes);
                 from = ranges[coord + "1"];
                 to = ranges[coord + "2"];
             }
@@ -1851,7 +1991,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             return {
                 from: from,
                 to: to,
-                axis: axis
+                axis: /** @type {InternalAxis} */ (axis)
             };
         }
 
@@ -2105,7 +2245,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             // check if the line will be overlapped with a border
             var overlappedWithBorder = function (value) {
                 var bw = options.grid.borderWidth;
-                return (((typeof bw === "object" && bw[axis.position] > 0) || bw > 0) && (value === axis.min || value === axis.max));
+                var overlapsBorder = typeof bw === "object" ? bw[axis.position] > 0 : bw > 0;
+                return overlapsBorder && (value === axis.min || value === axis.max);
             };
 
             ctx.strokeStyle = options.grid.tickColor;
@@ -2151,6 +2292,10 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             // line by line instead of as one rectangle
             var bw = options.grid.borderWidth,
                 bc = options.grid.borderColor;
+
+            if (bc == null) {
+                bc = options.grid.color;
+            }
 
             if (typeof bw === "object" || typeof bc === "object") {
                 if (typeof bw !== "object") {
@@ -2538,7 +2683,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
 
                 var s = series[i];
                 if (!s.datapoints) {
-                    return;
+                    continue;
                 }
 
                 var foundPoint = false;

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 Starting with 5.0.0, this changelog tracks the @kevinburke/flot fork.
 For earlier upstream history, see the [flot/flot repository](https://github.com/flot/flot).
 
+## Unreleased
+
+### Changed
+
+- `jquery.flot.js` / `Makefile`: clear the remaining TypeScript
+  `checkJs` source warnings and run `make types-source` as a direct
+  `tsc --project tsconfig.json` check. The old `.tsc-baseline`
+  ratchet is no longer needed now that the source warning count is
+  zero.
+
+### Fixed
+
+- `jquery.flot.js`: make `findNearbyItems()` skip series whose
+  `datapoints` have been removed instead of letting `findItems()`
+  return `undefined`. This preserves a list return value for hover
+  lookup and adds a regression test for the malformed-series case.
+
 ## [5.1.3] - 2026-04-22
 
 ### Fixed

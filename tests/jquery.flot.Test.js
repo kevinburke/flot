@@ -552,6 +552,20 @@ describe('flot', function() {
             expect(items[0].dataIndex).toEqual(2);
         });
 
+        it('should skip series without datapoints', function() {
+            plot = $.plot(placeholder, sampledata, {});
+            plot.getData()[1].datapoints = null;
+
+            var items = plot.findNearbyItems(0, 0, function() {
+                return true;
+            }, Number.MAX_VALUE);
+
+            expect(items.length).toEqual(1);
+            expect(items[0].seriesIndex).toEqual(0);
+            expect(items[0].datapoint[0]).toEqual(sampledata[0][0][0]);
+            expect(items[0].datapoint[1]).toEqual(sampledata[0][0][1]);
+        });
+
         it('should return arbitrary items specified by hook callback', function() {
             options.xaxis = {autoScale: 'none', min: 0, max: 2};
             options.yaxis = {autoScale: 'none', min: 0, max: 3};
