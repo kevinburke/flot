@@ -343,6 +343,7 @@ export interface Plot {
 		priority: number,
 	): void;
 	hooks: Record<string, Array<(...args: unknown[]) => unknown>>;
+	drawSymbol?: unknown;
 
 	// Plugin-provided methods (present when the relevant plugin is loaded)
 	// Hover plugin:

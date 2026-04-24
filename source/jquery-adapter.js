@@ -56,13 +56,15 @@ setTrigger(function(el, type, args) {
     $(el).trigger(event);
 });
 
-// Register $.plot and $.color on the jQuery object.
-$.plot = /** @type {typeof $.plot} */ (function(placeholder, data, options) {
+function jqueryPlot(placeholder, data, options) {
     var el = typeof placeholder === 'string'
         ? document.querySelector(placeholder)
         : (placeholder instanceof $ ? placeholder[0] : placeholder);
     return plot(el, data, options);
-});
+}
+
+// Register $.plot and $.color on the jQuery object.
+$.plot = /** @type {typeof $.plot} */ (/** @type {unknown} */ (jqueryPlot));
 
 $.plot.plugins = plugins;
 $.plot.version = version;
@@ -84,7 +86,9 @@ $.plot.composeImages = composeImages;
 var origExtract = color.extract;
 $.color = Object.create(color);
 $.color.extract = function(elem, cssProp) {
-    if (elem instanceof $ && elem.length) elem = elem[0];
+    if (elem instanceof $) {
+        elem = elem[0];
+    }
     return origExtract(elem, cssProp);
 };
 

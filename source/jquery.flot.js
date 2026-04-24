@@ -2532,10 +2532,14 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 smallestDistance = radius * radius + 1;
 
             for (i = series.length - 1; i >= 0; --i) {
-                if (!seriesFilter(i)) continue;
+                if (!seriesFilter(i)) {
+                    continue;
+                }
 
                 var s = series[i];
-                if (!s.datapoints) return;
+                if (!s.datapoints) {
+                    return;
+                }
 
                 var foundPoint = false;
                 if (s.lines.show || s.points.show) {
