@@ -16,6 +16,8 @@
 			"!**/source",
 			"!**/tests",
 			"!**/coverage",
+			"!.claude",
+			"!worktrees",
 			"!**/*.tgz",
 			"!**/package-lock.json",
 			"!**/flot-*.tgz",
