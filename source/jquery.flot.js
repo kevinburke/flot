@@ -1199,8 +1199,13 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         function measureTickLabels(axis) {
             var opts = axis.options,
                 ticks = opts.showTickLabels !== 'none' && axis.ticks ? axis.ticks : [],
-                showMajorTickLabels = opts.showTickLabels === 'major' || opts.showTickLabels === 'all',
-                showEndpointsTickLabels = opts.showTickLabels === 'endpoints' || opts.showTickLabels === 'all',
+                // Mirror drawAxisLabels: 'major' and 'all' draw every tick;
+                // only 'endpoints' skips middle ticks. Measurement must cover
+                // every label that will be drawn, otherwise labelWidth can be
+                // too small for the widest one — e.g. a top tick of 100 next
+                // to 70/80/90 gets clipped to "00" because the axis box was
+                // sized for 2-char labels. See flot/flot#1729, flot/flot#1788.
+                endpointsOnly = opts.showTickLabels === 'endpoints',
                 labelWidth = opts.labelWidth || 0,
                 labelHeight = opts.labelHeight || 0,
                 legacyStyles = axis.direction + "Axis " + axis.direction + axis.n + "Axis",
@@ -1211,9 +1216,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
                 var t = ticks[i];
                 var label = t.label;
 
-                if (!t.label ||
-                    (showMajorTickLabels === false && i > 0 && i < ticks.length - 1) ||
-                    (showEndpointsTickLabels === false && (i === 0 || i === ticks.length - 1))) {
+                if (!t.label || (endpointsOnly && i > 0 && i < ticks.length - 1)) {
                     continue;
                 }
 

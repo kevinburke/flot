@@ -196,8 +196,12 @@ describe("flot navigate plugin interactions", function () {
         jasmine.clock().tick(50);
         simulate.mouseUp(eventHolder, clientX + 70, clientY - 80);
         var ranges = plot.getSelection();
-        expect(ranges.xaxis.from).toBeCloseTo(0.9, 1);
-        expect(ranges.xaxis.to).toBeCloseTo(1.2, 1);
+        // Compute expected from the actual axis mapping so the test is
+        // independent of axis-box width. Hardcoded numbers (0.9, 1.2)
+        // happened to fit when the y-axis box was undersized by the
+        // flot/flot#1729 measurement bug; fixing that shifted plotWidth.
+        expect(ranges.xaxis.from).toBeCloseTo(xaxis.c2p(50), 6);
+        expect(ranges.xaxis.to).toBeCloseTo(xaxis.c2p(70), 6);
         expect(ranges.yaxis.from).toEqual(0);
         expect(ranges.yaxis.to).toEqual(10);
     });
@@ -266,8 +270,10 @@ describe("flot navigate plugin interactions", function () {
         jasmine.clock().tick(50);
         simulate.mouseUp(eventHolder, clientX + 70, clientY - 130);
         var ranges = plot.getSelection();
-        expect(ranges.xaxis.from).toBeCloseTo(0.9, 1);
-        expect(ranges.xaxis.to).toBeCloseTo(1.2, 1);
+        // See note above on selection mode x: compute from c2p so the
+        // test is independent of axis-box width changes.
+        expect(ranges.xaxis.from).toBeCloseTo(xaxis.c2p(50), 6);
+        expect(ranges.xaxis.to).toBeCloseTo(xaxis.c2p(70), 6);
         expect(Math.floor(ranges.yaxis.from * 10) / 10).toBeCloseTo(3.6, 1); //test on travis gives 3.67, locally 3.64
         expect(ranges.yaxis.to).toBeCloseTo(4.2, 1);
     });

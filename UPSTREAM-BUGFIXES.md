@@ -45,6 +45,28 @@ feasible, and reference the upstream issue/PR number in the commit.
   background.
   - Upstream issue: https://github.com/flot/flot/issues/1867
 
+- [x] **upstream #1729 / #1788** — `measureTickLabels` skipped the
+  first and last ticks whenever `opts.showTickLabels` was `'major'`
+  (the default), because the original code keyed off both
+  `showMajorTickLabels` and `showEndpointsTickLabels` and the latter
+  is false in `'major'` mode. `drawAxisLabels` for `'major'` and
+  `'all'` modes draws every tick, so the widest endpoint label
+  (e.g. a top y-tick of `100` next to `40..90`) was not factored
+  into `labelWidth`; the axis box ended up too narrow and the wider
+  endpoint rendered with a negative `x` and was visually clipped.
+  Fix: collapse the two flags to a single `endpointsOnly` flag —
+  only `'endpoints'` mode skips middle ticks; no mode that reaches
+  this loop skips endpoints. Regression test in
+  `tests/jquery.flot.Test.js` (`drawAxisLabels` describe block)
+  forces a y-axis with ticks `[40,...,100]` and asserts no
+  `flot-tick-label` has a negative `x` attribute. Three pre-existing
+  tests in `selection`, `navigate-interaction`, and `touchNavigate`
+  were silently calibrated to the buggy narrow axis box; updated to
+  compute expected values dynamically or cache `plot.width()` /
+  loosen precision so they survive the new, correct dimensions.
+  - Upstream issues: https://github.com/flot/flot/issues/1729,
+    https://github.com/flot/flot/issues/1788
+
 ## Tier 2 — port if Tier 1 lands cleanly
 
 Older but still legitimate; port after verifying the reported bug still

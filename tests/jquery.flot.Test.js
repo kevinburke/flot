@@ -924,6 +924,37 @@ describe('flot', function() {
             });
         });
 
+        // Regression test for flot/flot#1729 and flot/flot#1788: when the
+        // first or last tick has a wider label than the middle ones (e.g. a
+        // y-axis going 40,50,...,90,100), the default showTickLabels='major'
+        // measurement loop must include the endpoints. Otherwise labelWidth
+        // is undersized and the widest endpoint renders with a negative x
+        // and is visually clipped.
+        ['major', 'all'].forEach(function(showTickLabels) {
+            it('should not clip a wider endpoint tick label with showTickLabels = ' + showTickLabels, function () {
+                $.plot(placeholder, [[[0, 40], [1, 100]]], {
+                    yaxis: {
+                        autoScale: 'exact',
+                        min: 40,
+                        max: 100,
+                        ticks: [40, 50, 60, 70, 80, 90, 100],
+                        showTickLabels: showTickLabels
+                    }
+                });
+
+                var labels = placeholder[0].querySelectorAll('.flot-y-axis .flot-tick-label'),
+                    negativeLabels = [];
+                for (var i = 0; i < labels.length; ++i) {
+                    var xAttr = parseFloat(labels[i].getAttribute('x'));
+                    if (xAttr < 0) {
+                        negativeLabels.push(labels[i].textContent + ' @ x=' + xAttr);
+                    }
+                }
+
+                expect(negativeLabels).toEqual([]);
+            });
+        });
+
         function xTickLabels(placeholder) {
             var labels$ = placeholder.find('.flot-x-axis').find('.flot-tick-label'),
                 labels = labels$.map(function(i, label) {

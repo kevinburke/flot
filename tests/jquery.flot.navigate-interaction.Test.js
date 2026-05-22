@@ -45,18 +45,27 @@ describe("flot navigate plugin interactions", function () {
         eventHolder = plot.getEventHolder();
         var xaxis = plot.getXAxes()[0];
         var yaxis = plot.getYAxes()[0];
+        // Capture plot dimensions once. After fixing flot/flot#1729,
+        // axis box widths can shift between successive pan events
+        // because each setupGrid() re-measures the tick labels under
+        // the new axis range. Reading plot.width()/plot.height() at
+        // every event would feed mismatched coordinates into the same
+        // drag, causing the test's exact -10/+10 expectations to drift
+        // by a few hundredths.
+        var plotWidth = plot.width();
+        var plotHeight = plot.height();
 
         // drag almost horizontally snap to x direction
         simulate.mouseDown(eventHolder, 50, 70);
         simulate.mouseMove(eventHolder, 50, 70);
-        simulate.mouseMove(eventHolder, 50 + plot.width(), 80);
+        simulate.mouseMove(eventHolder, 50 + plotWidth, 80);
 
         expect(xaxis.min).toBe(-10);
         expect(xaxis.max).toBe(0);
         expect(yaxis.min).toBe(0);
         expect(yaxis.max).toBe(10);
 
-        simulate.mouseUp(eventHolder, 50 + plot.width(), 80);
+        simulate.mouseUp(eventHolder, 50 + plotWidth, 80);
 
         expect(xaxis.min).toBe(-10);
         expect(xaxis.max).toBe(0);
@@ -66,14 +75,14 @@ describe("flot navigate plugin interactions", function () {
         // drag almost vertically snap to y direction
         simulate.mouseDown(eventHolder, 50, 70);
         simulate.mouseMove(eventHolder, 50, 70);
-        simulate.mouseMove(eventHolder, 60, 70 + plot.height());
+        simulate.mouseMove(eventHolder, 60, 70 + plotHeight);
 
         expect(xaxis.min).toBe(-10);
         expect(xaxis.max).toBe(0);
         expect(yaxis.min).toBe(10);
         expect(yaxis.max).toBe(20);
 
-        simulate.mouseUp(eventHolder, 60, 70 + plot.height());
+        simulate.mouseUp(eventHolder, 60, 70 + plotHeight);
 
         expect(xaxis.min).toBe(-10);
         expect(xaxis.max).toBe(0);
@@ -91,10 +100,12 @@ describe("flot navigate plugin interactions", function () {
         eventHolder = plot.getEventHolder();
         xaxis = plot.getXAxes()[0];
         yaxis = plot.getYAxes()[0];
+        plotWidth = plot.width();
+        plotHeight = plot.height();
 
         // drag diagonally do not snap
-        simulate.mouseDown(eventHolder, plot.width() - 50, plot.height() - 70);
-        simulate.mouseMove(eventHolder, plot.width() - 50, plot.height() - 70);
+        simulate.mouseDown(eventHolder, plotWidth - 50, plotHeight - 70);
+        simulate.mouseMove(eventHolder, plotWidth - 50, plotHeight - 70);
         jasmine.clock().tick(100);
         simulate.mouseMove(eventHolder, -50, -70);
         jasmine.clock().tick(100);

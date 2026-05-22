@@ -21,6 +21,11 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   `datapoints` have been removed instead of letting `findItems()`
   return `undefined`. This preserves a list return value for hover
   lookup and adds a regression test for the malformed-series case.
+- `jquery.flot.js`: include the first and last ticks in
+  `measureTickLabels` for `showTickLabels: 'major'` (the default), so
+  that an endpoint label wider than the middle ticks no longer
+  overflows the axis box and gets clipped. Upstream `flot/flot#1729`
+  and `flot/flot#1788`.
 
 ## [5.1.3] - 2026-04-22
 
