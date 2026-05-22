@@ -7,6 +7,8 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ## Unreleased
 
+## [5.1.4] - 2026-05-22
+
 ### Changed
 
 - `jquery.flot.js` / `Makefile`: clear the remaining TypeScript
@@ -14,6 +16,7 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   `tsc --project tsconfig.json` check. The old `.tsc-baseline`
   ratchet is no longer needed now that the source warning count is
   zero.
+- `biome.json`: update the schema URL to match Biome 2.4.15.
 
 ### Fixed
 
