@@ -89,7 +89,7 @@ export function height(el) {
 export function css(el, prop, val) {
     if (val !== undefined) {
         el.style[prop] = typeof val === 'number' ? val + 'px' : val;
-        return;
+        return undefined;
     }
     return getComputedStyle(el)[prop];
 }

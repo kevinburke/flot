@@ -69,6 +69,7 @@ function DrawSeries() {
                     x2 = (axisy.min - y1) / (y2 - y1) * (x2 - x1) + x1;
                     y2 = axisy.min;
                 }
+                return false;
             };
 
             var handleYMaxClipping = function () {
@@ -87,6 +88,7 @@ function DrawSeries() {
                     x2 = (axisy.max - y1) / (y2 - y1) * (x2 - x1) + x1;
                     y2 = axisy.max;
                 }
+                return false;
             };
 
             var handleXMinClipping = function () {
@@ -105,6 +107,7 @@ function DrawSeries() {
                     y2 = (axisx.min - x1) / (x2 - x1) * (y2 - y1) + y1;
                     x2 = axisx.min;
                 }
+                return false;
             };
 
             var handleXMaxClipping = function () {
@@ -123,6 +126,7 @@ function DrawSeries() {
                     y2 = (axisx.max - x1) / (x2 - x1) * (y2 - y1) + y1;
                     x2 = axisx.max;
                 }
+                return false;
             };
 
             var drawLine = function () {

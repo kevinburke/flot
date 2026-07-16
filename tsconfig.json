@@ -12,7 +12,7 @@
 		"strictNullChecks": false,
 		"noImplicitAny": false,
 		"noImplicitThis": false,
-		"noImplicitReturns": false,
+		"noImplicitReturns": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"types": ["jquery"]

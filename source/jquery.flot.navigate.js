@@ -179,6 +179,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
                     return (ec.left > box.left) && (ec.left < box.left + box.width) &&
                         (ec.top > box.top) && (ec.top < box.top + box.height);
                 }
+                return false;
             });
 
             if (axes.length === 0) {
@@ -224,6 +225,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
                 onZoomClick(e, delta < 0, amount);
                 return false;
             }
+            return undefined;
         }
 
         plot.navigationState = function(startPageX, startPageY) {
@@ -261,6 +263,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
                     return (ec.left > box.left) && (ec.left < box.left + box.width) &&
                         (ec.top > box.top) && (ec.top < box.top + box.height);
                 }
+                return false;
             });
 
             if (panAxes.length === 0) {
@@ -842,6 +845,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
                     return (ec.left > box.left) && (ec.left < box.left + box.width) &&
                             (ec.top > box.top) && (ec.top < box.top + box.height);
                 }
+                return false;
             });
 
             return axis;
