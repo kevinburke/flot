@@ -53,7 +53,7 @@ Google Maps).
 */
 
 import $ from 'jquery';
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 
     var options = {
         series: {

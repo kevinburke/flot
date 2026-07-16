@@ -35,7 +35,7 @@ charts or filled areas).
 
 */
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 
     var options = {
 		series: { stack: /** @type {any} */ (null) } // or number/string

@@ -24,7 +24,7 @@ handles this events by unhighlighting all of the previously highlighted points a
 the tooltip from webcharts).
 */
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 import { browser } from './jquery.flot.browser.js';
 import { drawSeries } from './jquery.flot.drawSeries.js';
 import { color } from './jquery.colorhelpers.js';

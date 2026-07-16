@@ -8,7 +8,7 @@ BIOME := $(NODE_BIN)/biome
 # rebuild instead of always re-running terser.
 SOURCES := $(wildcard source/jquery.*.js)
 
-.PHONY: all build clean format test test-unit test-browser size types types-source types-source-strict publint ci install help
+.PHONY: all build clean format test test-unit test-browser size types types-source types-source-strict types-source-strict-files types-source-file publint ci install help
 
 all: build
 
@@ -54,10 +54,17 @@ types-source: node_modules ## run the current source check during strictness mig
 types-source-strict: node_modules ## run the fully strict source check
 	$(NODE_BIN)/tsc --project tsconfig.json
 
+types-source-strict-files: node_modules ## strictly check the migrated source files
+	$(NODE_BIN)/tsc --project tsconfig.strict-files.json
+
+types-source-file: node_modules ## strictly check one source file and its imports
+	test -n "$(FILE)"
+	$(NODE_BIN)/tsc --ignoreConfig --allowJs --checkJs --noEmit --noImplicitAny --noImplicitThis --strictNullChecks false --skipLibCheck --target ES2019 --module ESNext --moduleResolution bundler --lib ES2019,DOM --types jquery source/globals.d.ts $(FILE)
+
 publint: build ## validate package.json fields and exports
 	npx --yes publint
 
-ci: lint build test size types types-source publint ## run everything CI runs
+ci: lint build test size types types-source types-source-strict-files publint ## run everything CI runs
 
 help: ## list available targets
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)

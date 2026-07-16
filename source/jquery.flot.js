@@ -12,6 +12,7 @@ import { saturated } from './jquery.flot.saturated.js';
 import { browser } from './jquery.flot.browser.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
 import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
+import { plugins } from './plugin-registry.js';
 
 /**
  * @typedef {{ [key: string]: any }} PluginOptions
@@ -2969,9 +2970,6 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         }
     }
 
-    // Plugin registry. Plugins push to this array to register themselves.
-    export var plugins = [];
-
     export var version = "5.1.4";
 
     // The main plot function.
@@ -2981,4 +2979,4 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
     }
 
     export var linearTickGenerator = defaultTickGenerator;
-    export { defaultTickFormatter, expRepTickFormatter };
+    export { defaultTickFormatter, expRepTickFormatter, plugins };

@@ -11,7 +11,7 @@ can just fix the size of their placeholders.
 
 */
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 
     var options = { }; // no options
 

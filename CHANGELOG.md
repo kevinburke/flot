@@ -13,6 +13,14 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   checks for the JavaScript source.
 - `Makefile`: keep the existing source check green during the staged
   `noImplicitAny` migration and add `types-source-strict` for the full check.
+- `tsconfig.strict-files.json` / `Makefile`: enforce strict source checks for
+  completed migration files from a single file list while the remaining source
+  files are migrated.
+- `plugin-registry.js`: separate plugin registration from the plot core so
+  plugins can be checked strictly without pulling untyped core dependencies
+  into each incremental check.
+- `jquery.flot.axislabels.js`: add concrete axis, canvas, and hook types and
+  include the plugin in the strict source checks.
 
 ## [5.1.4] - 2026-05-22
 

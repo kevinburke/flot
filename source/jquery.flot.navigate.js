@@ -105,7 +105,7 @@ can set the default in the options.
 */
 
 /* eslint-enable */
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 import { saturated } from './jquery.flot.saturated.js';
 import { browser } from './jquery.flot.browser.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
