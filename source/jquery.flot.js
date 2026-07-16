@@ -75,8 +75,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
  *   tickSize: number,
  *   tickDecimals: number,
  *   ticks: Array<PluginOptions>,
- *   p2c: function(string | number): number,
- *   c2p: function(string | number): number
+ *   p2c: (value: string | number) => number,
+ *   c2p: (value: string | number) => number
  * }} InternalAxis
  */
 
@@ -116,7 +116,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
  */
 
 /**
- * @typedef {{ [key: string]: Array<function(...any): any> }} HookRegistry
+ * @typedef {{ [key: string]: Array<(...args: any[]) => any> }} HookRegistry
  */
 
 /**
@@ -439,7 +439,6 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             placeholder.innerHTML = '';
 
             series = [];
-            // @ts-expect-error destroy clears closure references after shutdown.
             options = null;
             surface = null;
             overlay = null;
@@ -448,9 +447,7 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
             octx = null;
             xaxes = [];
             yaxes = [];
-            // @ts-expect-error destroy clears closure references after shutdown.
             hooks = null;
-            // @ts-expect-error destroy clears closure references after shutdown.
             plot = null;
         };
 

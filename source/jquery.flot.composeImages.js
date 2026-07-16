@@ -150,8 +150,7 @@ import { browser } from './jquery.flot.browser.js';
         source = patchSVGSource(source);
 
         var blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"}),
-            domURL = self.URL || self.webkitURL || self,
-            url = domURL.createObjectURL(blob);
+            url = globalThis.URL.createObjectURL(blob);
         img.src = url;
     }
 

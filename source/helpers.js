@@ -33,8 +33,11 @@ function cloneDeepValue(value) {
 // Deep-extend target with one or more source objects. When `deep` is true,
 // nested objects are recursively merged rather than replaced. Arrays are
 // replaced, not concatenated (matching $.extend behavior that flot relies on).
-export function extend(deep, target) {
-    var sources = Array.prototype.slice.call(arguments, 2);
+/** @param {...any} args */
+export function extend(...args) {
+    var deep = args[0],
+        target = args[1],
+        sources = args.slice(2);
     if (typeof deep !== 'boolean') {
         sources.unshift(target);
         target = deep;

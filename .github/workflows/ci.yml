@@ -29,6 +29,9 @@ jobs:
       - name: Lint
         run: make lint
 
+      - name: Type-check source (checkJs ratchet)
+        run: make types-source
+
       - name: Build
         run: make build
 
@@ -43,9 +46,6 @@ jobs:
 
       - name: Type definitions
         run: make types
-
-      - name: Type-check source (checkJs ratchet)
-        run: make types-source
 
       - name: Package lint (publint)
         run: make publint
