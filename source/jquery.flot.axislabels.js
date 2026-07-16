@@ -29,7 +29,62 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
+
+/** @typedef {'bottom' | 'top' | 'left' | 'right'} AxisPosition */
+
+/**
+ * @typedef {Object} AxisBox
+ * @property {number} left
+ * @property {number} top
+ * @property {number} width
+ * @property {number} height
+ */
+
+/**
+ * @typedef {Object} AxisLabelAxis
+ * @property {'x' | 'y'} direction
+ * @property {number} n
+ * @property {boolean} show
+ * @property {number} labelHeight
+ * @property {number} labelWidth
+ * @property {{ centerX: number, centerY: number }} boxPosition
+ * @property {AxisBox} box
+ * @property {{ axisLabel?: string, axisLabelPadding?: number, position: AxisPosition }} options
+ */
+
+/**
+ * @typedef {Object} AxisLabelSurface
+ * @property {(layer: string, text: string, font: string) => { width: number, height: number }} getTextInfo
+ * @property {(classes: string) => SVGGElement} getSVGLayer
+ * @property {(
+ *   layer: string,
+ *   x: number,
+ *   y: number,
+ *   text: string,
+ *   font: string,
+ *   angle?: number,
+ *   width?: number,
+ *   halign?: 'left' | 'center' | 'right',
+ *   valign?: 'top' | 'middle' | 'bottom',
+ *   transforms?: SVGTransform[]
+ * ) => void} addText
+ * @property {(layer: string, x: number, y: number, text: string, font: string) => void} removeText
+ * @property {() => void} render
+ */
+
+/**
+ * @typedef {Object} AxisLabelPlot
+ * @property {{
+ *   processOptions: Array<(plot: AxisLabelPlot, options: { axisLabels: { show: boolean } }) => void>,
+ *   axisReserveSpace: Array<(plot: AxisLabelPlot, axis: AxisLabelAxis) => void>,
+ *   draw: Array<(plot: AxisLabelPlot) => void>,
+ *   shutdown: Array<() => void>
+ * }} hooks
+ * @property {() => HTMLElement} getPlaceholder
+ * @property {() => AxisLabelSurface} getSurface
+ * @property {() => Record<string, AxisLabelAxis>} getAxes
+ */
 
     "use strict";
 
@@ -39,7 +94,16 @@ import { plugins } from './jquery.flot.js';
         }
     };
 
-    function AxisLabel(axisName, position, padding, placeholder, axisLabel, surface) {
+	class AxisLabel {
+	/**
+	 * @param {string} axisName
+	 * @param {AxisPosition} position
+	 * @param {number} padding
+	 * @param {HTMLElement} placeholder
+	 * @param {string} axisLabel
+	 * @param {AxisLabelSurface} surface
+	 */
+	constructor(axisName, position, padding, placeholder, axisLabel, surface) {
         this.axisName = axisName;
         this.position = position;
         this.padding = padding;
@@ -51,7 +115,7 @@ import { plugins } from './jquery.flot.js';
         this.elem = null;
     }
 
-    AxisLabel.prototype.calculateSize = function() {
+	calculateSize() {
         var axisId = this.axisName + 'Label',
             layerId = axisId + 'Layer',
             className = axisId + ' axisLabels';
@@ -67,10 +131,16 @@ import { plugins } from './jquery.flot.js';
             this.width = 0;
             this.height = this.labelHeight + this.padding;
         }
-    };
+    }
 
-    AxisLabel.prototype.transforms = function(degrees, x, y, svgLayer) {
-        var transforms = [], translate, rotate;
+	/** @param {number} degrees @param {number} x @param {number} y @param {SVGSVGElement} svgLayer */
+	transforms(degrees, x, y, svgLayer) {
+		/** @type {SVGTransform[]} */
+		var transforms = [];
+		/** @type {SVGTransform} */
+		var translate;
+		/** @type {SVGTransform} */
+		var rotate;
         if (x !== 0 || y !== 0) {
             translate = svgLayer.createSVGTransform();
             translate.setTranslate(x, y);
@@ -85,9 +155,10 @@ import { plugins } from './jquery.flot.js';
         }
 
         return transforms;
-    };
+    }
 
-    AxisLabel.prototype.calculateOffsets = function(box) {
+	/** @param {AxisBox} box */
+	calculateOffsets(box) {
         var offsets = {
             x: 0,
             y: 0,
@@ -112,48 +183,54 @@ import { plugins } from './jquery.flot.js';
         offsets.y = Math.round(offsets.y);
 
         return offsets;
-    };
+    }
 
-    AxisLabel.prototype.cleanup = function() {
+	cleanup() {
         var axisId = this.axisName + 'Label',
             layerId = axisId + 'Layer',
             className = axisId + ' axisLabels';
         this.surface.removeText(layerId, 0, 0, this.axisLabel, className);
-    };
+    }
 
-    AxisLabel.prototype.draw = function(box) {
-        var axisId = this.axisName + 'Label',
+	/** @param {AxisBox} box */
+	draw(box) {
+		var axisId = this.axisName + 'Label',
             layerId = axisId + 'Layer',
             className = axisId + ' axisLabels',
             offsets = this.calculateOffsets(box),
-            style = {
+			style = {
                 position: 'absolute',
                 bottom: '',
                 right: '',
                 display: 'inline-block',
-                'white-space': 'nowrap'
-            };
+				'white-space': 'nowrap'
+			};
 
         var layer = this.surface.getSVGLayer(layerId);
-        var transforms = this.transforms(offsets.degrees, offsets.x, offsets.y, layer.parentNode);
+		var svgLayer = layer.ownerSVGElement;
+		if (!svgLayer) {
+			throw new Error('Axis label layer is not attached to an SVG element.');
+		}
+		var transforms = this.transforms(offsets.degrees, offsets.x, offsets.y, svgLayer);
 
         this.surface.addText(layerId, 0, 0, this.axisLabel, className, undefined, undefined, undefined, undefined, transforms);
         this.surface.render();
-        Object.keys(style).forEach(function(key) {
-            layer.style[key] = style[key];
-        });
-    };
+		Object.assign(layer.style, style);
+    }
+	}
 
-    function init(plot) {
-        plot.hooks.processOptions.push(function(plot, options) {
+	/** @param {AxisLabelPlot} plot */
+	function init(plot) {
+		plot.hooks.processOptions.push(function(plot, options) {
             if (!options.axisLabels.show) {
                 return;
             }
 
-            var axisLabels = {};
+			/** @type {Record<string, AxisLabel>} */
+			var axisLabels = {};
             var defaultPadding = 2; // padding between axis and tick labels
 
-            plot.hooks.axisReserveSpace.push(function(plot, axis) {
+			plot.hooks.axisReserveSpace.push(function(plot, axis) {
                 var opts = axis.options;
                 var axisName = axis.direction + axis.n;
 
@@ -184,7 +261,7 @@ import { plugins } from './jquery.flot.js';
             });
 
             // TODO - use the drawAxis hook
-            plot.hooks.draw.push(function(plot, ctx) {
+			plot.hooks.draw.push(function(plot) {
                 var axes = plot.getAxes();
                 Object.keys(axes).forEach(function(flotAxisName) {
                     var axis = axes[flotAxisName];
@@ -198,7 +275,7 @@ import { plugins } from './jquery.flot.js';
                 });
             });
 
-            plot.hooks.shutdown.push(function(plot, eventHolder) {
+			plot.hooks.shutdown.push(function() {
                 for (var axisName in axisLabels) {
                     axisLabels[axisName].cleanup();
                 }

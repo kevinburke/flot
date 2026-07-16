@@ -72,7 +72,7 @@ const standalonePlugins = [
 // Plugin bundles run in the browser after dist/jquery.flot.js. They import
 // from the (external) jQuery-adapter bundle and from helpers.js, and those
 // imports must resolve to live values the adapter exposes on window.Flot:
-//   - import { plugins } from './jquery.flot.js'  →  Flot.plugins
+//   - import { plugins } from './plugin-registry.js' → Flot.plugins
 //   - import { bind, ... } from './helpers.js'    →  Flot.helpers
 //   - import $ from 'jquery'                      →  jQuery
 // Using a function for external/globals (rather than a plain object) lets us
@@ -80,7 +80,7 @@ const standalonePlugins = [
 // to /abs/.../source/foo.js by the time these hooks run.
 function pluginGlobal(id) {
 	if (id === "jquery") return "jQuery";
-	if (id.endsWith("jquery.flot.js")) return "Flot";
+	if (id.endsWith("plugin-registry.js")) return "Flot";
 	if (id.endsWith("helpers.js")) return "Flot.helpers";
 	return null;
 }

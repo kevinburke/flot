@@ -17,7 +17,7 @@ You can use series.step to specify the interval between consecutive indexes of t
 
 /* global jQuery*/
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 
     'use strict';
 
@@ -40,7 +40,8 @@ import { plugins } from './jquery.flot.js';
     }
 
     plugins.push({
-		init: function(/** @type {any} */ plot) {
+		/** @param {any} plot */
+		init: function(plot) {
             plot.hooks.processRawData.push(process1DRawData);
         },
         name: 'flatdata',

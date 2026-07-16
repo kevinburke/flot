@@ -1,7 +1,8 @@
 'use strict';
 
 export var saturated = {
-		saturate: function (/** @type {number} */ a) {
+		/** @param {number} a */
+		saturate: function (a) {
         if (a === Infinity) {
             return Number.MAX_VALUE;
         }
@@ -12,15 +13,18 @@ export var saturated = {
 
         return a;
     },
-		delta: function(/** @type {number} */ min, /** @type {number} */ max, /** @type {number} */ noTicks) {
+		/** @param {number} min @param {number} max @param {number} noTicks */
+		delta: function(min, max, noTicks) {
         return ((max - min) / noTicks) === Infinity ? (max / noTicks - min / noTicks) : (max - min) / noTicks
     },
-		multiply: function (/** @type {number} */ a, /** @type {number} */ b) {
+		/** @param {number} a @param {number} b */
+		multiply: function (a, b) {
         return saturated.saturate(a * b);
     },
     // returns c * bInt * a. Beahves properly in the case where c is negative
     // and bInt * a is bigger that Number.MAX_VALUE (Infinity)
-		multiplyAdd: function (/** @type {number} */ a, /** @type {number} */ bInt, /** @type {number} */ c) {
+		/** @param {number} a @param {number} bInt @param {number} c */
+		multiplyAdd: function (a, bInt, c) {
         if (isFinite(a * bInt)) {
             return saturated.saturate(a * bInt + c);
         } else {
@@ -34,7 +38,8 @@ export var saturated = {
         }
     },
     // round to nearby lower multiple of base
-		floorInBase: function(/** @type {number} */ n, /** @type {number} */ base) {
+		/** @param {number} n @param {number} base */
+		floorInBase: function(n, base) {
         return base * Math.floor(n / base);
     }
 };

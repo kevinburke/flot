@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+type FlotWindow = typeof window & {
+	Flot: { plugins: Array<{ name?: string }> };
+};
+
 // Smoke-test a handful of representative example pages. Each example loads
 // the source files via <script> tags and calls $.plot(). We verify:
 //   1. No uncaught JS errors on the page.
@@ -32,3 +36,22 @@ for (const examplePath of EXAMPLES) {
 		expect(errors, `JS errors on ${examplePath}`).toEqual([]);
 	});
 }
+
+test("standalone plugin registers with the jQuery bundle", async ({ page }) => {
+	const errors: string[] = [];
+	page.on("pageerror", (err) => {
+		errors.push(err.message);
+	});
+
+	await page.goto("/tests/browser/harness.html", { waitUntil: "networkidle" });
+	const pluginCount = await page.evaluate(() => (window as FlotWindow).Flot.plugins.length);
+
+	await page.addScriptTag({ url: "/dist/plugins/jquery.flot.crosshair.js" });
+
+	const registeredPlugins = await page.evaluate(() =>
+		(window as FlotWindow).Flot.plugins.map((plugin) => plugin.name),
+	);
+	expect(registeredPlugins).toHaveLength(pluginCount + 1);
+	expect(registeredPlugins).toContain("crosshair");
+	expect(errors).toEqual([]);
+});

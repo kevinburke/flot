@@ -1,7 +1,7 @@
 
 /* global jQuery */
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 
     'use strict';
 

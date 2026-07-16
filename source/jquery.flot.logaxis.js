@@ -28,6 +28,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
     var PREFERRED_LOG_TICK_VALUES = computePreferedLogTickValues(Number.MAX_VALUE, 10),
         EXTENDED_LOG_TICK_VALUES = computePreferedLogTickValues(Number.MAX_VALUE, 4);
 
+    /** @param {number} endLimit @param {number} rangeStep */
     function computePreferedLogTickValues(endLimit, rangeStep) {
         var log10End = Math.floor(Math.log(endLimit) * Math.LOG10E) - 1,
             log10Start = -log10End,
@@ -50,6 +51,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
     In case the number of ticks that can be generated is less than the expected noTicks/4,
     a linear tick generation is used.
     */
+    /** @param {any} plot @param {any} axis @param {any} noTicks */
     var logTickGenerator = function (plot, axis, noTicks) {
         var ticks = [],
             minIdx = -1,
@@ -63,7 +65,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
             noTicks = 0.3 * Math.sqrt(axis.direction === "x" ? surface.width : surface.height);
         }
 
-        PREFERRED_LOG_TICK_VALUES.some(function (val, i) {
+        PREFERRED_LOG_TICK_VALUES.some(/** @param {number} val @param {number} i */ function (val, i) {
             if (val >= min) {
                 minIdx = i;
                 return true;
@@ -72,7 +74,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
             }
         });
 
-        PREFERRED_LOG_TICK_VALUES.some(function (val, i) {
+        PREFERRED_LOG_TICK_VALUES.some(/** @param {number} val @param {number} i */ function (val, i) {
             if (val >= max) {
                 maxIdx = i;
                 return true;
@@ -111,6 +113,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
                     };
                 } else {
 					if (Math.abs(pixelCoord - lastDisplayed.pixelCoord) >= inverseNoTicks) {
+						/** @type {number} */
 						var idealPixelCoord = lastDisplayed.idealPixelCoord;
 						lastDisplayed = {
 							pixelCoord: pixelCoord,
@@ -136,6 +139,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
         return ticks;
     };
 
+    /** @param {any} axis @param {any} plot */
     var clampAxis = function (axis, plot) {
         var min = axis.min,
             max = axis.max;
@@ -165,6 +169,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
     For a number greater that 10^6 or smaller than 10^(-3), this will be drawn
     with e representation
     */
+    /** @param {number} value @param {any} axis @param {any} precision */
     var logTickFormatter = function (value, axis, precision) {
         var tenExponent = value > 0 ? Math.floor(Math.log(value) / Math.LN10) : 0;
 
@@ -198,6 +203,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
     };
 
     /*logaxis caracteristic functions*/
+    /** @param {number} v */
     var logTransform = function (v) {
         if (v < PREFERRED_LOG_TICK_VALUES[0]) {
             v = PREFERRED_LOG_TICK_VALUES[0];
@@ -206,18 +212,22 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
         return Math.log(v);
     };
 
+    /** @param {number} v */
     var logInverseTransform = function (v) {
         return Math.exp(v);
     };
 
+    /** @param {number} v */
     var invertedTransform = function (v) {
         return -v;
     }
 
+    /** @param {number} v */
     var invertedLogTransform = function (v) {
         return -logTransform(v);
     }
 
+    /** @param {number} v */
     var invertedLogInverseTransform = function (v) {
         return logInverseTransform(-v);
     }
@@ -230,6 +240,7 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
     The function is usefull since the logarithmic representation can not show
     values less than or equal to 0.
     */
+    /** @param {any} plot @param {any} axis */
     function setDataminRange(plot, axis) {
         if (axis.options.mode === 'log' && axis.datamin <= 0) {
             if (axis.datamin === null) {
@@ -240,13 +251,14 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
         }
     }
 
+    /** @param {any} plot @param {any} axis */
     function processAxisOffset(plot, axis) {
         var series = plot.getData(),
             range = series
-                .filter(function(series) {
+                .filter(/** @param {any} series */ function(series) {
                     return series.xaxis === axis || series.yaxis === axis;
                 })
-                .map(function(series) {
+                .map(/** @param {any} series */ function(series) {
                     return plot.computeRangeForDataSeries(series, null, isValid);
                 }),
             min = axis.direction === 'x'
@@ -258,18 +270,20 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
         return min;
     }
 
+    /** @param {number} a */
     function isValid(a) {
         return a > 0;
     }
 
+    /** @param {any} plot */
     function init(plot) {
-        plot.hooks.processOptions.push(function (plot) {
+        plot.hooks.processOptions.push(/** @param {any} plot */ function (plot) {
             var axes = plot.getAxes();
-            Object.keys(axes).forEach(function (axisName) {
+            Object.keys(axes).forEach(/** @param {string} axisName */ function (axisName) {
                 var axis = axes[axisName];
                 var opts = axis.options;
                 if (opts.mode === 'log') {
-                    axis.tickGenerator = function (axis) {
+                    axis.tickGenerator = /** @param {any} axis */ function (axis) {
                         var noTicks = 11;
                         return logTickGenerator(plot, axis, noTicks);
                     };

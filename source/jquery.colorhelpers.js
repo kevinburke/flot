@@ -20,17 +20,21 @@
  * produce a color rather than just crashing.
  */
 
+/** @type {any} */
 export var color = {};
 
 // construct color object with some convenient chainable helpers
+/** @param {number} r @param {number} g @param {number} b @param {number} a */
 color.make = function (r, g, b, a) {
-    var o = {};
+	/** @type {any} */
+	var o = {};
     o.r = r || 0;
     o.g = g || 0;
     o.b = b || 0;
     o.a = a != null ? a : 1;
 
-    o.add = function (c, d) {
+	/** @param {string} c @param {number} d */
+	o.add = function (c, d) {
         for (var i = 0; i < c.length; ++i) {
             o[c.charAt(i)] += d;
         }
@@ -38,7 +42,8 @@ color.make = function (r, g, b, a) {
         return o.normalize();
     };
 
-    o.scale = function (c, f) {
+	/** @param {string} c @param {number} f */
+	o.scale = function (c, f) {
         for (var i = 0; i < c.length; ++i) {
             o[c.charAt(i)] *= f;
         }
@@ -55,7 +60,8 @@ color.make = function (r, g, b, a) {
     };
 
     o.normalize = function () {
-        function clamp(min, value, max) {
+		/** @param {number} min @param {number} value @param {number} max */
+		function clamp(min, value, max) {
             return value < min ? min : (value > max ? max : value);
         }
 
@@ -75,12 +81,13 @@ color.make = function (r, g, b, a) {
 
 // extract CSS color property from element, going up in the DOM
 // if it's "transparent". Takes a raw DOM element.
+/** @param {HTMLElement} elem @param {string} css */
 color.extract = function (elem, css) {
     var c;
 
     do {
-        var camel = css.replace(/-([a-z])/g, function(_, ch) { return ch.toUpperCase(); });
-        c = (elem.style[camel] || getComputedStyle(elem)[css] || '').toLowerCase();
+		var camel = css.replace(/-([a-z])/g, /** @param {string} _ @param {string} ch */ function(_, ch) { return ch.toUpperCase(); });
+		c = (/** @type {any} */ (elem.style)[camel] || /** @type {any} */ (getComputedStyle(elem))[css] || '').toLowerCase();
         // keep going until we find an element that has color, or
         // we hit the body or root (have no parent)
         if (c !== '' && c !== 'transparent') {
@@ -101,6 +108,7 @@ color.extract = function (elem, css) {
 // parse CSS color string (like "rgb(10, 32, 43)" or "#fff"),
 // returns color object, if parsing failed, you get black (0, 0,
 // 0) out
+/** @param {string} str */
 color.parse = function (str) {
     var res, m = color.make;
 
@@ -151,6 +159,7 @@ color.parse = function (str) {
     }
 }
 
+/** @type {Record<string, number[]>} */
 var lookupColors = {
     aqua: [0, 255, 255],
     azure: [240, 255, 255],

@@ -55,7 +55,7 @@ More detail and specific examples can be found in the included HTML file.
 
 */
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 import { extend, bind, unbind, trigger, width, height } from './helpers.js';
 
     // Maximum redraw attempts when fitting labels within the plot

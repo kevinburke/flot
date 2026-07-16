@@ -90,7 +90,7 @@ The plugin allso adds the following methods to the plot object:
 
 */
 
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
 import { color } from './jquery.colorhelpers.js';
 import { bind, trigger, unbind } from './helpers.js';

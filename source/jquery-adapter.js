@@ -106,7 +106,7 @@ if (typeof window !== 'undefined') {
     }
     window.Flot.Canvas = Canvas;
     // Exposed so standalone plugin bundles (dist/plugins/*.js) can resolve
-    // their `import { plugins } from './jquery.flot.js'` and
+    // their `import { plugins } from './plugin-registry.js'` and
     // `import { ... } from './helpers.js'` to live objects on this global.
     window.Flot.plugins = plugins;
     window.Flot.helpers = helpers;

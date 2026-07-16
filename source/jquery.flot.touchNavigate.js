@@ -1,4 +1,4 @@
-import { plugins } from './jquery.flot.js';
+import { plugins } from './plugin-registry.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
 import { trigger } from './helpers.js';
 
