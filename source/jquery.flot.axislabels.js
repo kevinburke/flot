@@ -39,7 +39,8 @@ import { plugins } from './jquery.flot.js';
         }
     };
 
-    function AxisLabel(axisName, position, padding, placeholder, axisLabel, surface) {
+	/** @constructor @param {string} axisName @param {string} position @param {number} padding @param {HTMLElement} placeholder @param {string} axisLabel @param {any} surface */
+	function AxisLabel(axisName, position, padding, placeholder, axisLabel, surface) {
         this.axisName = axisName;
         this.position = position;
         this.padding = padding;
@@ -69,7 +70,8 @@ import { plugins } from './jquery.flot.js';
         }
     };
 
-    AxisLabel.prototype.transforms = function(degrees, x, y, svgLayer) {
+	/** @param {number} degrees @param {number} x @param {number} y @param {any} svgLayer */
+	AxisLabel.prototype.transforms = function(degrees, x, y, svgLayer) {
         var transforms = [], translate, rotate;
         if (x !== 0 || y !== 0) {
             translate = svgLayer.createSVGTransform();
@@ -87,7 +89,8 @@ import { plugins } from './jquery.flot.js';
         return transforms;
     };
 
-    AxisLabel.prototype.calculateOffsets = function(box) {
+	/** @param {any} box */
+	AxisLabel.prototype.calculateOffsets = function(box) {
         var offsets = {
             x: 0,
             y: 0,
@@ -121,18 +124,19 @@ import { plugins } from './jquery.flot.js';
         this.surface.removeText(layerId, 0, 0, this.axisLabel, className);
     };
 
-    AxisLabel.prototype.draw = function(box) {
-        var axisId = this.axisName + 'Label',
+	/** @param {any} box */
+	AxisLabel.prototype.draw = function(box) {
+		var axisId = this.axisName + 'Label',
             layerId = axisId + 'Layer',
             className = axisId + ' axisLabels',
             offsets = this.calculateOffsets(box),
-            style = {
+			style = /** @type {any} */ ({
                 position: 'absolute',
                 bottom: '',
                 right: '',
                 display: 'inline-block',
-                'white-space': 'nowrap'
-            };
+				'white-space': 'nowrap'
+			});
 
         var layer = this.surface.getSVGLayer(layerId);
         var transforms = this.transforms(offsets.degrees, offsets.x, offsets.y, layer.parentNode);
@@ -144,16 +148,18 @@ import { plugins } from './jquery.flot.js';
         });
     };
 
-    function init(plot) {
-        plot.hooks.processOptions.push(function(plot, options) {
+	/** @param {any} plot */
+	function init(plot) {
+		plot.hooks.processOptions.push(/** @param {any} plot @param {any} options */ function(plot, options) {
             if (!options.axisLabels.show) {
                 return;
             }
 
-            var axisLabels = {};
+			/** @type {Record<string, any>} */
+			var axisLabels = {};
             var defaultPadding = 2; // padding between axis and tick labels
 
-            plot.hooks.axisReserveSpace.push(function(plot, axis) {
+			plot.hooks.axisReserveSpace.push(/** @param {any} plot @param {any} axis */ function(plot, axis) {
                 var opts = axis.options;
                 var axisName = axis.direction + axis.n;
 
@@ -184,7 +190,7 @@ import { plugins } from './jquery.flot.js';
             });
 
             // TODO - use the drawAxis hook
-            plot.hooks.draw.push(function(plot, ctx) {
+			plot.hooks.draw.push(/** @param {any} plot @param {any} ctx */ function(plot, ctx) {
                 var axes = plot.getAxes();
                 Object.keys(axes).forEach(function(flotAxisName) {
                     var axis = axes[flotAxisName];
@@ -198,7 +204,7 @@ import { plugins } from './jquery.flot.js';
                 });
             });
 
-            plot.hooks.shutdown.push(function(plot, eventHolder) {
+			plot.hooks.shutdown.push(/** @param {any} plot @param {any} eventHolder */ function(plot, eventHolder) {
                 for (var axisName in axisLabels) {
                     axisLabels[axisName].cleanup();
                 }

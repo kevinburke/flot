@@ -12,7 +12,7 @@ import { saturated } from './jquery.flot.saturated.js';
 
     'use strict';
 
-    var options = {
+	var options = /** @type {any} */ ({
         xaxis: {
             timezone: null, // "browser" for local to the client or timezone for timezone-js
             timeformat: null, // format string to use
@@ -23,16 +23,17 @@ import { saturated } from './jquery.flot.saturated.js';
         yaxis: {
             timeBase: 'seconds'
         }
-    };
+	});
 
     var floorInBase = saturated.floorInBase;
 
     // Method to provide microsecond support to Date like classes.
-    var CreateMicroSecondDate = function(DateType, microEpoch) {
+	/** @param {any} DateType @param {number} microEpoch */
+	var CreateMicroSecondDate = function(DateType, microEpoch) {
         var newDate = new DateType(microEpoch);
 
         var oldSetTime = newDate.setTime.bind(newDate);
-        newDate.update = function(microEpoch) {
+		newDate.update = /** @param {number} microEpoch */ function(microEpoch) {
             // Round epoch to 3 decimal accuracy
             microEpoch = Math.round(microEpoch * 1000) / 1000;
 
@@ -48,7 +49,7 @@ import { saturated } from './jquery.flot.saturated.js';
             return microEpoch;
         };
 
-        newDate.setTime = function (microEpoch) {
+		newDate.setTime = /** @param {number} microEpoch */ function (microEpoch) {
             this.update(microEpoch);
         };
 
@@ -56,13 +57,13 @@ import { saturated } from './jquery.flot.saturated.js';
             return this.microseconds;
         };
 
-        newDate.setMicroseconds = function(microseconds) {
+		newDate.setMicroseconds = /** @param {number} microseconds */ function(microseconds) {
             var epochWithoutMicroseconds = oldGetTime();
             var newEpoch = epochWithoutMicroseconds + microseconds / 1000;
             this.update(newEpoch);
         };
 
-        newDate.setUTCMicroseconds = function(microseconds) { this.setMicroseconds(microseconds); }
+		newDate.setUTCMicroseconds = /** @param {number} microseconds */ function(microseconds) { this.setMicroseconds(microseconds); }
 
         newDate.getUTCMicroseconds = function() { return this.getMicroseconds(); }
 
@@ -75,18 +76,19 @@ import { saturated } from './jquery.flot.saturated.js';
     // Returns a string with the date d formatted according to fmt.
     // A subset of the Open Group's strftime format is supported.
 
-    export function formatDate(d, fmt, monthNames, dayNames) {
+	/** @param {any} d @param {string} fmt @param {string[]} monthNames @param {string[]} dayNames */
+	export function formatDate(d, fmt, monthNames, dayNames) {
         if (typeof d.strftime === "function") {
             return d.strftime(fmt);
         }
 
-        var leftPad = function(n, pad) {
+		var leftPad = /** @param {any} n @param {any} [pad] */ function(n, pad) {
             n = "" + n;
             pad = "" + (pad == null ? "0" : pad);
             return n.length === 1 ? pad + n : n;
         };
 
-        var formatSubSeconds = function(milliseconds, microseconds, numberDecimalPlaces) {
+		var formatSubSeconds = /** @param {number} milliseconds @param {number} microseconds @param {number} numberDecimalPlaces */ function(milliseconds, microseconds, numberDecimalPlaces) {
             var totalMicroseconds = milliseconds * 1000 + microseconds;
             var formattedString;
             if (numberDecimalPlaces < 6 && numberDecimalPlaces > 0) {
@@ -170,8 +172,10 @@ import { saturated } from './jquery.flot.saturated.js';
     // of time zones.  This is done through a wrapper that only calls the UTC
     // versions of the accessor methods.
 
-    export function makeUtcWrapper(d) {
-        function addProxyMethod(sourceObj, sourceMethod, targetObj, targetMethod) {
+	/** @param {any} d */
+	export function makeUtcWrapper(d) {
+		/** @param {any} sourceObj @param {string} sourceMethod @param {any} targetObj @param {string} targetMethod */
+		function addProxyMethod(sourceObj, sourceMethod, targetObj, targetMethod) {
             sourceObj[sourceMethod] = function() {
                 return targetObj[targetMethod].apply(targetObj, arguments);
             };
@@ -201,7 +205,8 @@ import { saturated } from './jquery.flot.saturated.js';
 
     // select time zone strategy.  This returns a date-like object tied to the
     // desired timezone
-    export function dateGenerator(ts, opts) {
+	/** @param {number} ts @param {any} opts */
+	export function dateGenerator(ts, opts) {
         var maxDateValue = 8640000000000000;
 
         if (opts && opts.timeBase === 'seconds') {
@@ -233,7 +238,8 @@ import { saturated } from './jquery.flot.saturated.js';
     }
 
     // map of app. size of time units in seconds
-    var timeUnitSizeSeconds = {
+	/** @type {Record<string, number>} */
+	var timeUnitSizeSeconds = {
         "microsecond": 0.000001,
         "millisecond": 0.001,
         "second": 1,
@@ -246,7 +252,8 @@ import { saturated } from './jquery.flot.saturated.js';
     };
 
     // map of app. size of time units in milliseconds
-    var timeUnitSizeMilliseconds = {
+	/** @type {Record<string, number>} */
+	var timeUnitSizeMilliseconds = {
         "microsecond": 0.001,
         "millisecond": 1,
         "second": 1000,
@@ -259,7 +266,8 @@ import { saturated } from './jquery.flot.saturated.js';
     };
 
     // map of app. size of time units in microseconds
-    var timeUnitSizeMicroseconds = {
+	/** @type {Record<string, number>} */
+	var timeUnitSizeMicroseconds = {
         "microsecond": 1,
         "millisecond": 1000,
         "second": 1000000,
@@ -298,7 +306,8 @@ import { saturated } from './jquery.flot.saturated.js';
     var specQuarters = baseSpec.concat([[1, "quarter"], [2, "quarter"],
         [1, "year"]]);
 
-    export function dateTickGenerator(axis) {
+	/** @param {any} axis */
+	export function dateTickGenerator(axis) {
         var opts = axis.options,
             ticks = [],
             d = dateGenerator(axis.min, opts),
@@ -475,10 +484,11 @@ import { saturated } from './jquery.flot.saturated.js';
         return ticks;
     };
 
-    function init(plot) {
-        plot.hooks.processOptions.push(function (plot) {
+	/** @param {any} plot */
+	function init(plot) {
+		plot.hooks.processOptions.push(/** @param {any} plot */ function (plot) {
             var axes = plot.getAxes();
-            Object.keys(axes).forEach(function(axisName) {
+			Object.keys(axes).forEach(/** @param {string} axisName */ function(axisName) {
                 var axis = axes[axisName];
                 var opts = axis.options;
                 if (opts.mode === "time") {
@@ -487,7 +497,7 @@ import { saturated } from './jquery.flot.saturated.js';
                     // if a tick formatter is already provided do not overwrite it
                     if ('tickFormatter' in opts && typeof opts.tickFormatter === 'function') return;
 
-                    axis.tickFormatter = function (v, axis) {
+					axis.tickFormatter = /** @param {number} v @param {any} axis */ function (v, axis) {
                         var d = dateGenerator(v, axis.options);
 
                         // first check global format

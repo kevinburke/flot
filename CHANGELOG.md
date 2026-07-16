@@ -13,6 +13,10 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   checks for the JavaScript source.
 - `Makefile`: keep the existing source check green during the staged
   `noImplicitAny` migration and add `types-source-strict` for the full check.
+- `tsconfig.strict-files.json`: enforce strict source checks for the completed
+  migration files while the remaining source files are migrated.
+- `Makefile`: run the strict migrated-file checks independently so each file
+  can be added or reviewed incrementally.
 
 ## [5.1.4] - 2026-05-22
 

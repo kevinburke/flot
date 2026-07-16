@@ -126,11 +126,11 @@ import { extend } from './helpers.js';
 		function processThresholds(plot, s, datapoints) {
             if (!s.threshold) return;
             if (s.threshold instanceof Array) {
-			s.threshold.sort(function(/** @type {any} */ a, /** @type {any} */ b) {
+			s.threshold.sort(/** @param {any} a @param {any} b */ function(a, b) {
                     return a.below - b.below;
                 });
 
-				s.threshold.forEach(function(/** @type {any} */ th) {
+				s.threshold.forEach(/** @param {any} th */ function(th) {
                     thresholdData(plot, s, datapoints, th.below, th.color);
                 });
             } else {

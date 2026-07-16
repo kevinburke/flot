@@ -1,14 +1,16 @@
 'use strict';
 
 export var browser = {
-	getPageXY: function (/** @type {MouseEvent} */ e) {
+	/** @param {MouseEvent} e */
+	getPageXY: function (e) {
         var doc = document.documentElement,
             pageX = e.clientX + (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
             pageY = e.clientY + (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
         return { X: pageX, Y: pageY };
     },
 
-	getPixelRatio: function(/** @type {any} */ context) {
+	/** @param {any} context */
+	getPixelRatio: function(context) {
         var devicePixelRatio = window.devicePixelRatio || 1,
             backingStoreRatio =
             context.webkitBackingStorePixelRatio ||
@@ -22,7 +24,7 @@ export var browser = {
     isSafari: function() {
         var top = window.top;
         if (!top) return false;
-        return /constructor/i.test(/** @type {any} */ (top.HTMLElement)) || (function (/** @type {any} */ p) { return p.toString() === "[object SafariRemoteNotification]"; })(!(/** @type {any} */ (top))['safari'] || (typeof (/** @type {any} */ (top)).safari !== 'undefined' && (/** @type {any} */ (top)).safari.pushNotification));
+		return /constructor/i.test(/** @type {any} */ (top.HTMLElement)) || (/** @param {any} p */ function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!(/** @type {any} */ (top))['safari'] || (typeof (/** @type {any} */ (top)).safari !== 'undefined' && (/** @type {any} */ (top)).safari.pushNotification));
     },
 
     isMobileSafari: function() {

@@ -43,11 +43,12 @@ import { browser } from './jquery.flot.browser.js';
     var pixelRatio = 1;
     var getPixelRatio = browser.getPixelRatio;
 
+    /** @param {any[]} canvasOrSvgSources @param {any} destinationCanvas */
     export function composeImages(canvasOrSvgSources, destinationCanvas) {
         var validCanvasOrSvgSources = canvasOrSvgSources.filter(isValidSource);
         pixelRatio = getPixelRatio(destinationCanvas.getContext('2d'));
 
-        var allImgCompositionPromises = validCanvasOrSvgSources.map(function(validCanvasOrSvgSource) {
+		var allImgCompositionPromises = validCanvasOrSvgSources.map(/** @param {any} validCanvasOrSvgSource */ function(validCanvasOrSvgSource) {
             var tempImg = new Image();
             var currentPromise = new Promise(getGenerateTempImg(tempImg, validCanvasOrSvgSource));
             return currentPromise;
@@ -57,6 +58,7 @@ import { browser } from './jquery.flot.browser.js';
         return lastPromise;
     }
 
+    /** @param {any} canvasOrSvgSource */
     function isValidSource(canvasOrSvgSource) {
         var isValidFromCanvas = true;
         var isValidFromContent = true;
@@ -73,23 +75,24 @@ import { browser } from './jquery.flot.browser.js';
         return isValidFromContent && isValidFromCanvas && (window.getComputedStyle(canvasOrSvgSource).visibility === 'visible');
     }
 
+    /** @param {any} tempImg @param {any} canvasOrSvgSource */
     function getGenerateTempImg(tempImg, canvasOrSvgSource) {
         tempImg.sourceDescription = '<info className="' + canvasOrSvgSource.className + '" tagName="' + canvasOrSvgSource.tagName + '" id="' + canvasOrSvgSource.id + '">';
         tempImg.sourceComponent = canvasOrSvgSource;
 
-        return function doGenerateTempImg(successCallbackFunc, failureCallbackFunc) {
-            tempImg.onload = function(evt) {
+		return /** @param {any} successCallbackFunc @param {any} failureCallbackFunc */ function doGenerateTempImg(successCallbackFunc, failureCallbackFunc) {
+			tempImg.onload = /** @param {any} evt */ function(evt) {
                 tempImg.successfullyLoaded = true;
                 successCallbackFunc(tempImg);
             };
 
-            tempImg.onabort = function(evt) {
+			tempImg.onabort = /** @param {any} evt */ function(evt) {
                 tempImg.successfullyLoaded = false;
                 console.log('Can\'t generate temp image from ' + tempImg.sourceDescription + '. It is possible that it is missing some properties or its content is not supported by this browser. Source component:', tempImg.sourceComponent);
                 successCallbackFunc(tempImg); //call successCallback, to allow snapshot of all working images
             };
 
-            tempImg.onerror = function(evt) {
+			tempImg.onerror = /** @param {any} evt */ function(evt) {
                 tempImg.successfullyLoaded = false;
                 console.log('Can\'t generate temp image from ' + tempImg.sourceDescription + '. It is possible that it is missing some properties or its content is not supported by this browser. Source component:', tempImg.sourceComponent);
                 successCallbackFunc(tempImg); //call successCallback, to allow snapshot of all working images
@@ -99,17 +102,20 @@ import { browser } from './jquery.flot.browser.js';
         };
     }
 
+    /** @param {any} destinationCanvas */
     function getExecuteImgComposition(destinationCanvas) {
-        return function executeImgComposition(tempImgs) {
+		return /** @param {any[]} tempImgs */ function executeImgComposition(tempImgs) {
             var compositionResult = copyImgsToCanvas(tempImgs, destinationCanvas);
             return compositionResult;
         };
     }
 
+    /** @param {any} canvas @param {any} img */
     function copyCanvasToImg(canvas, img) {
         img.src = canvas.toDataURL('image/png');
     }
 
+    /** @param {Document} document */
     function getCSSRules(document) {
         var styleSheets = document.styleSheets,
             rulesList = [];
@@ -117,7 +123,7 @@ import { browser } from './jquery.flot.browser.js';
             // CORS requests for style sheets throw and an exception on Chrome > 64
             try {
                 // in Chrome, the external CSS files are empty when the page is directly loaded from disk
-                var rules = styleSheets[i].cssRules || [];
+				var rules = /** @type {any[]} */ (styleSheets[i].cssRules || []);
                 for (var j = 0; j < rules.length; j++) {
                     var rule = rules[j];
                     rulesList.push(rule.cssText);
@@ -129,6 +135,7 @@ import { browser } from './jquery.flot.browser.js';
         return rulesList;
     }
 
+    /** @param {any} rules @param {any} svg */
     function embedCSSRulesInSVG(rules, svg) {
         var text = [
             '<svg class="snapshot ' + svg.classList + '" width="' + svg.width.baseVal.value * pixelRatio + '" height="' + svg.height.baseVal.value * pixelRatio + '" viewBox="0 0 ' + svg.width.baseVal.value + ' ' + svg.height.baseVal.value + '" xmlns="http://www.w3.org/2000/svg">',
@@ -143,6 +150,7 @@ import { browser } from './jquery.flot.browser.js';
         return text;
     }
 
+    /** @param {any} svg @param {any} img */
     function copySVGToImgMostBrowsers(svg, img) {
         var rules = getCSSRules(document),
             source = embedCSSRulesInSVG(rules, svg);
@@ -154,12 +162,14 @@ import { browser } from './jquery.flot.browser.js';
         img.src = url;
     }
 
+    /** @param {any} svg @param {any} img */
     function copySVGToImgSafari(svg, img) {
         // Use this method to convert a string buffer array to a binary string.
         // Do so by breaking up large strings into smaller substrings; this is necessary to avoid the
         // "maximum call stack size exceeded" exception that can happen when calling 'String.fromCharCode.apply'
         // with a very long array.
-        function buildBinaryString (arrayBuffer) {
+		/** @param {any} arrayBuffer */
+		function buildBinaryString (arrayBuffer) {
             var binaryString = "";
             const utf8Array = new Uint8Array(arrayBuffer);
             const blockSize = 16384;
@@ -185,6 +195,7 @@ import { browser } from './jquery.flot.browser.js';
         img.src = data;
     }
 
+    /** @param {any} svgSource */
     function patchSVGSource(svgSource) {
         var source = '';
         //add name spaces.
@@ -199,6 +210,7 @@ import { browser } from './jquery.flot.browser.js';
         return '<?xml version="1.0" standalone="no"?>\r\n' + source;
     }
 
+    /** @param {any} svg @param {any} img */
     function copySVGToImg(svg, img) {
         if (browser.isSafari() || browser.isMobileSafari()) {
             copySVGToImgSafari(svg, img);
@@ -207,8 +219,10 @@ import { browser } from './jquery.flot.browser.js';
         }
     }
 
+    /** @param {any} destinationCanvas @param {any[]} sources */
     function adaptDestSizeToZoom(destinationCanvas, sources) {
-        function containsSVGs(source) {
+		/** @param {any} source */
+		function containsSVGs(source) {
             return source.srcImgTagName === 'svg';
         }
 
@@ -220,6 +234,7 @@ import { browser } from './jquery.flot.browser.js';
         }
     }
 
+    /** @param {any[]} sources @param {any} destination */
     function prepareImagesToBeComposed(sources, destination) {
         var result = SUCCESSFULIMAGEPREPARATION;
         if (sources.length === 0) {
@@ -268,6 +283,7 @@ import { browser } from './jquery.flot.browser.js';
         return result;
     }
 
+    /** @param {any[]} sources @param {any} destination */
     function copyImgsToCanvas(sources, destination) {
         var prepareImagesResult = prepareImagesToBeComposed(sources, destination);
         if (prepareImagesResult === SUCCESSFULIMAGEPREPARATION) {
@@ -282,6 +298,7 @@ import { browser } from './jquery.flot.browser.js';
         return prepareImagesResult;
     }
 
+    /** @param {any} srcCanvasOrSvg @param {any} destImg */
     function adnotateDestImgWithBoundingClientRect(srcCanvasOrSvg, destImg) {
         destImg.genLeft = srcCanvasOrSvg.getBoundingClientRect().left;
         destImg.genTop = srcCanvasOrSvg.getBoundingClientRect().top;
@@ -297,6 +314,7 @@ import { browser } from './jquery.flot.browser.js';
         }
     }
 
+    /** @param {any} srcCanvasOrSvg @param {any} destImg */
     function generateTempImageFromCanvasOrSvg(srcCanvasOrSvg, destImg) {
         if (srcCanvasOrSvg.tagName === 'CANVAS') {
             copyCanvasToImg(srcCanvasOrSvg, destImg);
@@ -314,6 +332,7 @@ import { browser } from './jquery.flot.browser.js';
         return GENERALFAILURECALLBACKERROR;
     }
 
+    /** @param {any} plot */
     function init(plot) {
         // used to extend the public API of the plot
         plot.composeImages = composeImages;

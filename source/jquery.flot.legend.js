@@ -4,7 +4,7 @@
 
 import { plugins } from './jquery.flot.js';
 
-    var defaultOptions = {
+	var defaultOptions = /** @type {any} */ ({
         legend: {
             show: false,
             noColumns: 1,
@@ -14,9 +14,10 @@ import { plugins } from './jquery.flot.js';
             margin: 5, // distance from grid edge to default legend container within plot
             sorted: null // default to no legend sorting
         }
-    };
+	});
 
-    function insertLegend(plot, options, placeholder, legendEntries) {
+	/** @param {any} plot @param {any} options @param {HTMLElement} placeholder @param {any[]} legendEntries */
+	function insertLegend(plot, options, placeholder, legendEntries) {
         // clear before redraw
         if (options.legend.container != null) {
             options.legend.container.innerHTML = '';
@@ -41,12 +42,12 @@ import { plugins } from './jquery.flot.js';
             pos = "",
             p = options.legend.position,
             m = options.legend.margin,
-            shape = {
-                name: '',
-                label: '',
-                xPos: '',
-                yPos: ''
-            };
+			shape = /** @type {any} */ ({
+				name: '',
+				label: '',
+				xPos: '',
+				yPos: ''
+			});
 
         html[j++] = '<svg class="legendLayer" style="width:inherit;height:inherit;">';
         html[j++] = '<rect class="background" width="100%" height="100%"/>';
@@ -184,7 +185,8 @@ import { plugins } from './jquery.flot.js';
     }
 
     // Generate html for a shape
-    function getEntryIconHtml(shape) {
+	/** @param {any} shape */
+	function getEntryIconHtml(shape) {
         var html = '',
             name = shape.name,
             x = shape.xPos,
@@ -354,9 +356,10 @@ import { plugins } from './jquery.flot.js';
         '</defs>';
 
     // Generate a list of legend entries in their final order
-    function getLegendEntries(series, labelFormatter, sorted) {
+	/** @param {any[]} series @param {any} labelFormatter @param {any} sorted */
+	function getLegendEntries(series, labelFormatter, sorted) {
         var lf = labelFormatter,
-            legendEntries = series.reduce(function(validEntries, s, i) {
+			legendEntries = series.reduce(/** @param {any[]} validEntries @param {any} s @param {number} i */ function(validEntries, s, i) {
                 var labelEval = (lf ? lf(s.label, s) : s.label)
                 if (s.hasOwnProperty("label") ? labelEval : true) {
                     var entry = {
@@ -394,7 +397,8 @@ import { plugins } from './jquery.flot.js';
     }
 
     // return false if opts1 same as opts2
-    function checkOptions(opts1, opts2) {
+	/** @param {any} opts1 @param {any} opts2 */
+	function checkOptions(opts1, opts2) {
         for (var prop in opts1) {
             if (opts1.hasOwnProperty(prop)) {
                 if (opts1[prop] !== opts2[prop]) {
@@ -406,7 +410,8 @@ import { plugins } from './jquery.flot.js';
     }
 
     // Compare two lists of legend entries
-    function shouldRedraw(oldEntries, newEntries) {
+	/** @param {any[]} oldEntries @param {any[]} newEntries */
+	function shouldRedraw(oldEntries, newEntries) {
         if (!oldEntries || !newEntries) {
             return true;
         }
@@ -452,8 +457,9 @@ import { plugins } from './jquery.flot.js';
         return false;
     }
 
-    function init(plot) {
-        plot.hooks.setupGrid.push(function (plot) {
+	/** @param {any} plot */
+	function init(plot) {
+		plot.hooks.setupGrid.push(/** @param {any} plot */ function (plot) {
             var options = plot.getOptions();
             var series = plot.getData(),
                 labelFormatter = options.legend.labelFormatter,

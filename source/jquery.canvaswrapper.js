@@ -15,8 +15,73 @@ don't work unless the canvas is attached to the DOM.
 import { browser } from './jquery.flot.browser.js';
 import { width, height } from './helpers.js';
 
+/**
+ * @typedef {Object} FontSpec
+ * @property {string} style CSS font style.
+ * @property {string} variant CSS font variant.
+ * @property {string} weight CSS font weight.
+ * @property {number} size Font size in pixels.
+ * @property {number} [lineHeight] Line height in pixels.
+ * @property {string} family CSS font family.
+ * @property {string} [fill] Text fill color.
+ */
+
+/** @typedef {string | FontSpec} CanvasFont */
+
+/** @typedef {string | number} CanvasText */
+
+/** @typedef {Record<string, Record<string, Record<string, TextInfo>>>} TextCache */
+
+/**
+ * @typedef {Object} TextPosition
+ * @property {boolean} active Whether this position is active in the next render.
+ * @property {boolean} rendered Whether this position is currently in the DOM.
+ * @property {SVGTextElement} element SVG element containing the text.
+ * @property {string} text Text rendered at this position.
+ * @property {number} x Horizontal position in pixels.
+ * @property {number} y Vertical position in pixels.
+ */
+
+/**
+ * @typedef {Object} TextInfo
+ * @property {number} width Measured text width in pixels.
+ * @property {number} height Measured text height in pixels.
+ * @property {boolean} measured Whether the text has been measured.
+ * @property {SVGTextElement} element The measured SVG text element.
+ * @property {TextPosition[]} positions Positions where the text is drawn.
+ */
+
+/**
+ * @typedef {Object} CanvasInstance
+ * @property {HTMLCanvasElement} element Canvas element.
+ * @property {CanvasRenderingContext2D} context Canvas drawing context.
+ * @property {number} pixelRatio Device pixel ratio.
+ * @property {number} width Canvas width in pixels.
+ * @property {number} height Canvas height in pixels.
+ * @property {HTMLElement | null} SVGContainer SVG overlay container.
+ * @property {Record<string, HTMLElement>} SVG SVG layers by class name.
+ * @property {TextCache} _textCache Text measurement cache.
+ * @property {(width: number, height: number) => void} resize Resize the canvas.
+ */
+
+/**
+ * @param {HTMLElement} container
+ * @param {string} cls Space-separated CSS class names to find.
+ * @returns {HTMLCanvasElement | null}
+ */
+function findCanvas(container, cls) {
+    var element = container.getElementsByClassName(cls)[0];
+    return element instanceof HTMLCanvasElement ? element : null;
+}
+
+/**
+ * @constructor
+ * @this {CanvasInstance}
+ * @param {string} cls Space-separated CSS class names to apply to the canvas.
+ * @param {HTMLElement} container Element to contain the canvas.
+ */
 var Canvas = function(cls, container) {
-        var element = container.getElementsByClassName(cls)[0];
+        var element = findCanvas(container, cls);
 
         if (!element) {
             element = document.createElement('canvas');
@@ -48,12 +113,14 @@ var Canvas = function(cls, container) {
         // Collection of HTML div layers for text overlaid onto the canvas
 
         this.SVGContainer = null;
-        this.SVG = {};
+		/** @type {Record<string, HTMLElement>} */
+		this.SVG = {};
 
         // Cache of text fragments and metrics, so we can avoid expensively
         // re-calculating them when the plot is re-rendered in a loop.
 
-        this._textCache = {};
+		/** @type {TextCache} */
+		this._textCache = {};
     }
 
     /**
@@ -64,7 +131,11 @@ var Canvas = function(cls, container) {
      is the new height of the canvas, both of them in pixels.
     */
 
-    Canvas.prototype.resize = function(width, height) {
+	/**
+	 * @param {number} width Canvas width in pixels.
+	 * @param {number} height Canvas height in pixels.
+	 */
+	Canvas.prototype.resize = function(width, height) {
         var minSize = 10;
         width = width < minSize ? minSize : width;
         height = height < minSize ? minSize : height;
@@ -83,13 +154,15 @@ var Canvas = function(cls, container) {
         if (this.width !== width) {
             element.width = width * pixelRatio;
             element.style.width = width + 'px';
-            this.width = width;
+			/** @type {number} */
+			this.width = width;
         }
 
         if (this.height !== height) {
             element.height = height * pixelRatio;
             element.style.height = height + 'px';
-            this.height = height;
+			/** @type {number} */
+			this.height = height;
         }
 
         // Save the context, so we can reset in case we get replotted.  The
@@ -184,7 +257,8 @@ var Canvas = function(cls, container) {
      The classes string represents the string of space-separated CSS classes
      used to uniquely identify the text layer. It return the svg-layer div.
     */
-    Canvas.prototype.getSVGLayer = function(classes) {
+	/** @param {string} classes Space-separated CSS class names for the layer. */
+	Canvas.prototype.getSVGLayer = function(classes) {
         var layer = this.SVG[classes];
 
         // Create the SVG layer if it doesn't exist
@@ -272,12 +346,19 @@ var Canvas = function(cls, container) {
      The last parameter is the Maximum width of the text before it wraps.
      The method returns a text info object.
     */
-    Canvas.prototype.getTextInfo = function(layer, text, font, angle, width) {
+	/**
+	 * @param {string} layer CSS classes identifying the text layer.
+	 * @param {CanvasText} text Text to measure.
+	 * @param {CanvasFont} font CSS classes or a font specification.
+	 * @param {number | null | undefined} angle Rotation angle in degrees.
+	 * @param {number | null | undefined} width Maximum text width in pixels.
+	 */
+	Canvas.prototype.getTextInfo = function(layer, text, font, angle, width) {
         var textStyle, layerCache, styleCache, info;
 
         // Cast the value to a string, in case we were given a number or such
 
-        text = '' + text;
+        var textString = '' + text;
 
         // If the font is a font-spec object, generate a CSS font definition
 
@@ -301,22 +382,22 @@ var Canvas = function(cls, container) {
             styleCache = layerCache[textStyle] = {};
         }
 
-        var key = generateKey(text);
+        var key = generateKey(textString);
         info = styleCache[key];
 
         // If we can't find a matching element in our cache, create a new one
 
         if (!info) {
             var element = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            if (text.indexOf('<br>') !== -1) {
-                addTspanElements(text, element, -9999);
+            if (textString.indexOf('<br>') !== -1) {
+                addTspanElements(textString, element, -9999);
             } else {
-                var textNode = document.createTextNode(text);
+                var textNode = document.createTextNode(textString);
                 element.appendChild(textNode);
             }
 
             element.style.position = 'absolute';
-            element.style.maxWidth = width;
+            element.style.maxWidth = width == null ? '' : String(width);
             element.setAttributeNS(null, 'x', String(-9999));
             element.setAttributeNS(null, 'y', String(-9999));
 
@@ -351,10 +432,14 @@ var Canvas = function(cls, container) {
         return info;
     };
 
-    function updateTransforms (element, transforms) {
+	/**
+	 * @param {SVGTextElement} element Text element to transform.
+	 * @param {SVGTransform[]} [transforms] SVG transforms to apply.
+	 */
+	function updateTransforms (element, transforms) {
         element.transform.baseVal.clear();
         if (transforms) {
-            transforms.forEach(function(t) {
+			transforms.forEach(/** @param {SVGTransform} t */ function(t) {
                 element.transform.baseVal.appendItem(t);
             });
         }
@@ -372,8 +457,21 @@ var Canvas = function(cls, container) {
      X and Y represents the X and Y coordinate at which to draw the text.
      and text is the string to draw
     */
-    Canvas.prototype.addText = function(layer, x, y, text, font, angle, width, halign, valign, transforms) {
-        var info = this.getTextInfo(layer, text, font, angle, width),
+	/**
+	 * @param {string} layer CSS classes identifying the text layer.
+	 * @param {number} x Horizontal position in pixels.
+	 * @param {number} y Vertical position in pixels.
+	 * @param {CanvasText} text Text to draw.
+	 * @param {CanvasFont} font CSS classes or a font specification.
+	 * @param {number | null | undefined} angle Rotation angle in degrees.
+	 * @param {number | null | undefined} width Maximum text width in pixels.
+	 * @param {'left' | 'center' | 'right'} halign Horizontal alignment.
+	 * @param {'top' | 'middle' | 'bottom'} valign Vertical alignment.
+	 * @param {SVGTransform[]} transforms SVG transforms to apply to the text.
+	 */
+	Canvas.prototype.addText = function(layer, x, y, text, font, angle, width, halign, valign, transforms) {
+		var textString = '' + text,
+			info = this.getTextInfo(layer, textString, font, angle, width),
             positions = info.positions;
 
         // Tweak the div's position to match the text's alignment
@@ -397,7 +495,7 @@ var Canvas = function(cls, container) {
 
         for (var i = 0, position; positions[i]; i++) {
             position = positions[i];
-            if (position.x === x && position.y === y && position.text === text) {
+            if (position.x === x && position.y === y && position.text === textString) {
                 position.active = true;
                 // update the transforms
                 updateTransforms(position.element, transforms);
@@ -405,12 +503,12 @@ var Canvas = function(cls, container) {
                 return;
             } else if (position.active === false) {
                 position.active = true;
-                position.text = text;
-                if (text.indexOf('<br>') !== -1) {
+                position.text = textString;
+                if (textString.indexOf('<br>') !== -1) {
                     y -= 0.25 * info.height;
-                    addTspanElements(text, position.element, x);
+                    addTspanElements(textString, position.element, x);
                 } else {
-                    position.element.textContent = text;
+                    position.element.textContent = textString;
                 }
                 position.element.setAttributeNS(null, 'x', x);
                 position.element.setAttributeNS(null, 'y', y);
@@ -432,18 +530,18 @@ var Canvas = function(cls, container) {
             active: true,
             rendered: false,
             element: positions.length ? info.element.cloneNode() : info.element,
-            text: text,
+            text: textString,
             x: x,
             y: y
         };
 
         positions.push(position);
 
-        if (text.indexOf('<br>') !== -1) {
+        if (textString.indexOf('<br>') !== -1) {
             y -= 0.25 * info.height;
-            addTspanElements(text, position.element, x);
+            addTspanElements(textString, position.element, x);
         } else {
-            position.element.textContent = text;
+            position.element.textContent = textString;
         }
 
         // Move the element to its final position within the container
@@ -454,21 +552,35 @@ var Canvas = function(cls, container) {
         updateTransforms(position.element, transforms);
     };
 
-    var addTspanElements = function(text, element, x) {
+	/**
+	 * @param {SVGTextElement} element SVG text element to inspect.
+	 * @param {number} index Tspan index within the text element.
+	 * @returns {SVGTSpanElement | null} Tspan at the requested index.
+	 */
+	function findTspanElement(element, index) {
+		var child = element.children[index];
+		return child instanceof SVGTSpanElement ? child : null;
+	}
+
+	/**
+	 * @param {string} text Text to split into SVG tspan elements.
+	 * @param {SVGTextElement} element SVG text element to populate.
+	 * @param {number} x Horizontal position in pixels.
+	 */
+	var addTspanElements = function(text, element, x) {
         var lines = text.split('<br>'),
             tspan, i, offset;
 
         for (i = 0; i < lines.length; i++) {
-            if (!element.childNodes[i]) {
-                tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-                element.appendChild(tspan);
-            } else {
-                tspan = element.childNodes[i];
-            }
+			tspan = findTspanElement(element, i);
+			if (!tspan) {
+				tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+				element.appendChild(tspan);
+			}
             tspan.textContent = lines[i];
             offset = (i === 0 ? 0 : 1) + 'em';
             tspan.setAttributeNS(null, 'dy', offset);
-            tspan.setAttributeNS(null, 'x', x);
+            tspan.setAttributeNS(null, 'x', String(x));
         }
     }
 
@@ -490,8 +602,20 @@ var Canvas = function(cls, container) {
       Text is the string to remove, while the font is either a string of space-separated CSS
       classes or a font-spec object, defining the text's font and style.
      */
-    Canvas.prototype.removeText = function(layer, x, y, text, font, angle) {
-        var info, htmlYCoord;
+	/**
+	 * @param {string} layer CSS classes identifying the text layer.
+	 * @param {number} x Horizontal position in pixels.
+	 * @param {number} y Vertical position in pixels.
+	 * @param {CanvasText} [text] Text to remove; omit to clear the layer.
+	 * @param {CanvasFont} [font] CSS classes or a font specification.
+	 * @param {number} [angle] Rotation angle in degrees.
+	 */
+	Canvas.prototype.removeText = function(layer, x, y, text, font, angle) {
+		/** @type {TextInfo} */
+		var info;
+		var htmlYCoord;
+		/** @type {TextPosition[]} */
+		var positions;
         if (text == null) {
             var layerCache = this._textCache[layer];
             if (layerCache != null) {
@@ -504,9 +628,9 @@ var Canvas = function(cls, container) {
                                 // positions array (e.g. when a Flot plugin
                                 // populates the cache outside the normal
                                 // addText path). Upstream flot/flot#1444.
-                                var positions = styleCache[key].positions;
+								positions = styleCache[key].positions;
                                 if (positions != null) {
-                                    positions.forEach(function(position) {
+								positions.forEach(/** @param {TextPosition} position */ function(position) {
                                         position.active = false;
                                     });
                                 }
@@ -518,9 +642,9 @@ var Canvas = function(cls, container) {
         } else {
             info = this.getTextInfo(layer, text, font, angle);
             positions = info.positions;
-            positions.forEach(function(position) {
+			positions.forEach(/** @param {TextPosition} position */ function(position) {
                 htmlYCoord = y + 0.75 * info.height;
-                if (position.x === x && position.y === htmlYCoord && position.text === text) {
+                if (position.x === x && position.y === htmlYCoord && position.text === String(text)) {
                     position.active = false;
                 }
             });
@@ -535,7 +659,7 @@ var Canvas = function(cls, container) {
      Use this function before plot.setupGrid() and plot.draw() if the plot just
      became visible or the styles changed.
     */
-    Canvas.prototype.clearCache = function() {
+	Canvas.prototype.clearCache = function() {
         var cache = this._textCache;
         for (var layerKey in cache) {
             if (Object.prototype.hasOwnProperty.call(cache, layerKey)) {
@@ -549,7 +673,8 @@ var Canvas = function(cls, container) {
         this._textCache = {};
     };
 
-    function generateKey(text) {
+	/** @param {string} text */
+	function generateKey(text) {
         return text.replace(/0|1|2|3|4|5|6|7|8|9/g, '0');
     }
 

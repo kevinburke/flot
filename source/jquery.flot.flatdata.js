@@ -40,7 +40,8 @@ import { plugins } from './jquery.flot.js';
     }
 
     plugins.push({
-		init: function(/** @type {any} */ plot) {
+		/** @param {any} plot */
+		init: function(plot) {
             plot.hooks.processRawData.push(process1DRawData);
         },
         name: 'flatdata',

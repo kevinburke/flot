@@ -47,14 +47,15 @@ import { plugins } from './jquery.flot.js';
 
     var options = {
         xaxis: {
-            categories: null
+			categories: /** @type {any} */ (null)
         },
         yaxis: {
-            categories: null
+			categories: /** @type {any} */ (null)
         }
     };
 
-    function processRawData(plot, series, data, datapoints) {
+	/** @param {any} plot @param {any} series @param {any} data @param {any} datapoints */
+	function processRawData(plot, series, data, datapoints) {
         // if categories are enabled, we need to disable
         // auto-transformation to numbers so the strings are intact
         // for later processing
@@ -99,7 +100,8 @@ import { plugins } from './jquery.flot.js';
         }
     }
 
-    function getNextIndex(categories) {
+	/** @param {Record<string, number>} categories */
+	function getNextIndex(categories) {
         var index = -1;
 
         for (var v in categories) {
@@ -111,7 +113,8 @@ import { plugins } from './jquery.flot.js';
         return index + 1;
     }
 
-    function categoriesTickGenerator(axis) {
+	/** @param {any} axis */
+	function categoriesTickGenerator(axis) {
         var res = [];
         for (var label in axis.categories) {
             var v = axis.categories[label];
@@ -125,14 +128,17 @@ import { plugins } from './jquery.flot.js';
         return res;
     }
 
-    function setupCategoriesForAxis(series, axis, datapoints) {
+	/** @param {any} series @param {string} axis @param {any} datapoints */
+	function setupCategoriesForAxis(series, axis, datapoints) {
         if (series[axis].options.mode !== "categories") {
             return;
         }
 
         if (!series[axis].categories) {
             // parse options
-            var c = {}, o = series[axis].options.categories || {};
+			/** @type {Record<string, number>} */
+			var c = {};
+			var o = series[axis].options.categories || {};
             if (Array.isArray(o)) {
                 for (var i = 0; i < o.length; ++i) {
                     c[o[i]] = i;
@@ -154,7 +160,8 @@ import { plugins } from './jquery.flot.js';
         transformPointsOnAxis(datapoints, axis, series[axis].categories);
     }
 
-    function transformPointsOnAxis(datapoints, axis, categories) {
+	/** @param {any} datapoints @param {string} axis @param {Record<string, number>} categories */
+	function transformPointsOnAxis(datapoints, axis, categories) {
         // go through the points, transforming them
         var points = datapoints.points,
             ps = datapoints.pointsize,
@@ -184,12 +191,14 @@ import { plugins } from './jquery.flot.js';
         }
     }
 
-    function processDatapoints(plot, series, datapoints) {
+	/** @param {any} plot @param {any} series @param {any} datapoints */
+	function processDatapoints(plot, series, datapoints) {
         setupCategoriesForAxis(series, "xaxis", datapoints);
         setupCategoriesForAxis(series, "yaxis", datapoints);
     }
 
-    function init(plot) {
+	/** @param {any} plot */
+	function init(plot) {
         plot.hooks.processRawData.push(processRawData);
         plot.hooks.processDatapoints.push(processDatapoints);
     }

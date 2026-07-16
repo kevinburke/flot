@@ -64,7 +64,7 @@ shadowSize and lineWidth are derived as well from the points series.
 
 import { plugins } from './jquery.flot.js';
 
-    var options = {
+	var options = /** @type {any} */ ({
         series: {
             points: {
                 errorbars: null, //should be 'x', 'y' or 'xy'
@@ -72,9 +72,10 @@ import { plugins } from './jquery.flot.js';
                 yerr: {err: 'y', show: null, asymmetric: null, upperCap: null, lowerCap: null, color: null, radius: null}
             }
         }
-    };
+	});
 
-    function processRawData(plot, series, data, datapoints) {
+	/** @param {any} plot @param {any} series @param {any} data @param {any} datapoints */
+	function processRawData(plot, series, data, datapoints) {
         if (!series.points.errorbars) {
             return;
         }
@@ -108,7 +109,8 @@ import { plugins } from './jquery.flot.js';
         datapoints.format = format;
     }
 
-    function parseErrors(series, i) {
+	/** @param {any} series @param {number} i */
+	function parseErrors(series, i) {
         var points = series.datapoints.points;
 
         // read errors from points array
@@ -173,7 +175,8 @@ import { plugins } from './jquery.flot.js';
         return errRanges;
     }
 
-    function drawSeriesErrors(plot, ctx, s) {
+	/** @param {any} plot @param {any} ctx @param {any} s */
+	function drawSeriesErrors(plot, ctx, s) {
         var points = s.datapoints.points,
             ps = s.datapoints.pointsize,
             ax = [s.xaxis, s.yaxis],
@@ -290,7 +293,8 @@ import { plugins } from './jquery.flot.js';
         }
     }
 
-    function drawError(ctx, err, x, y, upper, lower, drawUpper, drawLower, radius, offset, minmax) {
+	/** @param {any} ctx @param {any} err @param {any} x @param {any} y @param {any} upper @param {any} lower @param {any} drawUpper @param {any} drawLower @param {any} radius @param {any} offset @param {any} minmax */
+	function drawError(ctx, err, x, y, upper, lower, drawUpper, drawLower, radius, offset, minmax) {
         //shadow offset
         y += offset;
         upper += offset;
@@ -339,7 +343,8 @@ import { plugins } from './jquery.flot.js';
         }
     }
 
-    function drawPath(ctx, pts) {
+	/** @param {any} ctx @param {any} pts */
+	function drawPath(ctx, pts) {
         ctx.beginPath();
         ctx.moveTo(pts[0][0], pts[0][1]);
         for (var p = 1; p < pts.length; p++) {
@@ -349,12 +354,13 @@ import { plugins } from './jquery.flot.js';
         ctx.stroke();
     }
 
-    function draw(plot, ctx) {
+	/** @param {any} plot @param {any} ctx */
+	function draw(plot, ctx) {
         var plotOffset = plot.getPlotOffset();
 
         ctx.save();
         ctx.translate(plotOffset.left, plotOffset.top);
-        plot.getData().forEach(function (s) {
+		plot.getData().forEach(/** @param {any} s */ function (s) {
             if (s.points.errorbars && (s.points.xerr.show || s.points.yerr.show)) {
                 drawSeriesErrors(plot, ctx, s);
             }
@@ -362,7 +368,8 @@ import { plugins } from './jquery.flot.js';
         ctx.restore();
     }
 
-    function init(plot) {
+	/** @param {any} plot */
+	function init(plot) {
         plot.hooks.processRawData.push(processRawData);
         plot.hooks.draw.push(draw);
     }

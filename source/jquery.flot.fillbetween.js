@@ -66,7 +66,7 @@ import { plugins } from './jquery.flot.js';
             }
 
             var format = datapoints.format;
-			var plotHasId = function(/** @type {any} */ id) {
+			var plotHasId = /** @param {any} id */ function(id) {
                 var plotData = plot.getData();
                 for (var i = 0; i < plotData.length; i++) {
                     if (plotData[i].id === id) {
