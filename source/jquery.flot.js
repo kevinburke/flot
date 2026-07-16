@@ -489,7 +489,8 @@ import { drawSeries as drawSeriesModule } from './jquery.flot.drawSeries.js';
         draw();
         bindEvents();
 
-        function executeHooks(hook, args) {
+		/** @this {any} */
+		function executeHooks(hook, args) {
             args = [plot].concat(args);
             for (var i = 0; i < hook.length; ++i) {
                 hook[i].apply(this, args);

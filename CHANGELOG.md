@@ -7,6 +7,13 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ## Unreleased
 
+### Changed
+
+- `tsconfig.json`: enable TypeScript's `noImplicitAny` and `noImplicitThis`
+  checks for the JavaScript source.
+- `Makefile`: keep the existing source check green during the staged
+  `noImplicitAny` migration and add `types-source-strict` for the full check.
+
 ## [5.1.4] - 2026-05-22
 
 ### Changed

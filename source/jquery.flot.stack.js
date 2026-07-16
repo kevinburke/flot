@@ -38,11 +38,13 @@ charts or filled areas).
 import { plugins } from './jquery.flot.js';
 
     var options = {
-        series: { stack: null } // or number/string
+		series: { stack: /** @type {any} */ (null) } // or number/string
     };
 
-    function init(plot) {
-        function findMatchingSeries(s, allseries) {
+	/** @param {any} plot */
+	function init(plot) {
+		/** @param {any} s @param {any[]} allseries */
+		function findMatchingSeries(s, allseries) {
             var res = null;
             for (var i = 0; i < allseries.length; ++i) {
                 if (s === allseries[i]) break;
@@ -55,7 +57,8 @@ import { plugins } from './jquery.flot.js';
             return res;
         }
 
-        function addBottomPoints (s, datapoints) {
+		/** @param {any} s @param {any} datapoints */
+		function addBottomPoints (s, datapoints) {
             var formattedPoints = [];
             for (var i = 0; i < datapoints.points.length; i += 2) {
                 formattedPoints.push(datapoints.points[i]);
@@ -75,7 +78,8 @@ import { plugins } from './jquery.flot.js';
             datapoints.pointsize = 3;
         }
 
-        function stackData(plot, s, datapoints) {
+		/** @param {any} plot @param {any} s @param {any} datapoints */
+		function stackData(plot, s, datapoints) {
             if (s.stack == null || s.stack === false) return;
 
             var needsBottom = s.bars.show || (s.lines.show && s.lines.fill);

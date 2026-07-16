@@ -56,10 +56,11 @@ setTrigger(function(el, type, args) {
     $(el).trigger(event);
 });
 
+/** @param {any} placeholder @param {any} data @param {any} options */
 function jqueryPlot(placeholder, data, options) {
     var el = typeof placeholder === 'string'
         ? document.querySelector(placeholder)
-        : (placeholder instanceof $ ? placeholder[0] : placeholder);
+		: (placeholder instanceof $ ? /** @type {any} */ (placeholder)[0] : placeholder);
     return plot(el, data, options);
 }
 
@@ -86,8 +87,8 @@ $.plot.composeImages = composeImages;
 var origExtract = color.extract;
 $.color = Object.create(color);
 $.color.extract = function(elem, cssProp) {
-    if (elem instanceof $) {
-        elem = elem[0];
+	if (elem instanceof $) {
+		elem = /** @type {any} */ (elem)[0];
     }
     return origExtract(elem, cssProp);
 };

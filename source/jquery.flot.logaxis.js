@@ -110,10 +110,11 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
                         idealPixelCoord: pixelCoord
                     };
                 } else {
-                    if (Math.abs(pixelCoord - lastDisplayed.pixelCoord) >= inverseNoTicks) {
-                        lastDisplayed = {
-                            pixelCoord: pixelCoord,
-                            idealPixelCoord: lastDisplayed.idealPixelCoord - inverseNoTicks
+					if (Math.abs(pixelCoord - lastDisplayed.pixelCoord) >= inverseNoTicks) {
+						var idealPixelCoord = lastDisplayed.idealPixelCoord;
+						lastDisplayed = {
+							pixelCoord: pixelCoord,
+							idealPixelCoord: idealPixelCoord - inverseNoTicks
                         };
                     } else {
                         tick = null;
@@ -296,4 +297,3 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
 
     export var logTicksGenerator = logTickGenerator;
     export { logTickFormatter };
-

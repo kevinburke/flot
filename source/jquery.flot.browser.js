@@ -1,14 +1,14 @@
 'use strict';
 
 export var browser = {
-    getPageXY: function (e) {
+	getPageXY: function (/** @type {MouseEvent} */ e) {
         var doc = document.documentElement,
             pageX = e.clientX + (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
             pageY = e.clientY + (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
         return { X: pageX, Y: pageY };
     },
 
-    getPixelRatio: function(context) {
+	getPixelRatio: function(/** @type {any} */ context) {
         var devicePixelRatio = window.devicePixelRatio || 1,
             backingStoreRatio =
             context.webkitBackingStorePixelRatio ||

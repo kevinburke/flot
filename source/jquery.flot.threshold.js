@@ -46,11 +46,13 @@ import { plugins } from './jquery.flot.js';
 import { extend } from './helpers.js';
 
     var options = {
-        series: { threshold: null } // or { below: number, color: color spec}
+	series: { threshold: /** @type {any} */ (null) } // or { below: number, color: color spec}
     };
 
-    function init(plot) {
-        function thresholdData(plot, s, datapoints, below, color) {
+	/** @param {any} plot */
+	function init(plot) {
+		/** @param {any} plot @param {any} s @param {any} datapoints @param {number} below @param {any} color */
+		function thresholdData(plot, s, datapoints, below, color) {
             var ps = datapoints.pointsize, i, x, y, p, prevp,
                 thresholded = extend({}, s); // note: shallow copy
 
@@ -64,8 +66,10 @@ import { extend } from './helpers.js';
             var origpoints = datapoints.points,
                 addCrossingPoints = s.lines.show;
 
-            var threspoints = [];
-            var newpoints = [];
+			/** @type {any[]} */
+			var threspoints = [];
+			/** @type {any[]} */
+			var newpoints = [];
             var m;
 
             for (i = 0; i < origpoints.length; i += ps) {
@@ -118,14 +122,15 @@ import { extend } from './helpers.js';
             // FIXME: there are probably some edge cases left in bars
         }
 
-        function processThresholds(plot, s, datapoints) {
+		/** @param {any} plot @param {any} s @param {any} datapoints */
+		function processThresholds(plot, s, datapoints) {
             if (!s.threshold) return;
             if (s.threshold instanceof Array) {
-                s.threshold.sort(function(a, b) {
+			s.threshold.sort(function(/** @type {any} */ a, /** @type {any} */ b) {
                     return a.below - b.below;
                 });
 
-                s.threshold.forEach(function(th) {
+				s.threshold.forEach(function(/** @type {any} */ th) {
                     thresholdData(plot, s, datapoints, th.below, th.color);
                 });
             } else {

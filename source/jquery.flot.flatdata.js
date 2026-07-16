@@ -21,7 +21,8 @@ import { plugins } from './jquery.flot.js';
 
     'use strict';
 
-    function process1DRawData(plot, series, data, datapoints) {
+	/** @param {any} plot @param {any} series @param {number[]} data @param {any} datapoints */
+	function process1DRawData(plot, series, data, datapoints) {
         if (series.flatdata === true) {
             var start = series.start || 0;
             var step = typeof series.step === 'number' ? series.step : 1;
@@ -39,7 +40,7 @@ import { plugins } from './jquery.flot.js';
     }
 
     plugins.push({
-        init: function(plot) {
+		init: function(/** @type {any} */ plot) {
             plot.hooks.processRawData.push(process1DRawData);
         },
         name: 'flatdata',

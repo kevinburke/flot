@@ -1,5 +1,6 @@
 // Vanilla replacements for jQuery utility functions used throughout flot.
 
+/** @param {any} value */
 function isPlainObject(value) {
     if (!value || Object.prototype.toString.call(value) !== '[object Object]') {
         return false;
@@ -9,13 +10,15 @@ function isPlainObject(value) {
     return prototype === Object.prototype || prototype === null;
 }
 
+/** @param {any} value @returns {any} */
 function cloneDeepValue(value) {
     if (Array.isArray(value)) {
         return value.map(cloneDeepValue);
     }
 
     if (isPlainObject(value)) {
-        var copy = {};
+		/** @type {Record<string, any>} */
+		var copy = {};
         var keys = Object.keys(value);
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
@@ -76,27 +79,32 @@ export function extend(...args) {
 }
 
 // Get inner width of an element (content area, no padding/border/scrollbar).
+/** @param {HTMLElement} el */
 export function width(el) {
     return el.clientWidth;
 }
 
 // Get inner height of an element.
+/** @param {HTMLElement} el */
 export function height(el) {
     return el.clientHeight;
 }
 
 // Get or set a CSS property on an element.
+/** @param {HTMLElement} el @param {string} prop @param {any} [val] */
 export function css(el, prop, val) {
     if (val !== undefined) {
-        el.style[prop] = typeof val === 'number' ? val + 'px' : val;
+		/** @type {any} */ (el.style)[prop] = typeof val === 'number' ? val + 'px' : val;
         return undefined;
     }
-    return getComputedStyle(el)[prop];
+	return /** @type {any} */ (getComputedStyle(el))[prop];
 }
 
 // Store or retrieve arbitrary data on an element.
+/** @type {WeakMap<object, Record<string, any>>} */
 var dataStore = new WeakMap();
 
+/** @param {HTMLElement} el @param {string} key @param {any} [val] */
 export function data(el, key, val) {
     var store = dataStore.get(el);
     if (!store) {
@@ -110,6 +118,7 @@ export function data(el, key, val) {
     return store[key];
 }
 
+/** @param {HTMLElement} el @param {string} key */
 export function removeData(el, key) {
     var store = dataStore.get(el);
     if (store) {
@@ -125,6 +134,7 @@ export function removeData(el, key) {
 // on `event.detail` (an array). The jQuery adapter overrides this via
 // setTrigger so handlers bound with $(el).on(type, fn) receive the extra
 // args as positional parameters, matching upstream flot/flot behavior.
+/** @type {(el: any, type: string, args?: any) => Event} */
 var triggerImpl = function(el, type, args) {
     var event = new CustomEvent(type, {
         detail: args || [],
@@ -135,17 +145,21 @@ var triggerImpl = function(el, type, args) {
     return event;
 };
 
+/** @param {any} el @param {string} type @param {any} [args] */
 export function trigger(el, type, args) {
     return triggerImpl(el, type, args);
 }
 
+/** @param {(el: any, type: string, args?: any) => any} fn */
 export function setTrigger(fn) {
     triggerImpl = fn;
 }
 
 // Bind an event listener, tracking it so unbindAll can remove it later.
+/** @type {WeakMap<object, Array<{type: string, handler: EventListener}>>} */
 var listenerStore = new WeakMap();
 
+/** @param {HTMLElement} el @param {string} type @param {EventListener} handler */
 export function bind(el, type, handler) {
     el.addEventListener(type, handler);
     var listeners = listenerStore.get(el);
@@ -156,6 +170,7 @@ export function bind(el, type, handler) {
     listeners.push({ type: type, handler: handler });
 }
 
+/** @param {HTMLElement} el @param {string} [type] @param {EventListener} [handler] */
 export function unbind(el, type, handler) {
     if (type && handler) {
         el.removeEventListener(type, handler);

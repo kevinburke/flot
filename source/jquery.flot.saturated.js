@@ -1,7 +1,7 @@
 'use strict';
 
 export var saturated = {
-    saturate: function (a) {
+		saturate: function (/** @type {number} */ a) {
         if (a === Infinity) {
             return Number.MAX_VALUE;
         }
@@ -12,15 +12,15 @@ export var saturated = {
 
         return a;
     },
-    delta: function(min, max, noTicks) {
+		delta: function(/** @type {number} */ min, /** @type {number} */ max, /** @type {number} */ noTicks) {
         return ((max - min) / noTicks) === Infinity ? (max / noTicks - min / noTicks) : (max - min) / noTicks
     },
-    multiply: function (a, b) {
+		multiply: function (/** @type {number} */ a, /** @type {number} */ b) {
         return saturated.saturate(a * b);
     },
     // returns c * bInt * a. Beahves properly in the case where c is negative
     // and bInt * a is bigger that Number.MAX_VALUE (Infinity)
-    multiplyAdd: function (a, bInt, c) {
+		multiplyAdd: function (/** @type {number} */ a, /** @type {number} */ bInt, /** @type {number} */ c) {
         if (isFinite(a * bInt)) {
             return saturated.saturate(a * bInt + c);
         } else {
@@ -34,7 +34,7 @@ export var saturated = {
         }
     },
     // round to nearby lower multiple of base
-    floorInBase: function(n, base) {
+		floorInBase: function(/** @type {number} */ n, /** @type {number} */ base) {
         return base * Math.floor(n / base);
     }
 };

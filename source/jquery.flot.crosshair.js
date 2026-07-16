@@ -63,17 +63,19 @@ import { bind, unbind } from './helpers.js';
 
     var options = {
         crosshair: {
-            mode: null, // one of null, "x", "y" or "xy",
+			mode: /** @type {any} */ (null), // one of null, "x", "y" or "xy",
             color: "rgba(170, 0, 0, 0.80)",
             lineWidth: 1
         }
     };
 
-    function init(plot) {
+	/** @param {any} plot */
+	function init(plot) {
         // position of crosshair in pixels
-        var crosshair = {x: -1, y: -1, locked: false, highlighted: false};
+		/** @type {any} */
+		var crosshair = {x: -1, y: -1, locked: false, highlighted: false};
 
-        plot.setCrosshair = function setCrosshair(pos) {
+		plot.setCrosshair = function setCrosshair(/** @type {any} */ pos) {
             if (!pos) {
                 crosshair.x = -1;
             } else {
@@ -87,7 +89,7 @@ import { bind, unbind } from './helpers.js';
 
         plot.clearCrosshair = plot.setCrosshair; // passes null for pos
 
-        plot.lockCrosshair = function lockCrosshair(pos) {
+		plot.lockCrosshair = function lockCrosshair(/** @type {any} */ pos) {
             if (pos) {
                 plot.setCrosshair(pos);
             }
@@ -100,7 +102,7 @@ import { bind, unbind } from './helpers.js';
             crosshair.rect = null;
         };
 
-        function onMouseOut(e) {
+		function onMouseOut(/** @type {any} */ e) {
             if (crosshair.locked) {
                 return;
             }
@@ -111,7 +113,7 @@ import { bind, unbind } from './helpers.js';
             }
         }
 
-        function onMouseMove(e) {
+		function onMouseMove(/** @type {any} */ e) {
             var offset = plot.offset();
             if (crosshair.locked) {
                 var mouseX = Math.max(0, Math.min(e.pageX - offset.left, plot.width()));
@@ -141,7 +143,7 @@ import { bind, unbind } from './helpers.js';
             plot.triggerRedrawOverlay();
         }
 
-        plot.hooks.bindEvents.push(function (plot, eventHolder) {
+		plot.hooks.bindEvents.push(function (/** @type {any} */ plot, /** @type {any} */ eventHolder) {
             if (!plot.getOptions().crosshair.mode) {
                 return;
             }
@@ -150,7 +152,7 @@ import { bind, unbind } from './helpers.js';
             bind(eventHolder, "mousemove", onMouseMove);
         });
 
-        plot.hooks.drawOverlay.push(function (plot, ctx) {
+		plot.hooks.drawOverlay.push(function (/** @type {any} */ plot, /** @type {CanvasRenderingContext2D} */ ctx) {
             var c = plot.getOptions().crosshair;
             if (!c.mode) {
                 return;
@@ -189,7 +191,7 @@ import { bind, unbind } from './helpers.js';
             ctx.restore();
         });
 
-        plot.hooks.shutdown.push(function (plot, eventHolder) {
+		plot.hooks.shutdown.push(function (/** @type {any} */ plot, /** @type {any} */ eventHolder) {
             unbind(eventHolder, "mouseout", onMouseOut);
             unbind(eventHolder, "mousemove", onMouseMove);
         });

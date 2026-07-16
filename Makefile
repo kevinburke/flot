@@ -8,7 +8,7 @@ BIOME := $(NODE_BIN)/biome
 # rebuild instead of always re-running terser.
 SOURCES := $(wildcard source/jquery.*.js)
 
-.PHONY: all build clean lint format test test-unit test-browser size types types-source publint ci install help
+.PHONY: all build clean format test test-unit test-browser size types types-source types-source-strict publint ci install help
 
 all: build
 
@@ -48,7 +48,10 @@ size: build node_modules ## check bundle size budget (brotli)
 types: node_modules ## type-check the .d.ts files and compile test
 	$(NODE_BIN)/tsc --project types/tsconfig.json
 
-types-source: node_modules ## run tsc --checkJs on source
+types-source: node_modules ## run the current source check during strictness migration
+	$(NODE_BIN)/tsc --project tsconfig.json --noImplicitAny false --noImplicitThis false
+
+types-source-strict: node_modules ## run the fully strict source check
 	$(NODE_BIN)/tsc --project tsconfig.json
 
 publint: build ## validate package.json fields and exports

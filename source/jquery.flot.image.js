@@ -65,14 +65,19 @@ import { plugins } from './jquery.flot.js';
         }
     };
 
-    var image = {};
+	/** @type {any} */
+	var image = {};
 
-    image.loadDataImages = function (series, options, callback) {
-        var urls = [], points = [];
+	/** @param {any} series @param {any} options @param {() => any} callback */
+	image.loadDataImages = function (series, options, callback) {
+		/** @type {any[]} */
+		var urls = [];
+		/** @type {any[]} */
+		var points = [];
 
         var defaultShow = options.series.images.show;
 
-        series.forEach(function (s) {
+		series.forEach(/** @param {any} s */ function (s) {
             if (!(defaultShow || s.images.show)) {
                 return;
             }
@@ -81,7 +86,7 @@ import { plugins } from './jquery.flot.js';
                 s = s.data;
             }
 
-            s.forEach(function (p) {
+			s.forEach(/** @param {any[]} p */ function (p) {
                 if (typeof p[0] === "string") {
                     urls.push(p[0]);
                     points.push(p);
@@ -89,8 +94,8 @@ import { plugins } from './jquery.flot.js';
             });
         });
 
-        image.load(urls, function (loadedImages) {
-            points.forEach(function (p) {
+		image.load(urls, /** @param {Record<string, HTMLImageElement>} loadedImages */ function (loadedImages) {
+			points.forEach(/** @param {any[]} p */ function (p) {
                 var url = p[0];
                 if (loadedImages[url]) {
                     p[0] = loadedImages[url];
@@ -101,14 +106,18 @@ import { plugins } from './jquery.flot.js';
         });
     }
 
-    image.load = function (urls, callback) {
-        var missing = urls.length, loaded = {};
+	/** @param {string[]} urls @param {(loaded: any) => any} callback */
+	image.load = function (urls, callback) {
+		var missing = urls.length;
+		/** @type {Record<string, HTMLImageElement>} */
+		var loaded = {};
         if (missing === 0) {
             callback({});
         }
 
         urls.forEach(function (url) {
-            var handler = function () {
+			/** @this {any} */
+			var handler = function () {
                 --missing;
                 loaded[url] = this;
 
@@ -124,7 +133,8 @@ import { plugins } from './jquery.flot.js';
         });
     };
 
-    function drawSeries(plot, ctx, series) {
+	/** @param {any} plot @param {CanvasRenderingContext2D} ctx @param {any} series */
+	function drawSeries(plot, ctx, series) {
         var plotOffset = plot.getPlotOffset();
 
         if (!series.images || !series.images.show) {
@@ -225,7 +235,8 @@ import { plugins } from './jquery.flot.js';
         }
     }
 
-    function processRawData(plot, series, data, datapoints) {
+	/** @param {any} plot @param {any} series @param {any} data @param {any} datapoints */
+	function processRawData(plot, series, data, datapoints) {
         if (!series.images.show) {
             return;
         }
@@ -240,7 +251,8 @@ import { plugins } from './jquery.flot.js';
         ];
     }
 
-    function init(plot) {
+	/** @param {any} plot */
+	function init(plot) {
         plot.hooks.processRawData.push(processRawData);
         plot.hooks.drawSeries.push(drawSeries);
     }

@@ -15,8 +15,10 @@ import { plugins } from './jquery.flot.js';
 
     var options = { }; // no options
 
-    function init(plot) {
-        var observer = null;
+	/** @param {any} plot */
+	function init(plot) {
+		/** @type {ResizeObserver | null} */
+		var observer = null;
 
         function onResize() {
             var placeholder = plot.getPlaceholder();
@@ -30,7 +32,8 @@ import { plugins } from './jquery.flot.js';
             plot.draw();
         }
 
-        function bindEvents(plot, eventHolder) {
+		/** @param {any} plot @param {any} eventHolder */
+		function bindEvents(plot, eventHolder) {
             var placeholder = plot.getPlaceholder();
             observer = new ResizeObserver(function(entries) {
                 onResize();
@@ -38,7 +41,8 @@ import { plugins } from './jquery.flot.js';
             observer.observe(placeholder);
         }
 
-        function shutdown(plot, eventHolder) {
+		/** @param {any} plot @param {any} eventHolder */
+		function shutdown(plot, eventHolder) {
             if (observer) {
                 observer.disconnect();
                 observer = null;

@@ -33,12 +33,14 @@ import { plugins } from './jquery.flot.js';
 
     var options = {
         series: {
-            fillBetween: null // or number
+			fillBetween: /** @type {any} */ (null) // or number
         }
     };
 
-    function init(plot) {
-        function findBottomSeries(s, allseries) {
+	/** @param {any} plot */
+	function init(plot) {
+		/** @param {any} s @param {any[]} allseries */
+		function findBottomSeries(s, allseries) {
             var i;
 
             for (i = 0; i < allseries.length; ++i) {
@@ -57,13 +59,14 @@ import { plugins } from './jquery.flot.js';
             return null;
         }
 
-        function computeFormat(plot, s, data, datapoints) {
+		/** @param {any} plot @param {any} s @param {any} data @param {any} datapoints */
+		function computeFormat(plot, s, data, datapoints) {
             if (s.fillBetween == null) {
                 return;
             }
 
             var format = datapoints.format;
-            var plotHasId = function(id) {
+			var plotHasId = function(/** @type {any} */ id) {
                 var plotData = plot.getData();
                 for (var i = 0; i < plotData.length; i++) {
                     if (plotData[i].id === id) {
@@ -105,7 +108,8 @@ import { plugins } from './jquery.flot.js';
             }
         }
 
-        function computeFillBottoms(plot, s, datapoints) {
+		/** @param {any} plot @param {any} s @param {any} datapoints */
+		function computeFillBottoms(plot, s, datapoints) {
             if (s.fillBetween == null) {
                 return;
             }
