@@ -310,6 +310,26 @@ describe("flot navigate plugin interactions", function () {
 
         plot.setSelection({xaxis: {from: 0.88, to: 1.23}, yaxis: {from: 5, to: 6}});
     });
+    it('setselection rejects a missing selected axis range', function () {
+        plot = $.plot(placeholder, [
+            [[0, 0],
+            [10, 10]]
+        ], {
+        selection: {
+            mode: 'xy',
+        }});
+
+        var selectionError;
+        try {
+            plot.setSelection({xaxis: {from: 1, to: 2}});
+        } catch (error) {
+            selectionError = error;
+        }
+
+        var expectedMessage = 'Selection ranges must include values for the selected axes.';
+        expect(selectionError instanceof Error).toBe(true);
+        expect(selectionError.message).toEqual(expectedMessage);
+    });
     it('selection mode null does not zoom', function () {
         plot = $.plot(placeholder, [
             [[0, 0],

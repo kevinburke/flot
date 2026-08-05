@@ -93,9 +93,73 @@ The plugin allso adds the following methods to the plot object:
 import { plugins } from './plugin-registry.js';
 import { uiConstants } from './jquery.flot.uiConstants.js';
 import { color } from './jquery.colorhelpers.js';
-import { bind, trigger, unbind } from './helpers.js';
+import { trigger, unbind } from './helpers.js';
 
+/** @typedef {'x' | 'y'} AxisDirection */
+/** @typedef {'' | 'x' | 'y' | 'xy' | 'smart' | null} SelectionMode */
+/** @typedef {{ x: number, y: number }} SelectionPosition */
+/** @typedef {{ from: number, to: number }} SelectionRange */
+/** @typedef {Record<string, SelectionRange>} SelectionResult */
+/** @typedef {Record<string, SelectionRange | number | undefined>} SelectionRanges */
+
+/**
+ * @typedef {Object} SelectionState
+ * @property {SelectionPosition} first
+ * @property {SelectionPosition} second
+ * @property {boolean} show
+ * @property {SelectionMode} currentMode
+ * @property {boolean} active
+ */
+
+/**
+ * @typedef {Object} SelectionAxis
+ * @property {AxisDirection} direction
+ * @property {number} n
+ * @property {boolean} used
+ * @property {(value: number) => number} c2p
+ * @property {(value: number) => number} p2c
+ */
+
+/**
+ * @typedef {Object} SelectionOptions
+ * @property {SelectionMode} mode
+ * @property {'fill' | 'focus'} visualization
+ * @property {boolean} displaySelectionDecorations
+ * @property {string} color
+ * @property {CanvasLineJoin} shape
+ * @property {number} minSize
+ */
+
+/**
+ * @typedef {Object} SelectionPlot
+ * @property {() => HTMLElement} getPlaceholder
+ * @property {() => { selection: SelectionOptions }} getOptions
+ * @property {() => number} width
+ * @property {() => number} height
+ * @property {() => Record<string, SelectionAxis>} getAxes
+ * @property {() => SelectionAxis[]} getXAxes
+ * @property {() => SelectionAxis[]} getYAxes
+ * @property {() => { left: number, right: number, top: number, bottom: number }} getPlotOffset
+ * @property {() => void} triggerRedrawOverlay
+ * @property {(
+ *   event: string,
+ *   handler: EventListener,
+ *   eventHolder: HTMLElement,
+ *   priority: number
+ * ) => void} addEventHandler
+ * @property {{
+ *   bindEvents: Array<(plot: SelectionPlot, eventHolder: HTMLElement) => void>,
+ *   drawOverlay: Array<(plot: SelectionPlot, ctx: CanvasRenderingContext2D) => void>,
+ *   shutdown: Array<(plot: SelectionPlot, eventHolder: HTMLElement) => void>
+ * }} hooks
+ * @property {(preventEvent?: boolean) => void} [clearSelection]
+ * @property {(ranges: SelectionRanges, preventEvent?: boolean) => void} [setSelection]
+ * @property {() => SelectionResult | null} [getSelection]
+ */
+
+    /** @param {SelectionPlot} plot */
     function init(plot) {
+        /** @type {SelectionState} */
         var selection = {
             first: {x: -1, y: -1},
             second: {x: -1, y: -1},
@@ -111,8 +175,10 @@ import { bind, trigger, unbind } from './helpers.js';
         // the navigation plugin, this should be massaged a bit to fit
         // the Flot cases here better and reused. Doing this would
         // make this plugin much slimmer.
+        /** @type {{ onselectstart?: Document['onselectstart'], ondrag?: Document['ondrag'] }} */
         var savedhandlers = {};
 
+        /** @param {PointerEvent} e */
         function onDrag(e) {
             if (selection.active) {
                 updateSelection(e);
@@ -121,6 +187,7 @@ import { bind, trigger, unbind } from './helpers.js';
             }
         }
 
+        /** @param {PointerEvent} e */
         function onDragStart(e) {
             var o = plot.getOptions();
             // only accept left-click
@@ -147,6 +214,7 @@ import { bind, trigger, unbind } from './helpers.js';
             selection.active = true;
         }
 
+        /** @param {PointerEvent} e */
         function onDragEnd(e) {
             // revert drag stuff for old-school browsers
             if (document.onselectstart !== undefined) {
@@ -177,6 +245,7 @@ import { bind, trigger, unbind } from './helpers.js';
 
             if (!selection.show) return null;
 
+            /** @type {SelectionResult} */
             var r = {},
                 c1 = {x: selection.first.x, y: selection.first.y},
                 c2 = {x: selection.second.x, y: selection.second.y};
@@ -203,8 +272,10 @@ import { bind, trigger, unbind } from './helpers.js';
         }
 
         function triggerSelectedEvent() {
-            /** @type {any} */
             var r = getSelection();
+            if (r === null) {
+                return;
+            }
 
             trigger(plot.getPlaceholder(), "plotselected", [ r ]);
 
@@ -214,10 +285,12 @@ import { bind, trigger, unbind } from './helpers.js';
             }
         }
 
+        /** @param {number} min @param {number} value @param {number} max */
         function clamp(min, value, max) {
             return value < min ? min : (value > max ? max : value);
         }
 
+        /** @param {SelectionPlot} plot @returns {SelectionMode} */
         function selectionDirection(plot) {
             var o = plot.getOptions();
 
@@ -228,6 +301,7 @@ import { bind, trigger, unbind } from './helpers.js';
             }
         }
 
+        /** @param {SelectionPosition} pos */
         function updateMode(pos) {
             if (selection.first) {
                 var delta = {
@@ -245,6 +319,7 @@ import { bind, trigger, unbind } from './helpers.js';
             }
         }
 
+        /** @param {SelectionPosition} pos @param {Pick<PointerEvent, 'pageX' | 'pageY'>} e */
         function setSelectionPos(pos, e) {
             var placeholderRect = plot.getPlaceholder().getBoundingClientRect();
             var offset = { left: placeholderRect.left + window.scrollX, top: placeholderRect.top + window.scrollY };
@@ -263,6 +338,7 @@ import { bind, trigger, unbind } from './helpers.js';
             }
         }
 
+        /** @param {PointerEvent} pos */
         function updateSelection(pos) {
             if (pos.pageX == null) return;
 
@@ -273,6 +349,7 @@ import { bind, trigger, unbind } from './helpers.js';
             } else clearSelection(true);
         }
 
+        /** @param {boolean} [preventEvent] */
         function clearSelection(preventEvent) {
             if (selection.show) {
                 selection.show = false;
@@ -285,21 +362,32 @@ import { bind, trigger, unbind } from './helpers.js';
         }
 
         // function taken from markings support in Flot
+        /** @param {SelectionRanges} ranges @param {AxisDirection} coord */
         function extractRange(ranges, coord) {
-            var axis, from, to, /** @type {string|undefined} */ key, axes = plot.getAxes();
+            /** @type {SelectionAxis | undefined} */
+            var axis;
+            /** @type {number | undefined} */
+            var from;
+            /** @type {number | undefined} */
+            var to;
+            /** @type {string | undefined} */
+            var key;
+            var axes = plot.getAxes();
 
             for (var k in axes) {
-                axis = axes[k];
-                if (axis.direction === coord) {
+                var currentAxis = axes[k];
+                if (currentAxis.direction === coord) {
+                    axis = currentAxis;
                     key = coord + axis.n + "axis";
                     if (!ranges[key] && axis.n === 1) {
                         // support x1axis as xaxis
                         key = coord + "axis";
                     }
 
-                    if (ranges[key]) {
-                        from = ranges[key].from;
-                        to = ranges[key].to;
+                    var range = ranges[key];
+                    if (range && typeof range === 'object') {
+                        from = range.from;
+                        to = range.to;
                         break;
                     }
                 }
@@ -308,8 +396,10 @@ import { bind, trigger, unbind } from './helpers.js';
             // backwards-compat stuff - to be removed in future
             if (key && !ranges[key]) {
                 axis = coord === "x" ? plot.getXAxes()[0] : plot.getYAxes()[0];
-                from = ranges[coord + "1"];
-                to = ranges[coord + "2"];
+                var legacyFrom = ranges[coord + "1"];
+                var legacyTo = ranges[coord + "2"];
+                from = typeof legacyFrom === 'number' ? legacyFrom : undefined;
+                to = typeof legacyTo === 'number' ? legacyTo : undefined;
             }
 
             // auto-reverse as an added bonus
@@ -319,9 +409,14 @@ import { bind, trigger, unbind } from './helpers.js';
                 to = tmp;
             }
 
+            if (!axis || from == null || to == null) {
+                throw new Error('Selection ranges must include values for the selected axes.');
+            }
+
             return { from: from, to: to, axis: axis };
         }
 
+        /** @param {SelectionRanges} ranges @param {boolean} [preventEvent] */
         function setSelection(ranges, preventEvent) {
             var range;
 
@@ -360,27 +455,36 @@ import { bind, trigger, unbind } from './helpers.js';
         plot.setSelection = setSelection;
         plot.getSelection = getSelection;
 
+        /** @param {Event} e */
         function onPointerDown(e) {
+            if (!(e instanceof PointerEvent)) return;
             if (e.button !== 0) return;
-            var el = e.currentTarget;
+            const el = e.currentTarget;
+            if (!(el instanceof HTMLElement)) return;
+            /** @type {HTMLElement} */
+            const eventHolder = el;
             onDragStart(e);
 
+            /** @param {Event} e */
             function onPointerMove(e) {
+                if (!(e instanceof PointerEvent)) return;
                 onDrag(e);
             }
 
+            /** @param {Event} e */
             function onPointerUp(e) {
+                if (!(e instanceof PointerEvent)) return;
                 onDragEnd(e);
-                el.removeEventListener("pointermove", onPointerMove);
-                el.removeEventListener("pointerup", onPointerUp);
-                el.removeEventListener("pointercancel", onPointerUp);
-                el.releasePointerCapture(e.pointerId);
+                eventHolder.removeEventListener("pointermove", onPointerMove);
+                eventHolder.removeEventListener("pointerup", onPointerUp);
+                eventHolder.removeEventListener("pointercancel", onPointerUp);
+                eventHolder.releasePointerCapture(e.pointerId);
             }
 
-            el.setPointerCapture(e.pointerId);
-            el.addEventListener("pointermove", onPointerMove);
-            el.addEventListener("pointerup", onPointerUp);
-            el.addEventListener("pointercancel", onPointerUp);
+            eventHolder.setPointerCapture(e.pointerId);
+            eventHolder.addEventListener("pointermove", onPointerMove);
+            eventHolder.addEventListener("pointerup", onPointerUp);
+            eventHolder.addEventListener("pointercancel", onPointerUp);
         }
 
         plot.hooks.bindEvents.push(function(plot, eventHolder) {
@@ -390,6 +494,16 @@ import { bind, trigger, unbind } from './helpers.js';
             }
         });
 
+        /**
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} y
+         * @param {number} w
+         * @param {number} h
+         * @param {number} oX
+         * @param {number} oY
+         * @param {SelectionMode} mode
+         */
         function drawSelectionDecorations(ctx, x, y, w, h, oX, oY, mode) {
             var spacing = 3;
             var fullEarWidth = 15;
