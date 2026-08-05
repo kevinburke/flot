@@ -137,7 +137,7 @@ import { plugins } from './plugin-registry.js';
         if (!series[axis].categories) {
             // parse options
 			/** @type {Record<string, number>} */
-			var c = {};
+            var c = {};
 			var o = series[axis].options.categories || {};
             if (Array.isArray(o)) {
                 for (var i = 0; i < o.length; ++i) {

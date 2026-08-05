@@ -89,7 +89,7 @@ $.color = Object.create(color);
 $.color.extract = function(elem, cssProp) {
 	if (elem instanceof $) {
 		elem = /** @type {any} */ (elem)[0];
-    }
+	}
     return origExtract(elem, cssProp);
 };
 

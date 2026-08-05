@@ -643,7 +643,7 @@ describe("flot touch navigate plugin", function () {
       it('should drag the logarithmic plot', function() {
           var d1 = [];
           for (var i = 0; i < 14; i += 0.2) {
-              d1.push([i, 1.01 + Math.sin(i)]);
+            d1.push([i, 1.01 + Math.sin(i)]);
           }
 
           var plot = $.plot(placeholder, [d1], {
@@ -706,7 +706,7 @@ describe("flot touch navigate plugin", function () {
             pointCoords = [];
 
         for (var i = 1; i <= limit; i++) {
-            canvasCoords[i] = { x: i, y: i };
+          canvasCoords[i] = { x: i, y: i };
             pointCoords[i] = getPairOfCoords(xaxis, yaxis, canvasCoords[i].x, canvasCoords[i].y);
         }
 
@@ -714,7 +714,7 @@ describe("flot touch navigate plugin", function () {
         simulate.touchstart(eventHolder, pointCoords[1].x, pointCoords[1].y);
 
         for (var i = 2; i <= limit; i++) {
-            simulate.touchmove(eventHolder, pointCoords[i].x, pointCoords[i].y);
+          simulate.touchmove(eventHolder, pointCoords[i].x, pointCoords[i].y);
         }
 
         simulate.touchend(eventHolder, pointCoords[limit].x, pointCoords[limit].y);

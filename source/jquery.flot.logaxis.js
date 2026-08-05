@@ -112,9 +112,9 @@ import { plugins, linearTickGenerator, defaultTickFormatter, expRepTickFormatter
                         idealPixelCoord: pixelCoord
                     };
                 } else {
-					if (Math.abs(pixelCoord - lastDisplayed.pixelCoord) >= inverseNoTicks) {
+                    if (Math.abs(pixelCoord - lastDisplayed.pixelCoord) >= inverseNoTicks) {
 						/** @type {number} */
-						var idealPixelCoord = lastDisplayed.idealPixelCoord;
+                        var idealPixelCoord = lastDisplayed.idealPixelCoord;
 						lastDisplayed = {
 							pixelCoord: pixelCoord,
 							idealPixelCoord: idealPixelCoord - inverseNoTicks

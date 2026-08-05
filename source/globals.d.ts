@@ -9,19 +9,19 @@ declare const timezoneJS: { Date: new (...args: unknown[]) => Date } | undefined
 
 // Browser-specific / non-standard globals accessed for feature detection.
 interface Window {
-    opr?: { addons?: unknown };
-    opera?: unknown;
-    chrome?: { webstore?: unknown };
-    StyleMedia?: unknown;
-    safari?: { pushNotification?: unknown };
-    HTMLElement: typeof HTMLElement;
-    Flot?: {
-        Canvas?: unknown;
-        plugins?: unknown;
-        helpers?: unknown;
-    };
+	opr?: { addons?: unknown };
+	opera?: unknown;
+	chrome?: { webstore?: unknown };
+	StyleMedia?: unknown;
+	safari?: { pushNotification?: unknown };
+	HTMLElement: typeof HTMLElement;
+	Flot?: {
+		Canvas?: unknown;
+		plugins?: unknown;
+		helpers?: unknown;
+	};
 }
 
 interface Document {
-    documentMode?: unknown;
+	documentMode?: unknown;
 }

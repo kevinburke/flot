@@ -86,7 +86,7 @@ color.extract = function (elem, css) {
     var c;
 
     do {
-		var camel = css.replace(/-([a-z])/g, /** @param {string} _ @param {string} ch */ function(_, ch) { return ch.toUpperCase(); });
+        var camel = css.replace(/-([a-z])/g, /** @param {string} _ @param {string} ch */ function(_, ch) { return ch.toUpperCase(); });
 		c = (/** @type {any} */ (elem.style)[camel] || /** @type {any} */ (getComputedStyle(elem))[css] || '').toLowerCase();
         // keep going until we find an element that has color, or
         // we hit the body or root (have no parent)

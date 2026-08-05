@@ -311,7 +311,9 @@ import { bind, unbind, trigger, css } from './helpers.js';
                 return;
             }
 
-            if (panTimeout || !frameRate) return;
+            if (panTimeout || !frameRate) {
+                return;
+            }
 
             panTimeout = window.setTimeout(function() {
                 if (useSmartPan) {
@@ -369,7 +371,9 @@ import { bind, unbind, trigger, css } from './helpers.js';
             plot.activate();
             var o = plot.getOptions()
 
-            if (!o.recenter.interactive) { return; }
+            if (!o.recenter.interactive) {
+                return;
+            }
 
             var axes = plot.getTouchedAxis(e.clientX, e.clientY);
 
@@ -402,7 +406,9 @@ import { bind, unbind, trigger, css } from './helpers.js';
         }
 
         function onPointerDown(e) {
-            if (e.button !== 0) return;
+            if (e.button !== 0) {
+                return;
+            }
             var el = e.currentTarget;
             canDrag = true;
             onDragStart(e);
@@ -540,8 +546,12 @@ import { bind, unbind, trigger, css } from './helpers.js';
                 y: +args.top
             };
 
-            if (isNaN(delta.x)) delta.x = 0;
-            if (isNaN(delta.y)) delta.y = 0;
+            if (isNaN(delta.x)) {
+                delta.x = 0;
+            }
+            if (isNaN(delta.y)) {
+                delta.y = 0;
+            }
 
             var panAxesOrAll = args.axes || plot.getAxes();
             Object.keys(panAxesOrAll).forEach(function(key) {
@@ -570,8 +580,12 @@ import { bind, unbind, trigger, css } from './helpers.js';
                     maxD = swap;
                 }
                 // limit delta to min or max if enabled
-                if (opts.panRange[0] !== undefined && d >= maxD) d = maxD;
-                if (opts.panRange[1] !== undefined && d <= minD) d = minD;
+                if (opts.panRange[0] !== undefined && d >= maxD) {
+                    d = maxD;
+                }
+                if (opts.panRange[1] !== undefined && d <= minD) {
+                    d = minD;
+                }
 
                 if (d !== 0) {
                     var navigationOffsetBelow = saturated.saturate(axis.c2p(axis.p2c(axis.min) + d) - axis.c2p(axis.p2c(axis.min))),
@@ -707,8 +721,12 @@ import { bind, unbind, trigger, css } from './helpers.js';
                 }
             }
 
-            if (isNaN(delta.x)) delta.x = 0;
-            if (isNaN(delta.y)) delta.y = 0;
+            if (isNaN(delta.x)) {
+                delta.x = 0;
+            }
+            if (isNaN(delta.y)) {
+                delta.y = 0;
+            }
 
             if (panAxes) {
                 axes = panAxes;
@@ -741,8 +759,12 @@ import { bind, unbind, trigger, css } from './helpers.js';
                     maxD = swap;
                 }
                 // limit delta to min or max if enabled
-                if (opts.panRange[0] !== undefined && d >= maxD) d = maxD;
-                if (opts.panRange[1] !== undefined && d <= minD) d = minD;
+                if (opts.panRange[0] !== undefined && d >= maxD) {
+                    d = maxD;
+                }
+                if (opts.panRange[1] !== undefined && d <= minD) {
+                    d = minD;
+                }
 
                 if (d !== 0) {
                     var navigationOffsetBelow = saturated.saturate(axis.c2p(axis.p2c(axisMin) - (p - d)) - axis.c2p(axis.p2c(axisMin))),
@@ -783,7 +805,9 @@ import { bind, unbind, trigger, css } from './helpers.js';
             unbind(eventHolder, "dblclick", onDblClick);
             unbind(eventHolder, "click", onClick);
 
-            if (panTimeout) window.clearTimeout(panTimeout);
+            if (panTimeout) {
+                window.clearTimeout(panTimeout);
+            }
         }
 
         function drawOverlay(plot, ctx) {

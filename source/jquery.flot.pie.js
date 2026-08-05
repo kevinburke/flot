@@ -425,7 +425,9 @@ import { extend, bind, unbind, trigger, width, height } from './helpers.js';
                 // Draw the labels, returning true if they fit within the plot
                 if (options.series.pie.label.show) {
                     return drawLabels();
-                } else return true;
+                } else {
+                    return true;
+                }
 
                 function drawSlice(angle, color, fill) {
                     if (angle <= 0 || isNaN(angle)) {

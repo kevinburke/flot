@@ -23,7 +23,9 @@ export var browser = {
 
     isSafari: function() {
         var top = window.top;
-        if (!top) return false;
+        if (!top) {
+            return false;
+        }
 		return /constructor/i.test(/** @type {any} */ (top.HTMLElement)) || (/** @param {any} p */ function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!(/** @type {any} */ (top))['safari'] || (typeof (/** @type {any} */ (top)).safari !== 'undefined' && (/** @type {any} */ (top)).safari.pushNotification));
     },
 

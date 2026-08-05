@@ -825,8 +825,12 @@ import { plugins } from './plugin-registry.js';
                     if (variation >= 0) {
                         if (variation < 0.5) {
                             variation = -variation - 0.2;
-                        } else variation = 0;
-                    } else variation = -variation;
+                        } else {
+                            variation = 0;
+                        }
+                    } else {
+                        variation = -variation;
+                    }
                 }
 
                 colors[i] = c.scale('rgb', 1 + variation);
@@ -976,7 +980,9 @@ import { plugins } from './plugin-registry.js';
 
                 s.xaxis.used = s.yaxis.used = true;
 
-                if (s.datapoints.pointsize != null) continue; // already filled in
+                if (s.datapoints.pointsize != null) {
+                    continue; // already filled in
+                }
 
                 s.datapoints.pointsize = format.length;
                 ps = s.datapoints.pointsize;
@@ -1000,9 +1006,13 @@ import { plugins } from './plugin-registry.js';
                                 }
 
                                 if (val == null) {
-                                    if (f.required) nullify = true;
+                                    if (f.required) {
+                                        nullify = true;
+                                    }
 
-                                    if (f.defaultValue != null) val = f.defaultValue;
+                                    if (f.defaultValue != null) {
+                                        val = f.defaultValue;
+                                    }
                                 }
                             }
 
@@ -2024,7 +2034,9 @@ import { plugins } from './plugin-registry.js';
                     markings = markings(axes);
                 }
 
-                if (!markings) return;
+                if (!markings) {
+                    return;
+                }
 
                 var i;
                 for (i = 0; i < markings.length; ++i) {
@@ -2261,10 +2273,14 @@ import { plugins } from './plugin-registry.js';
                     x = 0,
                     y = 0;
 
-                if (isNaN(v) || v < axis.min || v > axis.max) continue;
+                if (isNaN(v) || v < axis.min || v > axis.max) {
+                    continue;
+                }
 
                 // skip those lying on the axes if we got a border
-                if (overlappedWithBorder(v)) continue;
+                if (overlappedWithBorder(v)) {
+                    continue;
+                }
 
                 if (axis.direction === "x") {
                     x = axis.p2c(v);

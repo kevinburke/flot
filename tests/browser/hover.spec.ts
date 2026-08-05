@@ -74,7 +74,16 @@ test.describe("flot hover plugin", () => {
 			const win = window as any;
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createBaseOptions();
-			const plot = $.plot($("#placeholder"), [[[0, 0], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const axisx = plot.getXAxes()[0];
 			const axisy = plot.getYAxes()[0];
@@ -92,7 +101,9 @@ test.describe("flot hover plugin", () => {
 		});
 
 		await page.clock.runFor(50);
-		const plothoverCount = await page.evaluate(() => (window as any).__hoverPortState.plothoverCount);
+		const plothoverCount = await page.evaluate(
+			() => (window as any).__hoverPortState.plothoverCount,
+		);
 		expect(plothoverCount).toBe(1);
 	});
 
@@ -108,7 +119,17 @@ test.describe("flot hover plugin", () => {
 			const win = window as any;
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createMouseHoverOptions();
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -118,13 +139,14 @@ test.describe("flot hover plugin", () => {
 			$(plot.getPlaceholder()).on(
 				"plothover",
 				(_event: unknown, pos: any, item: any, items: unknown) => {
-					if (win.__hoverPortState.captured !== null) return;
+					if (win.__hoverPortState.captured !== null) {
+						return;
+					}
 					win.__hoverPortState.captured = {
 						posType: typeof pos,
 						posHasX: pos !== null && typeof pos === "object" && "x" in pos,
 						posHasY: pos !== null && typeof pos === "object" && "y" in pos,
-						itemIsObjectOrNull:
-							item === null || (typeof item === "object" && item !== undefined),
+						itemIsObjectOrNull: item === null || (typeof item === "object" && item !== undefined),
 						itemsIsArray: Array.isArray(items),
 					};
 				},
@@ -148,7 +170,16 @@ test.describe("flot hover plugin", () => {
 			const win = window as any;
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createBaseOptions();
-			const plot = $.plot($("#placeholder"), [[[0, 0], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const axisx = plot.getXAxes()[0];
 			const axisy = plot.getYAxes()[0];
@@ -171,7 +202,16 @@ test.describe("flot hover plugin", () => {
 			const win = window as any;
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createBaseOptions();
-			const plot = $.plot($("#placeholder"), [[[0, 0], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			let count = 0;
 
 			$(plot.getPlaceholder()).on("plothovercleanup", () => {
@@ -191,7 +231,17 @@ test.describe("flot hover plugin", () => {
 			const win = window as any;
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createMouseHoverOptions();
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -204,7 +254,10 @@ test.describe("flot hover plugin", () => {
 		await page.clock.runFor(100);
 		const containsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(containsHighlight).toBe(true);
 	});
@@ -215,7 +268,17 @@ test.describe("flot hover plugin", () => {
 			const win = window as any;
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createMouseHoverOptions();
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -234,7 +297,10 @@ test.describe("flot hover plugin", () => {
 		await page.clock.runFor(100);
 		const containsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(containsHighlight).toBe(true);
 	});
@@ -264,7 +330,17 @@ test.describe("flot hover plugin", () => {
 				inverseTransform: (v: number) => v,
 			};
 
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -283,7 +359,10 @@ test.describe("flot hover plugin", () => {
 		await page.clock.runFor(100);
 		const containsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(containsHighlight).toBe(false);
 	});
@@ -298,7 +377,17 @@ test.describe("flot hover plugin", () => {
 			const options = win.__hoverPortHelpers.createMouseHoverOptions();
 			options.grid.hoverable = false;
 
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -311,7 +400,10 @@ test.describe("flot hover plugin", () => {
 		await page.clock.runFor(100);
 		const containsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(containsHighlight).toBe(false);
 	});
@@ -326,7 +418,17 @@ test.describe("flot hover plugin", () => {
 			const options = win.__hoverPortHelpers.createMouseHoverOptions();
 			options.series.hoverable = false;
 
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -339,7 +441,10 @@ test.describe("flot hover plugin", () => {
 		await page.clock.runFor(100);
 		const containsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(containsHighlight).toBe(false);
 	});
@@ -350,7 +455,17 @@ test.describe("flot hover plugin", () => {
 			const win = window as any;
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createMouseHoverOptions();
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -438,7 +553,17 @@ test.describe("flot hover plugin", () => {
 			const $ = win.jQuery;
 			const options = win.__hoverPortHelpers.createMouseHoverOptions();
 			const placeholder = $("#placeholder");
-			const plot = $.plot(placeholder, [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				placeholder,
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 
 			win.__hoverPortState = { hovered: false };
 			$(plot.getPlaceholder()).on("plothover", () => {
@@ -466,7 +591,17 @@ test.describe("flot hover plugin", () => {
 			const placeholder = $("#placeholder");
 
 			win.__hoverPortState.hovered = false;
-			const plot = $.plot(placeholder, [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				placeholder,
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const lastMouseMoveEvent = plot.getPlaceholder().lastMouseMoveEvent;
 			return {
 				actualX: lastMouseMoveEvent.x,
@@ -491,20 +626,38 @@ test.describe("flot hover plugin", () => {
 			options.series.bars = { show: true, barWidth: 0.5 };
 			options.series.lines = undefined;
 
-			const plot = $.plot($("#placeholder"), [[[0, 3], [1, 5], [2, 4]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 3],
+						[1, 5],
+						[2, 4],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
 			const axisy = plot.getYAxes()[0];
 
 			win.__hoverPortState = { canvas: eventHolder };
-			win.simulate.mouseMove(eventHolder, axisx.p2c(1.25) + offset.left, axisy.p2c(2) + offset.top, 0);
+			win.simulate.mouseMove(
+				eventHolder,
+				axisx.p2c(1.25) + offset.left,
+				axisy.p2c(2) + offset.top,
+				0,
+			);
 		});
 
 		await page.clock.runFor(100);
 		const containsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(containsHighlight).toBe(true);
 	});
@@ -517,7 +670,17 @@ test.describe("flot hover plugin", () => {
 			options.series.bars = { show: true, barWidth: 0.5 };
 			options.series.lines = undefined;
 
-			const plot = $.plot($("#placeholder"), [[[0, 5, 2], [1, 7, 2], [2, 6, 2]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 5, 2],
+						[1, 7, 2],
+						[2, 6, 2],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -536,19 +699,30 @@ test.describe("flot hover plugin", () => {
 		await page.waitForTimeout(100);
 		const firstHoverContainsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(firstHoverContainsHighlight).toBe(false);
 
 		await page.evaluate(() => {
 			const win = window as any;
-			win.simulate.mouseMove(win.__hoverPortState.canvas, win.__hoverPortState.x, win.__hoverPortState.y2, 0);
+			win.simulate.mouseMove(
+				win.__hoverPortState.canvas,
+				win.__hoverPortState.x,
+				win.__hoverPortState.y2,
+				0,
+			);
 		});
 
 		await page.waitForTimeout(100);
 		const secondHoverContainsHighlight = await page.evaluate((highlightColor) => {
 			const win = window as any;
-			return win.__hoverPortHelpers.canvasContainsColor(win.__hoverPortState.canvas, highlightColor);
+			return win.__hoverPortHelpers.canvasContainsColor(
+				win.__hoverPortState.canvas,
+				highlightColor,
+			);
 		}, HIGHLIGHT_RGBA);
 		expect(secondHoverContainsHighlight).toBe(true);
 	});
@@ -568,7 +742,17 @@ test.describe("flot hover plugin", () => {
 				],
 			};
 
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			const eventHolder = plot.getEventHolder();
 			const offset = plot.getPlotOffset();
 			const axisx = plot.getXAxes()[0];
@@ -590,17 +774,41 @@ test.describe("flot hover plugin", () => {
 
 			options.hooks = {
 				findNearbyItems: [
-					(_0: unknown, _1: unknown, _2: unknown, _3: unknown, _4: unknown, _5: unknown, _6: unknown, items: unknown[]) => {
+					(
+						_0: unknown,
+						_1: unknown,
+						_2: unknown,
+						_3: unknown,
+						_4: unknown,
+						_5: unknown,
+						_6: unknown,
+						items: unknown[],
+					) => {
 						items.push(testItem);
 					},
 				],
 			};
 
 			win.__hoverPortState = { seenTestItem: false };
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			$(plot.getPlaceholder()).on(
 				"plothover",
-				(event: { originalEvent?: { detail?: unknown[] } }, _pos: unknown, _item: unknown, items: unknown[]) => {
+				(
+					event: { originalEvent?: { detail?: unknown[] } },
+					_pos: unknown,
+					_item: unknown,
+					items: unknown[],
+				) => {
 					const detailItems = event.originalEvent?.detail?.[2] as unknown[] | undefined;
 					win.__hoverPortState.seenTestItem = Array.isArray(items) && items.includes(testItem);
 					if (!win.__hoverPortState.seenTestItem && detailItems) {
@@ -632,17 +840,40 @@ test.describe("flot hover plugin", () => {
 
 			options.hooks = {
 				findNearbyItems: [
-					(_0: unknown, _1: unknown, _2: unknown, _3: unknown, _4: unknown, _5: unknown, _6: unknown, items: unknown[]) => {
+					(
+						_0: unknown,
+						_1: unknown,
+						_2: unknown,
+						_3: unknown,
+						_4: unknown,
+						_5: unknown,
+						_6: unknown,
+						items: unknown[],
+					) => {
 						items.push(testItem);
 					},
 				],
 			};
 
 			win.__hoverPortState = { closerThanHookItem: false };
-			const plot = $.plot($("#placeholder"), [[[0, 0], [2, 3], [10, 10]]], options);
+			const plot = $.plot(
+				$("#placeholder"),
+				[
+					[
+						[0, 0],
+						[2, 3],
+						[10, 10],
+					],
+				],
+				options,
+			);
 			$(plot.getPlaceholder()).on(
 				"plothover",
-				(event: { originalEvent?: { detail?: unknown[] } }, _pos: unknown, item: { distance: number }) => {
+				(
+					event: { originalEvent?: { detail?: unknown[] } },
+					_pos: unknown,
+					item: { distance: number },
+				) => {
 					const detailItem = event.originalEvent?.detail?.[1] as { distance: number } | undefined;
 					const hoverItem = item || detailItem;
 					win.__hoverPortState.closerThanHookItem = hoverItem.distance < distance;
@@ -658,7 +889,9 @@ test.describe("flot hover plugin", () => {
 		});
 
 		await expect
-			.poll(async () => await page.evaluate(() => (window as any).__hoverPortState.closerThanHookItem))
+			.poll(
+				async () => await page.evaluate(() => (window as any).__hoverPortState.closerThanHookItem),
+			)
 			.toBe(true);
 	});
 });

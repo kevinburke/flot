@@ -168,7 +168,9 @@ import { plugins } from './plugin-registry.js';
             },
 
             isLongTap: function(e) {
-                if (gestureState.tapStartTime == null) return false;
+                if (gestureState.tapStartTime == null) {
+                    return false;
+                }
                 var currentTime = new Date().getTime(),
                     tapDuration = currentTime - gestureState.tapStartTime;
                 if (tapDuration >= minLongTapDuration && !gestureState.interceptedLongTap) {
@@ -209,7 +211,9 @@ import { plugins } from './plugin-registry.js';
             },
 
             isTap: function(e) {
-                if (gestureState.tapStartTime == null) return false;
+                if (gestureState.tapStartTime == null) {
+                    return false;
+                }
                 var currentTime = new Date().getTime(),
                     tapDuration = currentTime - gestureState.tapStartTime;
                 if (tapDuration <= pressedTapDuration) {

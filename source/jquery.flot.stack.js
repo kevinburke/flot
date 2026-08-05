@@ -47,7 +47,9 @@ import { plugins } from './plugin-registry.js';
 		function findMatchingSeries(s, allseries) {
             var res = null;
             for (var i = 0; i < allseries.length; ++i) {
-                if (s === allseries[i]) break;
+                if (s === allseries[i]) {
+                    break;
+                }
 
                 if (allseries[i].stack === s.stack) {
                     res = allseries[i];
@@ -80,7 +82,9 @@ import { plugins } from './plugin-registry.js';
 
 		/** @param {any} plot @param {any} s @param {any} datapoints */
 		function stackData(plot, s, datapoints) {
-            if (s.stack == null || s.stack === false) return;
+            if (s.stack == null || s.stack === false) {
+                return;
+            }
 
             var needsBottom = s.bars.show || (s.lines.show && s.lines.fill);
             var hasBottom = datapoints.pointsize > 2 && (s.bars.horizontal ? datapoints.format[2].x : datapoints.format[2].y);
@@ -90,7 +94,9 @@ import { plugins } from './plugin-registry.js';
             }
 
             var other = findMatchingSeries(s, plot.getData());
-            if (!other) return;
+            if (!other) {
+                return;
+            }
 
             var ps = datapoints.pointsize,
                 points = datapoints.points,
@@ -107,7 +113,9 @@ import { plugins } from './plugin-registry.js';
                 i = 0, j = 0, l, m;
 
             while (true) {
-                if (i >= points.length) break;
+                if (i >= points.length) {
+                    break;
+                }
 
                 l = newpoints.length;
 

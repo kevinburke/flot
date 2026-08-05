@@ -77,8 +77,11 @@ import { extend } from './helpers.js';
                 y = origpoints[i + 1];
 
                 prevp = p;
-                if (y < below) p = threspoints;
-                else p = newpoints;
+                if (y < below) {
+                    p = threspoints;
+                } else {
+                    p = newpoints;
+                }
 
                 if (addCrossingPoints && prevp !== undefined && prevp !== p &&
                     x !== null && i > 0 &&
@@ -124,9 +127,11 @@ import { extend } from './helpers.js';
 
 		/** @param {any} plot @param {any} s @param {any} datapoints */
 		function processThresholds(plot, s, datapoints) {
-            if (!s.threshold) return;
+            if (!s.threshold) {
+                return;
+            }
             if (s.threshold instanceof Array) {
-			s.threshold.sort(/** @param {any} a @param {any} b */ function(a, b) {
+                s.threshold.sort(/** @param {any} a @param {any} b */ function(a, b) {
                     return a.below - b.below;
                 });
 

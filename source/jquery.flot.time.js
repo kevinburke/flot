@@ -495,7 +495,9 @@ import { saturated } from './jquery.flot.saturated.js';
                     axis.tickGenerator = dateTickGenerator;
 
                     // if a tick formatter is already provided do not overwrite it
-                    if ('tickFormatter' in opts && typeof opts.tickFormatter === 'function') return;
+                    if ('tickFormatter' in opts && typeof opts.tickFormatter === 'function') {
+                        return;
+                    }
 
 					axis.tickFormatter = /** @param {number} v @param {any} axis */ function (v, axis) {
                         var d = dateGenerator(v, axis.options);
@@ -545,8 +547,7 @@ import { saturated } from './jquery.flot.saturated.js';
                             }
 
                             fmt = "%S.%" + decimals + "s";
-                        } else
-                        if (t < timeUnitSize.minute) {
+                        } else if (t < timeUnitSize.minute) {
                             fmt = hourCode + ":%M:%S" + suffix;
                         } else if (t < timeUnitSize.day) {
                             if (span < 2 * timeUnitSize.day) {

@@ -18,7 +18,7 @@ function cloneDeepValue(value) {
 
     if (isPlainObject(value)) {
 		/** @type {Record<string, any>} */
-		var copy = {};
+        var copy = {};
         var keys = Object.keys(value);
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
@@ -49,7 +49,9 @@ export function extend(...args) {
 
     for (var i = 0; i < sources.length; i++) {
         var src = sources[i];
-        if (src == null) continue;
+        if (src == null) {
+            continue;
+        }
         var keys = Object.keys(src);
         for (var k = 0; k < keys.length; k++) {
             var key = keys[k];

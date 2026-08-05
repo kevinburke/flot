@@ -439,7 +439,7 @@ var Canvas = function(cls, container) {
 	function updateTransforms (element, transforms) {
         element.transform.baseVal.clear();
         if (transforms) {
-			transforms.forEach(/** @param {SVGTransform} t */ function(t) {
+            transforms.forEach(/** @param {SVGTransform} t */ function(t) {
                 element.transform.baseVal.appendItem(t);
             });
         }
@@ -572,7 +572,7 @@ var Canvas = function(cls, container) {
             tspan, i, offset;
 
         for (i = 0; i < lines.length; i++) {
-			tspan = findTspanElement(element, i);
+            tspan = findTspanElement(element, i);
 			if (!tspan) {
 				tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
 				element.appendChild(tspan);
@@ -628,9 +628,9 @@ var Canvas = function(cls, container) {
                                 // positions array (e.g. when a Flot plugin
                                 // populates the cache outside the normal
                                 // addText path). Upstream flot/flot#1444.
-								positions = styleCache[key].positions;
+                                positions = styleCache[key].positions;
                                 if (positions != null) {
-								positions.forEach(/** @param {TextPosition} position */ function(position) {
+                                    positions.forEach(/** @param {TextPosition} position */ function(position) {
                                         position.active = false;
                                     });
                                 }

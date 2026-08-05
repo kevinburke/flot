@@ -77,7 +77,9 @@
   if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (el) {
       for (var i = 0; i < this.length; i++ ) {
-        if (el === this[i]) return i;
+        if (el === this[i]) {
+          return i;
+        }
       }
       return -1;
     }
@@ -91,7 +93,9 @@
   //
   // This is used to pad numbers in converting date to string in ISO standard.
   var _fixWidth = function (number, digits) {
-    if (typeof number !== "number") { throw "not a number: " + number; }
+    if (typeof number !== "number") {
+      throw "not a number: " + number;
+    }
     var s = number.toString();
     if (number.length > digits) {
       return number.substr(number.length - digits, number.length);
@@ -118,9 +122,15 @@
     if ((!fleegix || typeof fleegix.xhr === 'undefined') && (!$ || typeof $.ajax === 'undefined')) {
       throw new Error('Please use the Fleegix.js XHR module, jQuery ajax, Zepto ajax, or define your own transport mechanism for downloading zone files.');
     }
-    if (!opts) return;
-    if (!opts.url) throw new Error ('URL must be specified');
-    if (!('async' in opts)) opts.async = true;
+    if (!opts) {
+      return;
+    }
+    if (!opts.url) {
+      throw new Error ('URL must be specified');
+    }
+    if (!('async' in opts)) {
+      opts.async = true;
+    }
     if (!opts.async) {
       return fleegix && fleegix.xhr
       ? fleegix.xhr.doReq({ url: opts.url, async: false })
@@ -202,9 +212,9 @@
     // Date `dt` created should be in UTC. Thus the way I detect such cases is to determine if `arr` is not populated & `tz`
     // is specified. Because if `tz` is not specified, `dt` can be in local time.
     if (arr.length) {
-       this.setFromDateObjProxy(dt);
+      this.setFromDateObjProxy(dt);
     } else {
-       this.setFromTimeProxy(dt.getTime(), tz);
+      this.setFromTimeProxy(dt.getTime(), tz);
     }
   };
 
@@ -235,16 +245,17 @@
     getTimezoneOffset: function () { return this.getTimezoneInfo().tzOffset; },
     getTimezoneAbbreviation: function () { return this.getTimezoneInfo().tzAbbr; },
     getTimezoneInfo: function () {
-      if (this._useCache) return this._tzInfo;
+      if (this._useCache) {
+        return this._tzInfo;
+      }
       var res;
       // If timezone is specified, get the correct timezone info based on the Date given
       if (this.timezone) {
         res = this.timezone === 'Etc/UTC' || this.timezone === 'Etc/GMT'
           ? { tzOffset: 0, tzAbbr: 'UTC' }
           : timezoneJS.timezone.getTzInfo(this._timeProxy, this.timezone);
-      }
-      // If no timezone was specified, use the local browser offset
-      else {
+      } else {
+        // If no timezone was specified, use the local browser offset
         res = { tzOffset: this.getLocalOffset(), tzAbbr: null };
       }
       this._tzInfo = res;
@@ -265,7 +276,9 @@
     setMinutes: function (n) { this.setAttribute('minutes', n); },
     setSeconds: function (n) { this.setAttribute('seconds', n); },
     setTime: function (n) {
-      if (isNaN(n)) { throw new Error('Units must be a number.'); }
+      if (isNaN(n)) {
+        throw new Error('Units must be a number.');
+      }
       this.setFromTimeProxy(n, this.timezone);
     },
     setUTCDate: function (n) { this.setUTCAttribute('date', n); },
@@ -296,14 +309,18 @@
       this.setFromDateObjProxy(dt);
     },
     setAttribute: function (unit, n) {
-      if (isNaN(n)) { throw new Error('Units must be a number.'); }
+      if (isNaN(n)) {
+        throw new Error('Units must be a number.');
+      }
       var dt = this._dateProxy;
       var meth = unit === 'year' ? 'FullYear' : unit.substr(0, 1).toUpperCase() + unit.substr(1);
       dt['set' + meth](n);
       this.setFromDateObjProxy(dt);
     },
     setUTCAttribute: function (unit, n) {
-      if (isNaN(n)) { throw new Error('Units must be a number.'); }
+      if (isNaN(n)) {
+        throw new Error('Units must be a number.');
+      }
       var meth = unit === 'year' ? 'FullYear' : unit.substr(0, 1).toUpperCase() + unit.substr(1);
       var dt = this.getUTCDateProxy();
       dt['setUTC' + meth](n);
@@ -335,7 +352,9 @@
     // Allows different format following ISO8601 format:
     toString: function (format, tz) {
       // Default format is the same as toISOString
-      if (!format) format = 'yyyy-MM-dd HH:mm:ss';
+      if (!format) {
+        format = 'yyyy-MM-dd HH:mm:ss';
+      }
       var result = format;
       var tzInfo = tz ? timezoneJS.timezone.getTzInfo(this.getTime(), tz) : this.getTimezoneInfo();
       var _this = this;
@@ -438,11 +457,15 @@
       var exc = regionExceptions[tz]
         , reg
         , ret;
-      if (exc) return exc;
+      if (exc) {
+        return exc;
+      }
       reg = tz.split('/')[0];
       ret = regionMap[reg];
       // If there's nothing listed in the main regions for this TZ, check the 'backward' links
-      if (ret) return ret;
+      if (ret) {
+        return ret;
+      }
       var link = _this.zones[tz];
       if (typeof link === 'string') {
         return getRegionForTimezone(link);
@@ -465,7 +488,9 @@
       return hms;
     }
     function processZone(z) {
-      if (!z[3]) { return; }
+      if (!z[3]) {
+        return;
+      }
       var yea = parseInt(z[3], 10);
       var mon = 11;
       var dat = 31;
@@ -504,7 +529,9 @@
       //Do backwards lookup since most use cases deal with newer dates.
       for (var i = zoneList.length - 1; i >= 0; i--) {
         var z = zoneList[i];
-        if (z[3] && utcMillis > z[3]) break;
+        if (z[3] && utcMillis > z[3]) {
+          break;
+        }
       }
       return zoneList[i+1];
     }
@@ -571,19 +598,19 @@
         var hms = rule[5];
         var effectiveDate;
 
-        if (!EXACT_DATE_TIME[year])
+        if (!EXACT_DATE_TIME[year]) {
           EXACT_DATE_TIME[year] = {};
+        }
 
         // Result for given parameters is already stored
-        if (EXACT_DATE_TIME[year][rule])
+        if (EXACT_DATE_TIME[year][rule]) {
           effectiveDate = EXACT_DATE_TIME[year][rule];
-        else {
+        } else {
           //If we have a specific date, use that!
           if (!isNaN(rule[4])) {
             effectiveDate = new Date(Date.UTC(year, SHORT_MONTHS[rule[3]], rule[4], hms[1], hms[2], hms[3], 0));
-          }
-          //Let's hunt for the date.
-          else {
+          } else {
+            //Let's hunt for the date.
             var targetDay
               , operator;
             //Example: `lastThu`
@@ -592,9 +619,8 @@
               effectiveDate = new Date(Date.UTC(year, SHORT_MONTHS[rule[3]] + 1, 1, hms[1] - 24, hms[2], hms[3], 0));
               targetDay = SHORT_DAYS[rule[4].substr(4, 3)];
               operator = "<=";
-            }
-            //Example: `Sun>=15`
-            else {
+            } else {
+              //Example: `Sun>=15`
               //Start at the specified date.
               effectiveDate = new Date(Date.UTC(year, SHORT_MONTHS[rule[3]], rule[4].substr(5), hms[1], hms[2], hms[3], 0));
               targetDay = SHORT_DAYS[rule[4].substr(0, 3)];
@@ -604,9 +630,8 @@
             //Go forwards.
             if (operator === ">=") {
               effectiveDate.setUTCDate(effectiveDate.getUTCDate() + (targetDay - ourDay + ((targetDay < ourDay) ? 7 : 0)));
-            }
-            //Go backwards.  Looking for the last of a certain day, or operator is "<=" (less likely).
-            else {
+            } else {
+              //Go backwards.  Looking for the last of a certain day, or operator is "<=" (less likely).
               effectiveDate.setUTCDate(effectiveDate.getUTCDate() + (targetDay - ourDay - ((targetDay > ourDay) ? 7 : 0)));
             }
           }
@@ -639,8 +664,8 @@
                //It's completely okay to have any number of matches here.
                // Normally we should only see two, but that doesn't preclude other numbers of matches.
                // These matches are applicable to this year.
-               applicableRules.push([year, ruleset[i]]);
-             }
+            applicableRules.push([year, ruleset[i]]);
+          }
         }
         return applicableRules;
       };
@@ -710,16 +735,14 @@
         var repl;
         if (rule) {
           repl = rule[7] === '-' ? '' : rule[7];
-        }
-        //FIXME: Right now just falling back to Standard --
-        // apparently ought to use the last valid rule,
-        // although in practice that always ought to be Standard
-        else {
+        } else {
+          //FIXME: Right now just falling back to Standard --
+          // apparently ought to use the last valid rule,
+          // although in practice that always ought to be Standard
           repl = 'S';
         }
         res = base.replace('%s', repl);
-      }
-      else if (base.indexOf('/') > -1) {
+      } else if (base.indexOf('/') > -1) {
         //Chose one of two alternative strings.
         res = base.split("/", 2)[rule[6] ? 1 : 0];
       } else {
@@ -795,7 +818,9 @@
       : _this.transport({ url : url, success : processData });
     };
     this.loadZoneDataFromObject = function (data) {
-      if (!data) { return; }
+      if (!data) {
+        return;
+      }
       for (var z in data.zones) {
         _this.zones[z] = data.zones[z];
       }
@@ -805,7 +830,9 @@
     };
     this.getAllZones = function () {
       var arr = [];
-      for (var z in this.zones) { arr.push(z); }
+      for (var z in this.zones) {
+        arr.push(z);
+      }
       return arr.sort();
     };
     this.parseZones = function (str) {
@@ -831,10 +858,14 @@
               if (!_this.zones[zone]) {
                 _this.zones[zone] = [];
               }
-              if (arr.length < 3) break;
+              if (arr.length < 3) {
+                break;
+              }
               //Process zone right here and replace 3rd element with the processed array.
               arr.splice(3, arr.length, processZone(arr));
-              if (arr[3]) arr[3] = Date.UTC.apply(null, arr[3]);
+              if (arr[3]) {
+                arr[3] = Date.UTC.apply(null, arr[3]);
+              }
               arr[0] = -getBasicOffset(arr[0]);
               _this.zones[zone].push(arr);
               break;

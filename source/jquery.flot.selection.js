@@ -191,7 +191,9 @@ import { trigger, unbind } from './helpers.js';
         function onDragStart(e) {
             var o = plot.getOptions();
             // only accept left-click
-            if (e.button !== 0 || o.selection.mode === null) return;
+            if (e.button !== 0 || o.selection.mode === null) {
+                return;
+            }
 
             // reinitialize currentMode
             selection.currentMode = 'xy';
@@ -241,9 +243,13 @@ import { trigger, unbind } from './helpers.js';
         }
 
         function getSelection() {
-            if (!selectionIsSane()) return null;
+            if (!selectionIsSane()) {
+                return null;
+            }
 
-            if (!selection.show) return null;
+            if (!selection.show) {
+                return null;
+            }
 
             /** @type {SelectionResult} */
             var r = {},
@@ -327,7 +333,9 @@ import { trigger, unbind } from './helpers.js';
             pos.x = clamp(0, e.pageX - offset.left - plotOffset.left, plot.width());
             pos.y = clamp(0, e.pageY - offset.top - plotOffset.top, plot.height());
 
-            if (pos !== selection.first) updateMode(pos);
+            if (pos !== selection.first) {
+                updateMode(pos);
+            }
 
             if (selectionDirection(plot) === "y") {
                 pos.x = pos === selection.first ? 0 : plot.width();
@@ -340,13 +348,17 @@ import { trigger, unbind } from './helpers.js';
 
         /** @param {PointerEvent} pos */
         function updateSelection(pos) {
-            if (pos.pageX == null) return;
+            if (pos.pageX == null) {
+                return;
+            }
 
             setSelectionPos(selection.second, pos);
             if (selectionIsSane()) {
                 selection.show = true;
                 plot.triggerRedrawOverlay();
-            } else clearSelection(true);
+            } else {
+                clearSelection(true);
+            }
         }
 
         /** @param {boolean} [preventEvent] */
@@ -457,23 +469,33 @@ import { trigger, unbind } from './helpers.js';
 
         /** @param {Event} e */
         function onPointerDown(e) {
-            if (!(e instanceof PointerEvent)) return;
-            if (e.button !== 0) return;
+            if (!(e instanceof PointerEvent)) {
+                return;
+            }
+            if (e.button !== 0) {
+                return;
+            }
             const el = e.currentTarget;
-            if (!(el instanceof HTMLElement)) return;
+            if (!(el instanceof HTMLElement)) {
+                return;
+            }
             /** @type {HTMLElement} */
             const eventHolder = el;
             onDragStart(e);
 
             /** @param {Event} e */
             function onPointerMove(e) {
-                if (!(e instanceof PointerEvent)) return;
+                if (!(e instanceof PointerEvent)) {
+                    return;
+                }
                 onDrag(e);
             }
 
             /** @param {Event} e */
             function onPointerUp(e) {
-                if (!(e instanceof PointerEvent)) return;
+                if (!(e instanceof PointerEvent)) {
+                    return;
+                }
                 onDragEnd(e);
                 eventHolder.removeEventListener("pointermove", onPointerMove);
                 eventHolder.removeEventListener("pointerup", onPointerUp);
@@ -495,19 +517,19 @@ import { trigger, unbind } from './helpers.js';
         });
 
         /**
-         * @param {CanvasRenderingContext2D} ctx
-         * @param {number} x
-         * @param {number} y
-         * @param {number} w
-         * @param {number} h
-         * @param {number} oX
-         * @param {number} oY
-         * @param {SelectionMode} mode
+         * @param {CanvasRenderingContext2D} ctx Overlay context translated to the plot origin.
+         * @param {number} x Left edge of the rendered selection, in plot pixels.
+         * @param {number} y Top edge of the rendered selection, in plot pixels.
+         * @param {number} width Width of the rendered selection, in plot pixels.
+         * @param {number} height Height of the rendered selection, in plot pixels.
+         * @param {number} unexpandedX Left edge before a y-only selection expands to full width.
+         * @param {number} unexpandedY Top edge before an x-only selection expands to full height.
+         * @param {SelectionMode} mode Axes selected by the drag gesture.
          */
-        function drawSelectionDecorations(ctx, x, y, w, h, oX, oY, mode) {
+        function drawSelectionDecorations(ctx, x, y, width, height, unexpandedX, unexpandedY, mode) {
             var spacing = 3;
             var fullEarWidth = 15;
-            var earWidth = Math.max(0, Math.min(fullEarWidth, w / 2 - 2, h / 2 - 2));
+            var earWidth = Math.max(0, Math.min(fullEarWidth, width / 2 - 2, height / 2 - 2));
             ctx.fillStyle = '#ffffff';
 
             if (mode === 'xy') {
@@ -520,36 +542,36 @@ import { trigger, unbind } from './helpers.js';
                 ctx.lineTo(x, y);
                 ctx.closePath();
 
-                ctx.moveTo(x, y + h - earWidth);
-                ctx.lineTo(x - 3, y + h - earWidth);
-                ctx.lineTo(x - 3, y + h + 3);
-                ctx.lineTo(x + earWidth, y + h + 3);
-                ctx.lineTo(x + earWidth, y + h);
-                ctx.lineTo(x, y + h);
+                ctx.moveTo(x, y + height - earWidth);
+                ctx.lineTo(x - 3, y + height - earWidth);
+                ctx.lineTo(x - 3, y + height + 3);
+                ctx.lineTo(x + earWidth, y + height + 3);
+                ctx.lineTo(x + earWidth, y + height);
+                ctx.lineTo(x, y + height);
                 ctx.closePath();
 
-                ctx.moveTo(x + w, y + earWidth);
-                ctx.lineTo(x + w + 3, y + earWidth);
-                ctx.lineTo(x + w + 3, y - 3);
-                ctx.lineTo(x + w - earWidth, y - 3);
-                ctx.lineTo(x + w - earWidth, y);
-                ctx.lineTo(x + w, y);
+                ctx.moveTo(x + width, y + earWidth);
+                ctx.lineTo(x + width + 3, y + earWidth);
+                ctx.lineTo(x + width + 3, y - 3);
+                ctx.lineTo(x + width - earWidth, y - 3);
+                ctx.lineTo(x + width - earWidth, y);
+                ctx.lineTo(x + width, y);
                 ctx.closePath();
 
-                ctx.moveTo(x + w, y + h - earWidth);
-                ctx.lineTo(x + w + 3, y + h - earWidth);
-                ctx.lineTo(x + w + 3, y + h + 3);
-                ctx.lineTo(x + w - earWidth, y + h + 3);
-                ctx.lineTo(x + w - earWidth, y + h);
-                ctx.lineTo(x + w, y + h);
+                ctx.moveTo(x + width, y + height - earWidth);
+                ctx.lineTo(x + width + 3, y + height - earWidth);
+                ctx.lineTo(x + width + 3, y + height + 3);
+                ctx.lineTo(x + width - earWidth, y + height + 3);
+                ctx.lineTo(x + width - earWidth, y + height);
+                ctx.lineTo(x + width, y + height);
                 ctx.closePath();
 
                 ctx.stroke();
                 ctx.fill();
             }
 
-            x = oX;
-            y = oY;
+            x = unexpandedX;
+            y = unexpandedY;
 
             if (mode === 'x') {
                 ctx.beginPath();
@@ -559,10 +581,10 @@ import { trigger, unbind } from './helpers.js';
                 ctx.lineTo(x - spacing, y + fullEarWidth);
                 ctx.closePath();
 
-                ctx.moveTo(x + w, y + fullEarWidth);
-                ctx.lineTo(x + w, y - fullEarWidth);
-                ctx.lineTo(x + w + spacing, y - fullEarWidth);
-                ctx.lineTo(x + w + spacing, y + fullEarWidth);
+                ctx.moveTo(x + width, y + fullEarWidth);
+                ctx.lineTo(x + width, y - fullEarWidth);
+                ctx.lineTo(x + width + spacing, y - fullEarWidth);
+                ctx.lineTo(x + width + spacing, y + fullEarWidth);
                 ctx.closePath();
                 ctx.stroke();
                 ctx.fill();
@@ -577,10 +599,10 @@ import { trigger, unbind } from './helpers.js';
                 ctx.lineTo(x - fullEarWidth, y - spacing);
                 ctx.closePath();
 
-                ctx.moveTo(x - fullEarWidth, y + h);
-                ctx.lineTo(x + fullEarWidth, y + h);
-                ctx.lineTo(x + fullEarWidth, y + h + spacing);
-                ctx.lineTo(x - fullEarWidth, y + h + spacing);
+                ctx.moveTo(x - fullEarWidth, y + height);
+                ctx.lineTo(x + fullEarWidth, y + height);
+                ctx.lineTo(x + fullEarWidth, y + height + spacing);
+                ctx.lineTo(x - fullEarWidth, y + height + spacing);
                 ctx.closePath();
                 ctx.stroke();
                 ctx.fill();

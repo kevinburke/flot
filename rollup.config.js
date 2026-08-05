@@ -79,9 +79,15 @@ const standalonePlugins = [
 // match resolved absolute paths, since Rollup has already resolved `./foo.js`
 // to /abs/.../source/foo.js by the time these hooks run.
 function pluginGlobal(id) {
-	if (id === "jquery") return "jQuery";
-	if (id.endsWith("plugin-registry.js")) return "Flot";
-	if (id.endsWith("helpers.js")) return "Flot.helpers";
+	if (id === "jquery") {
+		return "jQuery";
+	}
+	if (id.endsWith("plugin-registry.js")) {
+		return "Flot";
+	}
+	if (id.endsWith("helpers.js")) {
+		return "Flot.helpers";
+	}
 	return null;
 }
 
