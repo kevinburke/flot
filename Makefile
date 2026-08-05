@@ -29,10 +29,12 @@ clean: ## remove built artifacts
 	rm -rf dist
 
 lint: node_modules ## run biome lint + format check
-	$(BIOME) check .
+	$(BIOME) check --error-on-warnings .
+	$(BIOME) lint --config-path biome.braces.json --error-on-warnings .
 
 format: node_modules ## auto-format with biome
 	$(BIOME) check --write .
+	$(BIOME) lint --config-path biome.braces.json --write --unsafe .
 
 test: test-unit test-browser ## run the test suite
 

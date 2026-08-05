@@ -25,7 +25,7 @@ import { plugins } from './plugin-registry.js';
 
             // somebody might have hidden us and we can't plot
             // when we don't have the dimensions
-            if (placeholder.clientWidth === 0 || placeholder.clientHeight === 0) return;
+            if (placeholder.clientWidth === 0 || placeholder.clientHeight === 0) { return; }
 
             plot.resize();
             plot.setupGrid();

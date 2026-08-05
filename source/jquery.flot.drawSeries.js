@@ -162,10 +162,10 @@ function DrawSeries() {
                         i -= ps;
                     }
                 }
-                if (handleYMinClipping()) continue;
-                if (handleYMaxClipping()) continue;
-                if (handleXMinClipping()) continue;
-                if (handleXMaxClipping()) continue;
+                if (handleYMinClipping()) { continue; }
+                if (handleYMaxClipping()) { continue; }
+                if (handleXMinClipping()) { continue; }
+                if (handleXMaxClipping()) { continue; }
 
                 drawLine();
             }

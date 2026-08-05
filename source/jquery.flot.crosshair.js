@@ -184,8 +184,8 @@ import { bind, unbind } from './helpers.js';
                     ctx.lineTo(plot.width(), drawY);
                 }
                 if (crosshair.locked) {
-                    if (crosshair.highlighted) ctx.fillStyle = 'orange';
-                    else ctx.fillStyle = c.color;
+                    if (crosshair.highlighted) { ctx.fillStyle = 'orange'; }
+                    else { ctx.fillStyle = c.color; }
                     ctx.fillRect(Math.floor(crosshair.x) + adj - 4, Math.floor(crosshair.y) + adj - 4, 8, 8);
                 }
                 ctx.stroke();

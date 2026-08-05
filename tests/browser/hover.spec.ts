@@ -118,7 +118,7 @@ test.describe("flot hover plugin", () => {
 			$(plot.getPlaceholder()).on(
 				"plothover",
 				(_event: unknown, pos: any, item: any, items: unknown) => {
-					if (win.__hoverPortState.captured !== null) return;
+					if (win.__hoverPortState.captured !== null) { return; }
 					win.__hoverPortState.captured = {
 						posType: typeof pos,
 						posHasX: pos !== null && typeof pos === "object" && "x" in pos,

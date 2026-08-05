@@ -77,7 +77,7 @@
   if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (el) {
       for (var i = 0; i < this.length; i++ ) {
-        if (el === this[i]) return i;
+        if (el === this[i]) { return i; }
       }
       return -1;
     }
@@ -118,9 +118,9 @@
     if ((!fleegix || typeof fleegix.xhr === 'undefined') && (!$ || typeof $.ajax === 'undefined')) {
       throw new Error('Please use the Fleegix.js XHR module, jQuery ajax, Zepto ajax, or define your own transport mechanism for downloading zone files.');
     }
-    if (!opts) return;
-    if (!opts.url) throw new Error ('URL must be specified');
-    if (!('async' in opts)) opts.async = true;
+    if (!opts) { return; }
+    if (!opts.url) { throw new Error ('URL must be specified'); }
+    if (!('async' in opts)) { opts.async = true; }
     if (!opts.async) {
       return fleegix && fleegix.xhr
       ? fleegix.xhr.doReq({ url: opts.url, async: false })
@@ -235,7 +235,7 @@
     getTimezoneOffset: function () { return this.getTimezoneInfo().tzOffset; },
     getTimezoneAbbreviation: function () { return this.getTimezoneInfo().tzAbbr; },
     getTimezoneInfo: function () {
-      if (this._useCache) return this._tzInfo;
+      if (this._useCache) { return this._tzInfo; }
       var res;
       // If timezone is specified, get the correct timezone info based on the Date given
       if (this.timezone) {
@@ -335,7 +335,7 @@
     // Allows different format following ISO8601 format:
     toString: function (format, tz) {
       // Default format is the same as toISOString
-      if (!format) format = 'yyyy-MM-dd HH:mm:ss';
+      if (!format) { format = 'yyyy-MM-dd HH:mm:ss'; }
       var result = format;
       var tzInfo = tz ? timezoneJS.timezone.getTzInfo(this.getTime(), tz) : this.getTimezoneInfo();
       var _this = this;
@@ -438,11 +438,11 @@
       var exc = regionExceptions[tz]
         , reg
         , ret;
-      if (exc) return exc;
+      if (exc) { return exc; }
       reg = tz.split('/')[0];
       ret = regionMap[reg];
       // If there's nothing listed in the main regions for this TZ, check the 'backward' links
-      if (ret) return ret;
+      if (ret) { return ret; }
       var link = _this.zones[tz];
       if (typeof link === 'string') {
         return getRegionForTimezone(link);
@@ -504,7 +504,7 @@
       //Do backwards lookup since most use cases deal with newer dates.
       for (var i = zoneList.length - 1; i >= 0; i--) {
         var z = zoneList[i];
-        if (z[3] && utcMillis > z[3]) break;
+        if (z[3] && utcMillis > z[3]) { break; }
       }
       return zoneList[i+1];
     }
@@ -571,12 +571,14 @@
         var hms = rule[5];
         var effectiveDate;
 
-        if (!EXACT_DATE_TIME[year])
+        if (!EXACT_DATE_TIME[year]) {
           EXACT_DATE_TIME[year] = {};
+        }
 
         // Result for given parameters is already stored
-        if (EXACT_DATE_TIME[year][rule])
+        if (EXACT_DATE_TIME[year][rule]) {
           effectiveDate = EXACT_DATE_TIME[year][rule];
+        }
         else {
           //If we have a specific date, use that!
           if (!isNaN(rule[4])) {
@@ -831,10 +833,10 @@
               if (!_this.zones[zone]) {
                 _this.zones[zone] = [];
               }
-              if (arr.length < 3) break;
+              if (arr.length < 3) { break; }
               //Process zone right here and replace 3rd element with the processed array.
               arr.splice(3, arr.length, processZone(arr));
-              if (arr[3]) arr[3] = Date.UTC.apply(null, arr[3]);
+              if (arr[3]) { arr[3] = Date.UTC.apply(null, arr[3]); }
               arr[0] = -getBasicOffset(arr[0]);
               _this.zones[zone].push(arr);
               break;

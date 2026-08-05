@@ -9,6 +9,9 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ### Changed
 
+- `biome.json` / `biome.braces.json` / `Makefile`: require braces around
+  control-flow bodies throughout the JavaScript and TypeScript codebase and
+  update the Biome schema URL to match the installed CLI.
 - `tsconfig.json`: enable TypeScript's `noImplicitAny` and `noImplicitThis`
   checks for the JavaScript source.
 - `Makefile`: keep the existing source check green during the staged

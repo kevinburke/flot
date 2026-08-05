@@ -264,8 +264,8 @@ import { bind, unbind, trigger } from './helpers.js';
             for (i = 0; i < highlights.length; ++i) {
                 hi = highlights[i];
 
-                if (hi.series.bars.show) drawBarHighlight(hi.series, hi.point, octx);
-                else drawPointHighlight(hi.series, hi.point, octx, plot);
+                if (hi.series.bars.show) { drawBarHighlight(hi.series, hi.point, octx); }
+                else { drawPointHighlight(hi.series, hi.point, octx, plot); }
             }
             octx.restore();
         }
