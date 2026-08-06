@@ -15,6 +15,7 @@
 		"source/jquery.flot.hover.js",
 		"source/jquery.flot.saturated.js",
 		"source/jquery.flot.selection.js",
+		"source/jquery.flot.touch.js",
 		"source/plugin-registry.js"
 	]
 }
