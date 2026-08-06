@@ -28,6 +28,9 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 - `jquery.flot.selection.js`: add concrete selection, axis, event, drawing, and
   hook types and report a clear error when a programmatic selection omits a
   required axis range.
+- `jquery.flot.drawSeries.js`: add concrete datapoint, axis, series, symbol,
+  fill, gradient, and canvas types and include the renderer in the strict
+  source checks.
 
 ## [5.1.4] - 2026-05-22
 

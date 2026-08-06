@@ -8,20 +8,55 @@ This plugin is used by flot for drawing lines, plots, bars or area.
 
 import { color } from './jquery.colorhelpers.js';
 
-function DrawSeries() {
+/** @typedef {{ points: Array<number | null>, pointsize: number, format: unknown }} Datapoints */
+/** @typedef {{ min: number, max: number, p2c: (value: number) => number }} DrawAxis */
+/** @typedef {{ left: number, top: number }} PlotOffset */
+/** @typedef {string | CanvasGradient | CanvasPattern} FillStyle */
+/** @typedef {string | { colors: unknown[] }} ColorSpec */
+/** @typedef {(spec: ColorSpec, bottom: number | null, top: number | null, defaultColor: string) => FillStyle} GetColorOrGradient */
+/** @typedef {((ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, shadow: boolean, fill?: boolean) => void) & { fill?: boolean }} DrawSymbol */
+/** @typedef {DrawSymbol | Record<string, DrawSymbol> | null} DrawSymbolOption */
+/** @typedef {{ fill: boolean | number, fillColor?: ColorSpec | null }} FillOptions */
+
+/**
+ * @typedef {Object} DrawSeriesData
+ * @property {Datapoints} datapoints
+ * @property {DrawAxis} xaxis
+ * @property {DrawAxis} yaxis
+ * @property {string} color
+ * @property {FillOptions & { lineWidth: number, dashes?: number[], fillTowards?: number, steps: boolean }} lines
+ * @property {FillOptions & { lineWidth: number, radius: number, symbol: string | DrawSymbol }} points
+ * @property {FillOptions & { lineWidth: number, barWidth: number | [number, boolean], align: 'left' | 'right' | 'center', horizontal: boolean, fillTowards?: number }} bars
+ * @property {(series: DrawSeriesData, xmin: number, xmax: number, width: number, ymin?: number, ymax?: number, height?: number) => Array<number | null>} [decimate]
+ * @property {(series: DrawSeriesData, xmin: number, xmax: number, width: number, ymin: number, ymax: number, height: number) => Array<number | null>} [decimatePoints]
+ */
+
+class DrawSeries {
+    constructor() {
+        /**
+         * @param {Datapoints} datapoints
+         * @param {number} xoffset
+         * @param {number} yoffset
+         * @param {DrawAxis} axisx
+         * @param {DrawAxis} axisy
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {boolean} steps Whether to connect datapoints with
+         * horizontal-then-vertical steps instead of straight lines
+         */
         function plotLine(datapoints, xoffset, yoffset, axisx, axisy, ctx, steps) {
             var points = datapoints.points,
                 ps = datapoints.pointsize,
-                prevx = null,
-                prevy = null;
+                /** @type {number | null} */ prevx = null,
+                /** @type {number | null} */ prevy = null;
             var x1 = 0.0,
                 y1 = 0.0,
                 x2 = 0.0,
                 y2 = 0.0,
-                mx = null,
-                my = null,
+                /** @type {number | null} */ mx = null,
+                /** @type {number | null} */ my = null,
                 i = 0;
 
+            /** @param {number} i */
             var initPoints = function (i) {
                 x1 = points[i - ps];
                 y1 = points[i - ps + 1];
@@ -194,6 +229,15 @@ function DrawSeries() {
             ctx.stroke();
         }
 
+        /**
+         * @param {Datapoints} datapoints
+         * @param {DrawAxis} axisx
+         * @param {DrawAxis} axisy
+         * @param {number} fillTowards
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {boolean} steps Whether to bound the filled area with
+         * horizontal-then-vertical steps instead of straight lines
+         */
         function plotLineArea(datapoints, axisx, axisy, fillTowards, ctx, steps) {
             var points = datapoints.points,
                 ps = datapoints.pointsize,
@@ -203,8 +247,8 @@ function DrawSeries() {
                 areaOpen = false,
                 segmentStart = 0,
                 segmentEnd = 0,
-                mx = null,
-                my = null;
+                /** @type {number | null} */ mx = null,
+                /** @type {number | null} */ my = null;
 
             // we process each segment in two turns, first forward
             // direction to sketch out top, then once we hit the
@@ -387,6 +431,15 @@ function DrawSeries() {
          plotHeight are the corresponding parameters of flot used to determine the drawing surface.
          The function getColorOrGradient is used to compute the fill style of lines and area.
         */
+        /**
+         * @param {DrawSeriesData} series
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {PlotOffset} plotOffset
+         * @param {number} plotWidth
+         * @param {number} plotHeight
+         * @param {DrawSymbolOption} drawSymbol
+         * @param {GetColorOrGradient} getColorOrGradient
+         */
         function drawSeriesLines(series, ctx, plotOffset, plotWidth, plotHeight, drawSymbol, getColorOrGradient) {
             ctx.save();
             ctx.translate(plotOffset.left, plotOffset.top);
@@ -433,12 +486,39 @@ function DrawSeries() {
          plotHeight are the corresponding parameters of flot used to determine the drawing surface.
          The function drawSymbol is used to compute and draw the symbol chosen for the points.
         */
+        /**
+         * @param {DrawSeriesData} series
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {PlotOffset} plotOffset
+         * @param {number} plotWidth
+         * @param {number} plotHeight
+         * @param {DrawSymbolOption} drawSymbol
+         * @param {GetColorOrGradient} getColorOrGradient
+         */
         function drawSeriesPoints(series, ctx, plotOffset, plotWidth, plotHeight, drawSymbol, getColorOrGradient) {
+            /**
+             * @param {CanvasRenderingContext2D} ctx
+             * @param {number} x
+             * @param {number} y
+             * @param {number} radius
+             * @param {boolean} shadow
+             * @param {boolean} fill
+             */
             function drawCircle(ctx, x, y, radius, shadow, fill) {
                 ctx.moveTo(x + radius, y);
                 ctx.arc(x, y, radius, 0, shadow ? Math.PI : Math.PI * 2, false);
             }
             drawCircle.fill = true;
+            /**
+             * @param {Datapoints} datapoints
+             * @param {number} radius
+             * @param {boolean} fill
+             * @param {number} offset
+             * @param {boolean} shadow
+             * @param {DrawAxis} axisx
+             * @param {DrawAxis} axisy
+             * @param {DrawSymbol} drawSymbolFn
+             */
             function plotPoints(datapoints, radius, fill, offset, shadow, axisx, axisy, drawSymbolFn) {
                 var points = datapoints.points,
                     ps = datapoints.pointsize;
@@ -478,11 +558,11 @@ function DrawSeries() {
             var lw = series.points.lineWidth,
                 radius = series.points.radius,
                 symbol = series.points.symbol,
-                drawSymbolFn;
+                /** @type {DrawSymbol} */ drawSymbolFn;
 
             if (symbol === 'circle') {
                 drawSymbolFn = drawCircle;
-            } else if (typeof symbol === 'string' && drawSymbol && drawSymbol[symbol]) {
+            } else if (typeof symbol === 'string' && typeof drawSymbol === 'object' && drawSymbol !== null && drawSymbol[symbol]) {
                 drawSymbolFn = drawSymbol[symbol];
             } else if (typeof drawSymbol === 'function') {
                 drawSymbolFn = drawSymbol;
@@ -504,6 +584,19 @@ function DrawSeries() {
             ctx.restore();
         }
 
+        /**
+         * @param {number} x
+         * @param {number} y
+         * @param {number} b
+         * @param {number} barLeft
+         * @param {number} barRight
+         * @param {((bottom: number, top: number) => FillStyle | null) | null} fillStyleCallback
+         * @param {DrawAxis} axisx
+         * @param {DrawAxis} axisy
+         * @param {CanvasRenderingContext2D} c
+         * @param {boolean} horizontal
+         * @param {number} lineWidth
+         */
         function drawBar(x, y, b, barLeft, barRight, fillStyleCallback, axisx, axisy, c, horizontal, lineWidth) {
             var left = x + barLeft,
                 right = x + barRight,
@@ -631,7 +724,24 @@ function DrawSeries() {
          plotHeight are the corresponding parameters of flot used to determine the drawing surface.
          The function getColorOrGradient is used to compute the fill style of bars.
         */
+        /**
+         * @param {DrawSeriesData} series
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {PlotOffset} plotOffset
+         * @param {number} plotWidth
+         * @param {number} plotHeight
+         * @param {DrawSymbolOption} drawSymbol
+         * @param {GetColorOrGradient} getColorOrGradient
+         */
         function drawSeriesBars(series, ctx, plotOffset, plotWidth, plotHeight, drawSymbol, getColorOrGradient) {
+            /**
+             * @param {Datapoints} datapoints
+             * @param {number} barLeft
+             * @param {number} barRight
+             * @param {((bottom: number, top: number) => FillStyle | null) | null} fillStyleCallback
+             * @param {DrawAxis} axisx
+             * @param {DrawAxis} axisy
+             */
             function plotBars(datapoints, barLeft, barRight, fillStyleCallback, axisx, axisy) {
                 var points = datapoints.points,
                     ps = datapoints.pointsize,
@@ -666,7 +776,7 @@ function DrawSeries() {
             ctx.strokeStyle = series.color;
 
             var barLeft;
-            var barWidth = series.bars.barWidth[0] || series.bars.barWidth;
+            var barWidth = Array.isArray(series.bars.barWidth) ? series.bars.barWidth[0] : series.bars.barWidth;
             switch (series.bars.align) {
                 case "left":
                     barLeft = 0;
@@ -678,6 +788,7 @@ function DrawSeries() {
                     barLeft = -barWidth / 2;
             }
 
+            /** @type {((bottom: number, top: number) => FillStyle | null) | null} */
             var fillStyleCallback = series.bars.fill ? function(bottom, top) {
                 return getFillStyle(series.bars, series.color, bottom, top, getColorOrGradient);
             } : null;
@@ -686,6 +797,14 @@ function DrawSeries() {
             ctx.restore();
         }
 
+        /**
+         * @param {FillOptions} filloptions
+         * @param {string} seriesColor
+         * @param {number | null} bottom
+         * @param {number | null} top
+         * @param {GetColorOrGradient} getColorOrGradient
+         * @returns {FillStyle | null}
+         */
         function getFillStyle(filloptions, seriesColor, bottom, top, getColorOrGradient) {
             var fill = filloptions.fill;
             if (!fill) {
@@ -706,6 +825,7 @@ function DrawSeries() {
         this.drawSeriesPoints = drawSeriesPoints;
         this.drawSeriesBars = drawSeriesBars;
         this.drawBar = drawBar;
-    };
+    }
+}
 
 export var drawSeries = new DrawSeries();
