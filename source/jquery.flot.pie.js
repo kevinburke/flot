@@ -662,8 +662,8 @@ import { extend, bind, unbind, trigger, width, height } from './helpers.js';
             // event fires before processDatapoints has run.
             var options = plot.getOptions();
             var offset = plot.offset();
-            var canvasX = parseInt(String(e.pageX - offset.left));
-            var canvasY = parseInt(String(e.pageY - offset.top));
+            var canvasX = Math.trunc(e.pageX - offset.left);
+            var canvasY = Math.trunc(e.pageY - offset.top);
             var item = findNearbySlice(canvasX, canvasY);
 
             if (options.grid.autoHighlight) {

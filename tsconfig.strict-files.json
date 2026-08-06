@@ -12,6 +12,7 @@
 		"source/jquery.flot.axislabels.js",
 		"source/jquery.flot.browser.js",
 		"source/jquery.flot.drawSeries.js",
+		"source/jquery.flot.hover.js",
 		"source/jquery.flot.saturated.js",
 		"source/jquery.flot.selection.js",
 		"source/plugin-registry.js"

@@ -25,3 +25,8 @@ interface Window {
 interface Document {
 	documentMode?: unknown;
 }
+
+interface HTMLElementEventMap {
+	tap: CustomEvent<TouchEvent>;
+	touchevent: CustomEvent<TouchEvent>;
+}

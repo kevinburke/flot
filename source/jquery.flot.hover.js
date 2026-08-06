@@ -30,6 +30,61 @@ import { drawSeries } from './jquery.flot.drawSeries.js';
 import { color } from './jquery.colorhelpers.js';
 import { bind, unbind, trigger } from './helpers.js';
 
+/** @typedef {'click' | 'hover'} HoverEventType */
+/** @typedef {Array<number>} HoverPoint */
+/** @typedef {{ min: number, max: number, p2c: (value: number) => number, c2p?: (value: number) => number }} HoverAxis */
+/** @typedef {(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, shadow: boolean) => void} DrawSymbol */
+
+/**
+ * @typedef {Object} HoverSeries
+ * @property {{ points: Array<number | null>, pointsize: number }} datapoints
+ * @property {HoverAxis} xaxis
+ * @property {HoverAxis} yaxis
+ * @property {string} color
+ * @property {string | null} highlightColor
+ * @property {boolean} clickable
+ * @property {boolean} hoverable
+ * @property {{ radius: number, lineWidth: number, symbol: string }} points
+ * @property {{ show: boolean, barWidth: number | [number, boolean], align: 'left' | 'right' | 'center', lineWidth: number, horizontal: boolean, fillTowards?: number }} bars
+ */
+
+/**
+ * @typedef {Object} HoverItem
+ * @property {HoverPoint} datapoint
+ * @property {HoverSeries} series
+ * @property {number} [distance]
+ * @property {number} [pageX]
+ * @property {number} [pageY]
+ */
+
+/** @typedef {{ grid: { hoverable: boolean, clickable: boolean, autoHighlight: boolean, mouseActiveRadius: number } }} HoverOptions */
+/** @typedef {HTMLElement & { lastMouseMoveEvent?: MouseEvent }} HoverPlaceholder */
+/** @typedef {{ [axis: string]: number }} HoverPosition */
+/** @typedef {{ series: HoverSeries, point: HoverPoint, auto: string | boolean | undefined }} Highlight */
+
+/**
+ * @typedef {Object} HoverPlot
+ * @property {() => HoverOptions} getOptions
+ * @property {() => HoverSeries[]} getData
+ * @property {() => HoverPlaceholder} getPlaceholder
+ * @property {() => { left: number, top: number }} offset
+ * @property {(position: { left: number, top: number }) => HoverPosition} c2p
+ * @property {(canvasX: number, canvasY: number, seriesFilter: (index: number) => boolean, distance: number) => HoverItem[]} findNearbyItems
+ * @property {() => { left: number, top: number }} getPlotOffset
+ * @property {() => void} triggerRedrawOverlay
+ * @property {(series?: number | HoverSeries, point?: number | HoverPoint) => void} unhighlight
+ * @property {(series: number | HoverSeries, point: number | HoverPoint, auto?: boolean) => void} highlight
+ * @property {Record<string, DrawSymbol>} [drawSymbol]
+ * @property {{
+ *   bindEvents: Array<(plot: HoverPlot, eventHolder: HTMLElement) => void>,
+ *   shutdown: Array<(plot: HoverPlot, eventHolder: HTMLElement) => void>,
+ *   processOptions: Array<(plot: HoverPlot, options: HoverOptions) => void>,
+ *   drawOverlay: Array<(plot: HoverPlot, ctx: CanvasRenderingContext2D, overlay: unknown) => void>,
+ *   processDatapoints: Array<() => void>,
+ *   setupGrid: Array<() => void>
+ * }} hooks
+ */
+
     'use strict';
 
     var options = {
@@ -39,15 +94,20 @@ import { bind, unbind, trigger } from './helpers.js';
         }
     };
 
+    /** @type {{ click: HoverEventType, hover: HoverEventType }} */
     var eventType = {
         click: 'click',
         hover: 'hover'
     }
 
+    /** @param {HoverPlot} plot */
     function init(plot) {
+        /** @type {MouseEvent | undefined} */
         var lastMouseMoveEvent;
+        /** @type {Highlight[]} */
         var highlights = [];
 
+        /** @param {HoverPlot} plot @param {HTMLElement} eventHolder */
         function bindEvents(plot, eventHolder) {
             var o = plot.getOptions();
 
@@ -66,6 +126,7 @@ import { bind, unbind, trigger } from './helpers.js';
             }
         }
 
+        /** @param {HoverPlot} plot @param {HTMLElement} eventHolder */
         function shutdown(plot, eventHolder) {
             eventHolder.removeEventListener('tap', generatePlothoverEvent);
             eventHolder.removeEventListener('touchevent', triggerCleanupEvent);
@@ -75,15 +136,14 @@ import { bind, unbind, trigger } from './helpers.js';
             highlights = [];
         }
 
+        /** @param {CustomEvent<TouchEvent>} e */
         function generatePlothoverEvent(e) {
             var o = plot.getOptions(),
-                newEvent = new CustomEvent('mouseevent');
-
-            //transform from touch event to mouse event format
-            /** @type {any} */ (newEvent).pageX = e.detail.changedTouches[0].pageX;
-            /** @type {any} */ (newEvent).pageY = e.detail.changedTouches[0].pageY;
-            /** @type {any} */ (newEvent).clientX = e.detail.changedTouches[0].clientX;
-            /** @type {any} */ (newEvent).clientY = e.detail.changedTouches[0].clientY;
+                touch = e.detail.changedTouches[0],
+                newEvent = new MouseEvent('mouseevent', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
 
             if (o.grid.hoverable) {
                 doTriggerClickHoverEvent(newEvent, eventType.hover, 30);
@@ -91,6 +151,11 @@ import { bind, unbind, trigger } from './helpers.js';
             return false;
         }
 
+        /**
+         * @param {MouseEvent | undefined} event
+         * @param {HoverEventType} eventType
+         * @param {number} [searchDistance]
+         */
         function doTriggerClickHoverEvent(event, eventType, searchDistance) {
             var series = plot.getData();
             if (event !== undefined &&
@@ -98,21 +163,30 @@ import { bind, unbind, trigger } from './helpers.js';
                 series[0].xaxis.c2p !== undefined &&
                 series[0].yaxis.c2p !== undefined) {
                 var eventToTrigger = "plot" + eventType;
-                var seriesFlag = eventType + "able";
                 triggerClickHoverEvent(eventToTrigger, event,
                     function(i) {
-                        return series[i][seriesFlag] !== false;
+                        return eventType === "click" ? series[i].clickable !== false : series[i].hoverable !== false;
                     }, searchDistance);
             }
         }
 
+        /** @param {Event} e */
         function onMouseMove(e) {
+            if (!(e instanceof MouseEvent)) {
+                return;
+            }
+
             lastMouseMoveEvent = e;
             plot.getPlaceholder().lastMouseMoveEvent = e;
             doTriggerClickHoverEvent(e, eventType.hover);
         }
 
+        /** @param {Event} e */
         function onMouseLeave(e) {
+            if (!(e instanceof MouseEvent)) {
+                return;
+            }
+
             lastMouseMoveEvent = undefined;
             plot.getPlaceholder().lastMouseMoveEvent = undefined;
             triggerClickHoverEvent("plothover", e,
@@ -121,7 +195,12 @@ import { bind, unbind, trigger } from './helpers.js';
                 });
         }
 
+        /** @param {Event} e */
         function onClick(e) {
+            if (!(e instanceof MouseEvent)) {
+                return;
+            }
+
             doTriggerClickHoverEvent(e, eventType.click);
         }
 
@@ -132,6 +211,12 @@ import { bind, unbind, trigger } from './helpers.js';
 
         // trigger click or hover event (they send the same parameters
         // so we share their code)
+        /**
+         * @param {string} eventname
+         * @param {MouseEvent} event
+         * @param {(index: number) => boolean} seriesFilter
+         * @param {number} [searchDistance]
+         */
         function triggerClickHoverEvent(eventname, event, seriesFilter, searchDistance) {
             var options = plot.getOptions(),
                 offset = plot.offset(),
@@ -159,8 +244,8 @@ import { bind, unbind, trigger } from './helpers.js';
 
             if (item) {
                 // fill in mouse pos for any listeners out there
-                item.pageX = parseInt(item.series.xaxis.p2c(item.datapoint[0]) + offset.left, 10);
-                item.pageY = parseInt(item.series.yaxis.p2c(item.datapoint[1]) + offset.top, 10);
+                item.pageX = Math.trunc(item.series.xaxis.p2c(item.datapoint[0]) + offset.left);
+                item.pageY = Math.trunc(item.series.yaxis.p2c(item.datapoint[1]) + offset.top);
             } else {
                 item = null;
             }
@@ -185,6 +270,11 @@ import { bind, unbind, trigger } from './helpers.js';
             trigger(plot.getPlaceholder(), eventname, [pos, item, items]);
         }
 
+        /**
+         * @param {number | HoverSeries} s Series or series index to highlight
+         * @param {number | HoverPoint} point Datapoint or datapoint index to highlight
+         * @param {string | boolean} [auto] Event name for automatic highlights, or whether the highlight is automatic
+         */
         function highlight(s, point, auto) {
             if (typeof s === "number") {
                 s = plot.getData()[s];
@@ -209,6 +299,10 @@ import { bind, unbind, trigger } from './helpers.js';
             }
         }
 
+        /**
+         * @param {number | HoverSeries} [s] Series or series index to stop highlighting
+         * @param {number | HoverPoint} [point] Datapoint or datapoint index to stop highlighting
+         */
         function unhighlight(s, point) {
             if (s == null && point == null) {
                 highlights = [];
@@ -233,6 +327,7 @@ import { bind, unbind, trigger } from './helpers.js';
             }
         }
 
+        /** @param {HoverSeries} s @param {HoverPoint} p */
         function indexOfHighlight(s, p) {
             for (var i = 0; i < highlights.length; ++i) {
                 var h = highlights[i];
@@ -255,6 +350,7 @@ import { bind, unbind, trigger } from './helpers.js';
             doTriggerClickHoverEvent(lastMouseMoveEvent, eventType.hover);
         }
 
+        /** @param {HoverPlot} plot @param {CanvasRenderingContext2D} octx @param {unknown} overlay */
         function drawOverlay(plot, octx, overlay) {
             var plotOffset = plot.getPlotOffset(),
                 i, hi;
@@ -273,6 +369,7 @@ import { bind, unbind, trigger } from './helpers.js';
             octx.restore();
         }
 
+        /** @param {HoverSeries} series @param {HoverPoint} point @param {CanvasRenderingContext2D} octx @param {HoverPlot} plot */
         function drawPointHighlight(series, point, octx, plot) {
             var x = point[0],
                 y = point[1],
@@ -303,12 +400,13 @@ import { bind, unbind, trigger } from './helpers.js';
             octx.stroke();
         }
 
+        /** @param {HoverSeries} series @param {HoverPoint} point @param {CanvasRenderingContext2D} octx */
         function drawBarHighlight(series, point, octx) {
             var highlightColor = (typeof series.highlightColor === "string") ? series.highlightColor : color.parse(series.color).scale('a', 0.5).toString(),
                 fillStyle = highlightColor,
                 barLeft;
 
-            var barWidth = series.bars.barWidth[0] || series.bars.barWidth;
+            var barWidth = Array.isArray(series.bars.barWidth) ? series.bars.barWidth[0] : series.bars.barWidth;
             switch (series.bars.align) {
                 case "left":
                     barLeft = 0;
@@ -332,6 +430,7 @@ import { bind, unbind, trigger } from './helpers.js';
                 }, series.xaxis, series.yaxis, octx, series.bars.horizontal, series.bars.lineWidth);
         }
 
+        /** @param {HoverPlot} plot @param {HoverOptions} options */
         function initHover(plot, options) {
             plot.highlight = highlight;
             plot.unhighlight = unhighlight;

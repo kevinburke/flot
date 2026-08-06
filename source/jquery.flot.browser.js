@@ -1,7 +1,7 @@
 'use strict';
 
 export var browser = {
-	/** @param {MouseEvent} e */
+	/** @param {{ clientX: number, clientY: number }} e */
 	getPageXY: function (e) {
         var doc = document.documentElement,
             pageX = e.clientX + (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),

@@ -429,8 +429,8 @@ import { plugins } from './plugin-registry.js';
         plot.triggerRedrawOverlay = triggerRedrawOverlay;
         plot.pointOffset = function(point) {
             return {
-                left: parseInt(String(xaxes[axisNumber(point, "x") - 1].p2c(+point.x) + plotOffset.left), 10),
-                top: parseInt(String(yaxes[axisNumber(point, "y") - 1].p2c(+point.y) + plotOffset.top), 10)
+                left: Math.trunc(xaxes[axisNumber(point, "x") - 1].p2c(+point.x) + plotOffset.left),
+                top: Math.trunc(yaxes[axisNumber(point, "y") - 1].p2c(+point.y) + plotOffset.top)
             };
         };
         plot.shutdown = shutdown;
