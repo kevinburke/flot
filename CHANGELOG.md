@@ -37,6 +37,10 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 - `jquery.flot.touch.js`: add concrete plot, option, gesture-state, touch-event,
   dispatch, timer, and geometry types and include the gesture producer in the
   strict source checks.
+- `jquery.flot.touchNavigate.js`: distinguish page positions, plot positions,
+  and pixel deltas while adding concrete gesture, navigation-state, axis,
+  option, hook, and timer types. Include the gesture consumer in the strict
+  source checks.
 
 ## [5.1.4] - 2026-05-22
 
