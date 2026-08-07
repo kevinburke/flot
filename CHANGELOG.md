@@ -41,6 +41,9 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   and pixel deltas while adding concrete gesture, navigation-state, axis,
   option, hook, and timer types. Include the gesture consumer in the strict
   source checks.
+- `jquery.flot.navigate.js`: add concrete axis, option, navigation-state,
+  event, geometry, hook, and timer types and include the navigation producer in
+  the strict source checks.
 
 ## [5.1.4] - 2026-05-22
 
