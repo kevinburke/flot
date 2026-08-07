@@ -20,6 +20,12 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 - Remove the unused `@rollup/plugin-node-resolve` build dependency and its
   transitive `deepmerge` dependency, which is affected by CVE-2026-93753.
 
+### Changed
+
+- `jquery.flot.navigate.js`: add concrete axis, option, navigation-state,
+  event, geometry, hook, and timer types and include the navigation producer in
+  the strict source checks.
+
 ## [5.1.5] - 2026-09-15
 
 ### Changed

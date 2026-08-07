@@ -14,6 +14,7 @@
 		"source/jquery.flot.drawSeries.js",
 		"source/jquery.flot.errorbars.js",
 		"source/jquery.flot.hover.js",
+		"source/jquery.flot.navigate.js",
 		"source/jquery.flot.saturated.js",
 		"source/jquery.flot.selection.js",
 		"source/jquery.flot.touch.js",
