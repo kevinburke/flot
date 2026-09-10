@@ -61,6 +61,6 @@
 		"size-limit": "^13.0.1",
 		"terser": "^5.36.0",
 		"typescript": "^7.0.2",
-		"vitest": "^4.1.4"
+		"vitest": "^5.0.0"
 	}
 }
