@@ -41,6 +41,13 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   and pixel deltas while adding concrete gesture, navigation-state, axis,
   option, hook, and timer types. Include the gesture consumer in the strict
   source checks.
+- `jquery.flot.errorbars.js`: add concrete options, datapoint, axis, drawing,
+  and hook types and include the plugin in the strict source checks. Publish
+  error-bar options and custom cap callback types with compile-time tests.
+  Extract pure format construction with a typed return value and keep the
+  raw-data hook's mutation in a small adapter.
+- `.github/workflows/ci.yml`: run the strict check for migrated source files
+  in GitHub Actions as well as through `make ci`.
 
 ## [5.1.4] - 2026-05-22
 

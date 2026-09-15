@@ -50,10 +50,36 @@ export interface LinesOptions {
 	[key: string]: unknown;
 }
 
+/** A perpendicular line cap, a custom canvas drawing callback, or no cap. */
+export type ErrorBarCap =
+	| "-"
+	| ((ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) => void)
+	| null;
+
+/** Per-axis options supplied by the errorbars plugin. */
+export interface ErrorBarOptions {
+	show?: boolean | null;
+	asymmetric?: boolean | null;
+	upperCap?: ErrorBarCap;
+	lowerCap?: ErrorBarCap;
+	/** Defaults to the series color. */
+	color?: string | null;
+	/** Cap radius; defaults to the point radius. */
+	radius?: number | null;
+	/** Defaults to the point line width when unset or zero. */
+	lineWidth?: number | null;
+}
+
 export interface PointsOptions {
 	show?: boolean;
 	radius?: number;
 	lineWidth?: number;
+	/** Error-bar shadow size; defaults to the series shadow size. */
+	shadowSize?: number | null;
+	/** Error values follow x and y in each data point, with x errors first. */
+	errorbars?: "x" | "y" | "xy" | null;
+	xerr?: ErrorBarOptions;
+	yerr?: ErrorBarOptions;
 	fill?: boolean | number;
 	fillColor?: string | null;
 	symbol?:

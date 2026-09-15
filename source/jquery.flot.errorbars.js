@@ -64,60 +64,112 @@ shadowSize and lineWidth are derived as well from the points series.
 
 import { plugins } from './plugin-registry.js';
 
-	var options = /** @type {any} */ ({
+/** @typedef {import('../types/index.js').ErrorBarOptions & { err: 'x' | 'y' }} ErrorBarOptions */
+/** @typedef {import('../types/index.js').ErrorBarCap} ErrorBarCap */
+/** @typedef {{ min: number, max: number, p2c: (value: number) => number }} ErrorBarAxis */
+/** @typedef {NonNullable<import('../types/index.js').PointsOptions['errorbars']>} ErrorBarDirection */
+/** @typedef {{ x: true, y?: never, number: true, required: true }} ErrorBarXField */
+/** @typedef {{ x?: never, y: true, number: true, required: true }} ErrorBarYField */
+/** @typedef {[ErrorBarXField, ErrorBarYField, ...Array<ErrorBarXField | ErrorBarYField>]} ErrorBarFormat */
+/** @typedef {{ points: Array<number | null>, pointsize: number }} ErrorBarDatapoints */
+/** @typedef {[number | null, number | null, number | null, number | null]} ErrorRanges Lower/upper x errors followed by lower/upper y errors. */
+
+/**
+ * Point options after the plot core merges defaults and per-series overrides.
+ * @typedef {Object} ErrorBarPoints
+ * @property {import('../types/index.js').PointsOptions['errorbars']} errorbars
+ * @property {ErrorBarOptions} xerr
+ * @property {ErrorBarOptions} yerr
+ * @property {number} radius
+ * @property {number} lineWidth
+ * @property {number | null} [shadowSize]
+ */
+
+/**
+ * @typedef {Object} ErrorBarSeries
+ * @property {ErrorBarDatapoints} datapoints
+ * @property {ErrorBarAxis} xaxis
+ * @property {ErrorBarAxis} yaxis
+ * @property {ErrorBarPoints} points
+ * @property {string} color
+ * @property {number} shadowSize
+ */
+
+/**
+ * @typedef {Object} ErrorBarPlot
+ * @property {() => ErrorBarSeries[]} getData
+ * @property {() => { left: number, top: number }} getPlotOffset
+ * @property {{ processRawData: Array<typeof processRawData>, draw: Array<typeof draw> }} hooks
+ */
+
+    /** @type {{ series: { points: Pick<ErrorBarPoints, 'errorbars' | 'xerr' | 'yerr'> } }} */
+	var options = {
         series: {
             points: {
-                errorbars: null, //should be 'x', 'y' or 'xy'
+                errorbars: null, // Disable error-bar processing by default.
                 xerr: {err: 'x', show: null, asymmetric: null, upperCap: null, lowerCap: null, color: null, radius: null},
                 yerr: {err: 'y', show: null, asymmetric: null, upperCap: null, lowerCap: null, color: null, radius: null}
             }
         }
-	});
+	};
 
-	/** @param {any} plot @param {any} series @param {any} data @param {any} datapoints */
-	function processRawData(plot, series, data, datapoints) {
-        if (!series.points.errorbars) {
-            return;
-        }
-
+    /**
+     * Build a fresh format for x, y, and the configured error values. Error
+     * fields follow x then y, with lower/upper fields for asymmetric errors.
+     * Each field is a required number belonging to exactly one axis.
+     *
+     * @param {ErrorBarDirection} errors
+     * @param {boolean | null} [xAsymmetric]
+     * @param {boolean | null} [yAsymmetric]
+     * @returns {ErrorBarFormat}
+     * @internal
+     */
+    export function createErrorBarFormat(errors, xAsymmetric, yAsymmetric) {
         // x,y values
+        /** @type {ErrorBarFormat} */
         var format = [
             { x: true, number: true, required: true },
             { y: true, number: true, required: true }
         ];
 
-        var errors = series.points.errorbars;
-        // error bars - first X then Y
-        if (errors === 'x' || errors === 'xy') {
-            // lower / upper error
-            if (series.points.xerr.asymmetric) {
-                format.push({ x: true, number: true, required: true });
-                format.push({ x: true, number: true, required: true });
-            } else {
-                format.push({ x: true, number: true, required: true });
+        // Error fields copy the matching coordinate's requirements. Each gets
+        // its own descriptor so later processing can modify fields separately.
+        for (var axis of errors) {
+            var field = format[axis === 'x' ? 0 : 1];
+            format.push({ ...field });
+            if (axis === 'x' ? xAsymmetric : yAsymmetric) {
+                format.push({ ...field });
             }
         }
-        if (errors === 'y' || errors === 'xy') {
-            // lower / upper error
-            if (series.points.yerr.asymmetric) {
-                format.push({ y: true, number: true, required: true });
-                format.push({ y: true, number: true, required: true });
-            } else {
-                format.push({ y: true, number: true, required: true });
-            }
-        }
-        datapoints.format = format;
+        return format;
     }
 
-	/** @param {any} series @param {number} i */
+    /**
+     * Hook adapter: when error bars are configured, replace datapoints.format
+     * with the format the plot core uses to copy raw data before rendering.
+     *
+     * @param {ErrorBarPlot} _plot Unused; retained for the hook signature.
+     * @param {{ points: ErrorBarPoints }} series
+     * @param {unknown} _data Unused raw data; retained for the hook signature.
+     * @param {{ format?: Array<{ x?: boolean, y?: boolean, number?: boolean, required?: boolean }> }} datapoints
+     * @returns {void}
+     */
+    function processRawData(_plot, series, _data, datapoints) {
+        var points = series.points;
+        if (points.errorbars) {
+            datapoints.format = createErrorBarFormat(points.errorbars, points.xerr.asymmetric, points.yerr.asymmetric);
+        }
+    }
+
+	/** @param {ErrorBarSeries} series @param {number} i @returns {ErrorRanges} */
 	function parseErrors(series, i) {
         var points = series.datapoints.points;
 
         // read errors from points array
-        var exl = null,
-            exu = null,
-            eyl = null,
-            eyu = null;
+        var /** @type {number | null} */ exl = null,
+            /** @type {number | null} */ exu = null,
+            /** @type {number | null} */ eyl = null,
+            /** @type {number | null} */ eyu = null;
         var xerr = series.points.xerr,
             yerr = series.points.yerr;
 
@@ -166,6 +218,7 @@ import { plugins } from './plugin-registry.js';
             eyu = eyl;
         }
 
+        /** @type {ErrorRanges} */
         var errRanges = [exl, exu, eyl, eyu];
         // nullify if not showing
         if (!xerr.show) {
@@ -179,14 +232,14 @@ import { plugins } from './plugin-registry.js';
         return errRanges;
     }
 
-	/** @param {any} plot @param {any} ctx @param {any} s */
+	/** @param {ErrorBarPlot} plot @param {CanvasRenderingContext2D} ctx @param {ErrorBarSeries} s */
 	function drawSeriesErrors(plot, ctx, s) {
         var points = s.datapoints.points,
             ps = s.datapoints.pointsize,
             ax = [s.xaxis, s.yaxis],
             radius = s.points.radius,
             err = [s.points.xerr, s.points.yerr],
-            tmp;
+            /** @type {ErrorBarCap | number | boolean} */ tmp;
 
         //sanity check, in case some inverted axis hack is applied to flot
         var invertX = false;
@@ -211,6 +264,7 @@ import { plugins } from './plugin-registry.js';
 
             //cycle xerr & yerr
             for (var e = 0; e < err.length; e++) {
+                /** @type {[number, number]} */
                 var minmax = [ax[e].min, ax[e].max];
 
                 //draw this error?
@@ -297,7 +351,19 @@ import { plugins } from './plugin-registry.js';
         }
     }
 
-	/** @param {any} ctx @param {any} err @param {any} x @param {any} y @param {any} upper @param {any} lower @param {any} drawUpper @param {any} drawLower @param {any} radius @param {any} offset @param {any} minmax */
+	/**
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {ErrorBarOptions} err
+     * @param {number} x
+     * @param {number} y
+     * @param {number} upper
+     * @param {number} lower
+     * @param {boolean} drawUpper
+     * @param {boolean} drawLower
+     * @param {number} radius
+     * @param {number} offset
+     * @param {[number, number]} minmax
+     */
 	function drawError(ctx, err, x, y, upper, lower, drawUpper, drawLower, radius, offset, minmax) {
         //shadow offset
         y += offset;
@@ -371,7 +437,7 @@ import { plugins } from './plugin-registry.js';
         }
     }
 
-	/** @param {any} ctx @param {any} pts */
+	/** @param {CanvasRenderingContext2D} ctx @param {Array<[number, number]>} pts */
 	function drawPath(ctx, pts) {
         ctx.beginPath();
         ctx.moveTo(pts[0][0], pts[0][1]);
@@ -382,13 +448,13 @@ import { plugins } from './plugin-registry.js';
         ctx.stroke();
     }
 
-	/** @param {any} plot @param {any} ctx */
+	/** @param {ErrorBarPlot} plot @param {CanvasRenderingContext2D} ctx */
 	function draw(plot, ctx) {
         var plotOffset = plot.getPlotOffset();
 
         ctx.save();
         ctx.translate(plotOffset.left, plotOffset.top);
-		plot.getData().forEach(/** @param {any} s */ function (s) {
+		plot.getData().forEach(function (s) {
             if (s.points.errorbars && (s.points.xerr.show || s.points.yerr.show)) {
                 drawSeriesErrors(plot, ctx, s);
             }
@@ -396,7 +462,7 @@ import { plugins } from './plugin-registry.js';
         ctx.restore();
     }
 
-	/** @param {any} plot */
+	/** @param {ErrorBarPlot} plot */
 	function init(plot) {
         plot.hooks.processRawData.push(processRawData);
         plot.hooks.draw.push(draw);

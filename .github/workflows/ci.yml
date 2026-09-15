@@ -32,6 +32,9 @@ jobs:
       - name: Type-check source (checkJs ratchet)
         run: make types-source
 
+      - name: Type-check migrated source files strictly
+        run: make types-source-strict-files
+
       - name: Build
         run: make build
 
