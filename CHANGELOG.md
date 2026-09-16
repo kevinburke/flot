@@ -7,8 +7,12 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ## Unreleased
 
+## [5.1.5] - 2026-09-15
+
 ### Changed
 
+- Simplify navigation, error-bar processing, touch handling, and canvas text
+  caching to reduce the compressed bundle while preserving bundled features.
 - `biome.json` / `biome.braces.json` / `Makefile`: require braces around
   control-flow bodies throughout the JavaScript and TypeScript codebase, format
   their statements on separate lines, and keep `else` beside the preceding

@@ -2986,7 +2986,7 @@ import { plugins } from './plugin-registry.js';
         }
     }
 
-    export var version = "5.1.4";
+    export var version = "5.1.5";
 
     // The main plot function.
     export function plot(placeholder, data, options) {

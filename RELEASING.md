@@ -2,27 +2,41 @@
 
 ## Pre-release checklist
 
-1. Make sure `main` is clean and CI is green:
+1. Create a release worktree from the latest `origin/main`. Do not commit
+   in the primary checkout:
 
    ```bash
-   git checkout main && git pull
-   make ci
+   set -euo pipefail
+   ~/local/bin/create-worktree -m -b main release-X.Y.Z
+   cd worktrees/release-X.Y.Z
    ```
 
-2. Bump the version in two places:
+2. Bump the version consistently:
 
    - `package.json` → `"version": "X.Y.Z"`
+   - `package-lock.json` → top-level and root package versions
    - `source/jquery.flot.js` → `export var version = "X.Y.Z";`
 
 3. Update `CHANGELOG.md` with a new section for the version. Include
-   the date and a summary of changes.
+   the date and a summary of changes. Update the CDN URLs in `README.md`.
+
+   Install the locked dependencies, then run all release checks and inspect
+   the package contents:
+
+   ```bash
+   npm ci --no-audit --no-fund
+   npx playwright install chromium
+   make ci
+   npm pack --dry-run
+   ```
 
 4. Commit the version bump:
 
    ```bash
-   git add package.json package-lock.json source/jquery.flot.js CHANGELOG.md
-   git commit -m "release: vX.Y.Z"
-   git push origin main
+   safegit add package.json package-lock.json source/jquery.flot.js CHANGELOG.md README.md
+   printf 'release: vX.Y.Z\n' > /tmp/flot-release-commit.txt
+   safegit commit --file /tmp/flot-release-commit.txt
+   git push origin HEAD:main
    ```
 
 5. Wait for CI to pass:
@@ -57,13 +71,11 @@
 
 ## Post-release
 
-9. Update the CDN URLs in `README.md` if the major version changed.
-
-10. Verify the package is available:
+9. Verify the package is available:
 
     ```bash
     npm view @kevinburke/flot version
-    curl -I https://unpkg.com/@kevinburke/flot@X.Y.Z/dist/flot.min.js
+    curl --fail --head https://unpkg.com/@kevinburke/flot@X.Y.Z/dist/flot.min.js
     ```
 
 ## Versioning

@@ -42,7 +42,7 @@ plot(document.getElementById('placeholder'), data, options);
 Or via `<script>` tag from a CDN:
 
 ```html
-<script src="https://unpkg.com/@kevinburke/flot@5.1.0/dist/flot.min.js"></script>
+<script src="https://unpkg.com/@kevinburke/flot@5.1.5/dist/flot.min.js"></script>
 <script>
   Flot.plot(document.getElementById('placeholder'), data, options);
 </script>
@@ -52,7 +52,7 @@ Or via `<script>` tag from a CDN:
 
 ```html
 <script src="https://unpkg.com/jquery@3/dist/jquery.min.js"></script>
-<script src="https://unpkg.com/@kevinburke/flot@5.1.0/dist/jquery.flot.min.js"></script>
+<script src="https://unpkg.com/@kevinburke/flot@5.1.5/dist/jquery.flot.min.js"></script>
 <script>
   $.plot("#placeholder", data, options);
 </script>
@@ -107,12 +107,8 @@ make help        # list all targets
 
 ## Releasing
 
-```bash
-# bump version in package.json + source/jquery.flot.js, update CHANGELOG
-make ci          # verify everything passes
-npm publish      # prepack hook runs the build automatically
-git tag v5.x.y && git push origin v5.x.y
-```
+Follow [RELEASING.md](RELEASING.md) to prepare a release in a worktree,
+validate it, and publish it to npm and GitHub.
 
 ## License
 
