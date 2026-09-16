@@ -29,6 +29,13 @@ this fork modernizes the build toolchain, test infrastructure, and packaging.
 npm install @kevinburke/flot
 ```
 
+The package supports both ES module imports and CommonJS `require()` with
+matching TypeScript declarations. Both formats require a browser DOM to draw
+plots. The files `dist/flot.js` and `dist/jquery.flot.js` (and their minified
+variants) are standalone browser scripts for use with `<script>` tags.
+Module entries in `dist/` also use files in `dist/shared/`; copy the entire
+directory if serving those entries yourself.
+
 ## Usage without jQuery
 
 As an ES module:
@@ -60,6 +67,18 @@ Or via `<script>` tag from a CDN:
 
 The jQuery adapter registers `$.plot()`, `$.color`, and `$.fn.plot()` so
 existing code works unchanged.
+
+When using a bundler, import the adapter alongside jQuery:
+
+```js
+import $ from 'jquery';
+import '@kevinburke/flot/jquery';
+
+$.plot('#placeholder', data, options);
+```
+
+CommonJS consumers can use `const $ = require('jquery')` followed by
+`require('@kevinburke/flot/jquery')`.
 
 ## Basic example
 
@@ -99,7 +118,8 @@ make install     # install dependencies into node_modules
 make build       # build dist/ (main bundle + standalone plugins)
 make lint        # run Biome lint + format check
 make format      # auto-format with Biome
-make test        # run all tests (Vitest unit + Playwright browser)
+make test        # run unit, browser, and packed-package tests
+make test-package # test exports and declarations from the npm tarball
 make size        # check bundle size budget (brotli)
 make ci          # lint + build + test + size (what CI runs)
 make help        # list all targets

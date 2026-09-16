@@ -3,20 +3,31 @@
 	"version": "5.1.5",
 	"description": "JavaScript plotting library for engineering and scientific applications.",
 	"type": "module",
-	"main": "./dist/flot.js",
+	"main": "./dist/flot.cjs",
 	"module": "./dist/flot.mjs",
 	"types": "./types/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./types/index.d.ts",
-			"import": "./dist/flot.mjs",
-			"require": "./dist/flot.js",
-			"default": "./dist/flot.js"
+			"import": {
+				"types": "./types/index.d.ts",
+				"default": "./dist/flot.mjs"
+			},
+			"require": {
+				"types": "./dist/flot.d.cts",
+				"default": "./dist/flot.cjs"
+			},
+			"default": "./dist/flot.mjs"
 		},
 		"./jquery": {
-			"types": "./types/jquery.d.ts",
-			"import": "./dist/jquery.flot.js",
-			"default": "./dist/jquery.flot.js"
+			"import": {
+				"types": "./types/jquery.d.ts",
+				"default": "./dist/jquery.flot.mjs"
+			},
+			"require": {
+				"types": "./dist/jquery.flot.d.cts",
+				"default": "./dist/jquery.flot.cjs"
+			},
+			"default": "./dist/jquery.flot.mjs"
 		}
 	},
 	"files": [

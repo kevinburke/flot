@@ -7,6 +7,17 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 
 ## Unreleased
 
+### Fixed
+
+- Package exports: provide real CommonJS bundles and matching declarations
+  for `require('@kevinburke/flot')`. The old entry loaded a browser script
+  with no module exports, and TypeScript rejected CommonJS consumers.
+- jQuery adapter: provide ES module and CommonJS entries that import jQuery
+  and share the core's plugin registry and event dispatch. Module consumers
+  no longer need a global `jQuery` variable.
+- Test the packed npm package through both module formats, including its
+  TypeScript declarations, and treat package validation warnings as errors.
+
 ## [5.1.5] - 2026-09-15
 
 ### Changed

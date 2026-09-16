@@ -28,10 +28,51 @@ const core = {
 			sourcemap: true,
 			plugins: [terser(terserOpts)],
 		},
+	],
+};
+
+// Build both package entries together so the adapter and core share plugin
+// registration and event dispatch. Browser script bundles above/below remain
+// self-contained; module consumers load their shared code from dist/shared/.
+const modules = {
+	input: { flot: "source/index.js", "jquery.flot": "source/jquery-adapter.js" },
+	external: ["jquery"],
+	output: [
 		{
-			file: "dist/flot.mjs",
+			dir: "dist",
 			format: "es",
+			entryFileNames: "[name].mjs",
+			chunkFileNames: "shared/[name].mjs",
 			banner,
+		},
+		{
+			dir: "dist",
+			format: "cjs",
+			entryFileNames: "[name].cjs",
+			chunkFileNames: "shared/[name].cjs",
+			banner,
+		},
+	],
+	plugins: [
+		{
+			name: "commonjs-declarations",
+			generateBundle(output) {
+				if (output.format !== "cjs") {
+					return;
+				}
+				// Generate from the hand-written types on every build/prepack so the
+				// CommonJS declarations cannot drift from the ES module declarations.
+				this.emitFile({
+					type: "asset",
+					fileName: "flot.d.cts",
+					source: readFileSync("types/index.d.ts", "utf8"),
+				});
+				this.emitFile({
+					type: "asset",
+					fileName: "jquery.flot.d.cts",
+					source: readFileSync("types/jquery.d.ts", "utf8").replace('"./index.js"', '"./flot.cjs"'),
+				});
+			},
 		},
 	],
 };
@@ -112,4 +153,4 @@ const pluginBuilds = standalonePlugins.map((name) => ({
 	],
 }));
 
-export default [core, jqueryAdapter, ...pluginBuilds];
+export default [core, modules, jqueryAdapter, ...pluginBuilds];

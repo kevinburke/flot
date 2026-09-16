@@ -8,7 +8,7 @@ BIOME := $(NODE_BIN)/biome
 # rebuild instead of always re-running terser.
 SOURCES := $(wildcard source/jquery.*.js)
 
-.PHONY: all build clean format test test-unit test-browser size types types-source types-source-strict types-source-strict-files types-source-file publint ci install help
+.PHONY: all build clean format test test-unit test-browser test-package size types types-source types-source-strict types-source-strict-files types-source-file publint ci install help
 
 all: build
 
@@ -40,13 +40,16 @@ format: node_modules ## auto-format with biome
 	node scripts/format-control-flow.mjs --write
 	$(BIOME) format --config-path biome.braces.json --write .
 
-test: test-unit test-browser ## run the test suite
+test: test-unit test-browser test-package ## run the test suite
 
 test-unit: build ## run unit tests in vitest
 	$(NODE_BIN)/vitest run
 
 test-browser: build ## run browser tests in playwright
 	$(NODE_BIN)/playwright test
+
+test-package: build ## test runtime exports and declarations from the npm tarball
+	node --test tests/package.test.mjs
 
 size: build node_modules ## check bundle size budget (brotli)
 	$(NODE_BIN)/size-limit
@@ -68,7 +71,7 @@ types-source-file: node_modules ## strictly check one source file and its import
 	$(NODE_BIN)/tsc --ignoreConfig --allowJs --checkJs --noEmit --noImplicitAny --noImplicitThis --strictNullChecks false --skipLibCheck --target ES2019 --module ESNext --moduleResolution bundler --lib ES2019,DOM --types jquery source/globals.d.ts $(FILE)
 
 publint: build ## validate package.json fields and exports
-	npx --yes publint
+	npx --yes publint --strict
 
 ci: lint build test size types types-source types-source-strict-files publint ## run everything CI runs
 
