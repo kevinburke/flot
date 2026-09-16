@@ -168,19 +168,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
             c.left = page.X - c.left;
             c.top = page.Y - c.top;
 
-            var placeholderRect = plot.getPlaceholder().getBoundingClientRect();
-            var ec = { left: placeholderRect.left + window.scrollX, top: placeholderRect.top + window.scrollY };
-            ec.left = page.X - ec.left;
-            ec.top = page.Y - ec.top;
-
-            var axes = plot.getXAxes().concat(plot.getYAxes()).filter(function (axis) {
-                var box = axis.box;
-                if (box !== undefined) {
-                    return (ec.left > box.left) && (ec.left < box.left + box.width) &&
-                        (ec.top > box.top) && (ec.top < box.top + box.height);
-                }
-                return false;
-            });
+            var axes = plot.getTouchedAxis(page.X, page.Y);
 
             if (axes.length === 0) {
                 axes = undefined;
@@ -252,19 +240,7 @@ import { bind, unbind, trigger, css } from './helpers.js';
             isPanAction = true;
             var page = browser.getPageXY(e);
 
-            var placeholderRect = plot.getPlaceholder().getBoundingClientRect();
-            var ec = { left: placeholderRect.left + window.scrollX, top: placeholderRect.top + window.scrollY };
-            ec.left = page.X - ec.left;
-            ec.top = page.Y - ec.top;
-
-            panAxes = plot.getXAxes().concat(plot.getYAxes()).filter(function (axis) {
-                var box = axis.box;
-                if (box !== undefined) {
-                    return (ec.left > box.left) && (ec.left < box.left + box.width) &&
-                        (ec.top > box.top) && (ec.top < box.top + box.height);
-                }
-                return false;
-            });
+            panAxes = plot.getTouchedAxis(page.X, page.Y);
 
             if (panAxes.length === 0) {
                 panAxes = undefined;

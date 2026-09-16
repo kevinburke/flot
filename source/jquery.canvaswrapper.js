@@ -86,10 +86,7 @@ var Canvas = function(cls, container) {
         if (!element) {
             element = document.createElement('canvas');
             element.className = cls;
-            element.style.direction = 'ltr';
-            element.style.position = 'absolute';
-            element.style.left = '0px';
-            element.style.top = '0px';
+            element.style.cssText = 'direction:ltr;position:absolute;left:0px;top:0px';
 
             container.appendChild(element);
 
@@ -199,54 +196,46 @@ var Canvas = function(cls, container) {
         // For each text layer, add elements marked as active that haven't
         // already been rendered, and remove those that are no longer active.
 
-        for (var layerKey in cache) {
-            if (Object.prototype.hasOwnProperty.call(cache, layerKey)) {
-                var layer = this.getSVGLayer(layerKey),
-                    layerCache = cache[layerKey];
+        for (var layerKey of Object.keys(cache)) {
+            var layer = this.getSVGLayer(layerKey),
+                layerCache = cache[layerKey];
 
-                var display = layer.style.display;
-                layer.style.display = 'none';
+            var display = layer.style.display;
+            layer.style.display = 'none';
 
-                for (var styleKey in layerCache) {
-                    if (Object.prototype.hasOwnProperty.call(layerCache, styleKey)) {
-                        var styleCache = layerCache[styleKey];
-                        for (var key in styleCache) {
-                            if (Object.prototype.hasOwnProperty.call(styleCache, key)) {
-                                var val = styleCache[key],
-                                    positions = val.positions;
+            for (var styleKey of Object.keys(layerCache)) {
+                var styleCache = layerCache[styleKey];
+                for (var key of Object.keys(styleCache)) {
+                    var val = styleCache[key],
+                        positions = val.positions;
 
-                                for (var i = 0, position; positions[i]; i++) {
-                                    position = positions[i];
-                                    if (position.active) {
-                                        if (!position.rendered) {
-                                            layer.appendChild(position.element);
-                                            position.rendered = true;
-                                        }
-                                    } else {
-                                        positions.splice(i--, 1);
-                                        if (position.rendered) {
-                                            while (position.element.firstChild) {
-                                                position.element.removeChild(position.element.firstChild);
-                                            }
-                                            position.element.parentNode.removeChild(position.element);
-                                        }
-                                    }
-                                }
-
-                                if (positions.length === 0) {
-                                    if (val.measured) {
-                                        val.measured = false;
-                                    } else {
-                                        delete styleCache[key];
-                                    }
-                                }
+                    for (var i = 0, position; positions[i]; i++) {
+                        position = positions[i];
+                        if (position.active) {
+                            if (!position.rendered) {
+                                layer.appendChild(position.element);
+                                position.rendered = true;
+                            }
+                        } else {
+                            positions.splice(i--, 1);
+                            if (position.rendered) {
+                                position.element.textContent = '';
+                                position.element.remove();
                             }
                         }
                     }
-                }
 
-                layer.style.display = display;
+                    if (positions.length === 0) {
+                        if (val.measured) {
+                            val.measured = false;
+                        } else {
+                            delete styleCache[key];
+                        }
+                    }
+                }
             }
+
+            layer.style.display = display;
         }
     };
 
@@ -271,17 +260,11 @@ var Canvas = function(cls, container) {
             if (!this.SVGContainer) {
                 this.SVGContainer = document.createElement('div');
                 this.SVGContainer.className = 'flot-svg';
-                this.SVGContainer.style.position = 'absolute';
-                this.SVGContainer.style.top = '0px';
-                this.SVGContainer.style.left = '0px';
-                this.SVGContainer.style.height = '100%';
-                this.SVGContainer.style.width = '100%';
-                this.SVGContainer.style.pointerEvents = 'none';
+                this.SVGContainer.style.cssText = 'position:absolute;top:0px;left:0px;height:100%;width:100%;pointer-events:none';
                 this.element.parentNode.appendChild(this.SVGContainer);
 
                 svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                svgElement.style.width = '100%';
-                svgElement.style.height = '100%';
+                svgElement.style.cssText = 'width:100%;height:100%';
 
                 this.SVGContainer.appendChild(svgElement);
             } else {
@@ -290,11 +273,7 @@ var Canvas = function(cls, container) {
 
             layer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             layer.setAttribute('class', classes);
-            layer.style.position = 'absolute';
-            layer.style.top = '0px';
-            layer.style.left = '0px';
-            layer.style.bottom = '0px';
-            layer.style.right = '0px';
+            layer.style.cssText = 'position:absolute;top:0px;left:0px;bottom:0px;right:0px';
             if (svgElement) {
                 svgElement.appendChild(layer);
             }
@@ -420,12 +399,8 @@ var Canvas = function(cls, container) {
             };
 
             //remove elements from dom
-            while (element.firstChild) {
-                element.removeChild(element.firstChild);
-            }
-            if (element.parentNode) {
-                element.parentNode.removeChild(element);
-            }
+            element.textContent = '';
+            element.remove();
         }
 
         info.measured = true;
@@ -619,22 +594,18 @@ var Canvas = function(cls, container) {
         if (text == null) {
             var layerCache = this._textCache[layer];
             if (layerCache != null) {
-                for (var styleKey in layerCache) {
-                    if (Object.prototype.hasOwnProperty.call(layerCache, styleKey)) {
-                        var styleCache = layerCache[styleKey];
-                        for (var key in styleCache) {
-                            if (Object.prototype.hasOwnProperty.call(styleCache, key)) {
-                                // styleCache entries can exist without a
-                                // positions array (e.g. when a Flot plugin
-                                // populates the cache outside the normal
-                                // addText path). Upstream flot/flot#1444.
-                                positions = styleCache[key].positions;
-                                if (positions != null) {
-                                    positions.forEach(/** @param {TextPosition} position */ function(position) {
-                                        position.active = false;
-                                    });
-                                }
-                            }
+                for (var styleKey of Object.keys(layerCache)) {
+                    var styleCache = layerCache[styleKey];
+                    for (var key of Object.keys(styleCache)) {
+                        // styleCache entries can exist without a
+                        // positions array (e.g. when a Flot plugin
+                        // populates the cache outside the normal
+                        // addText path). Upstream flot/flot#1444.
+                        positions = styleCache[key].positions;
+                        if (positions != null) {
+                            positions.forEach(/** @param {TextPosition} position */ function(position) {
+                                position.active = false;
+                            });
                         }
                     }
                 }
@@ -661,21 +632,17 @@ var Canvas = function(cls, container) {
     */
 	Canvas.prototype.clearCache = function() {
         var cache = this._textCache;
-        for (var layerKey in cache) {
-            if (Object.prototype.hasOwnProperty.call(cache, layerKey)) {
-                var layer = this.getSVGLayer(layerKey);
-                while (layer.firstChild) {
-                    layer.removeChild(layer.firstChild);
-                }
-            }
-        };
+        for (var layerKey of Object.keys(cache)) {
+            var layer = this.getSVGLayer(layerKey);
+            layer.textContent = '';
+        }
 
         this._textCache = {};
     };
 
 	/** @param {string} text */
 	function generateKey(text) {
-        return text.replace(/0|1|2|3|4|5|6|7|8|9/g, '0');
+        return text.replace(/\d/g, '0');
     }
 
 export { Canvas };

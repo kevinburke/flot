@@ -356,6 +356,47 @@ describe("flot navigate plugin interactions", function () {
         expect(yaxis.max).toBeCloseTo(10, 1);
     });
 
+    it('keeps mouse zoom and pan constrained to the hovered axis on a scrolled page', function() {
+        var oldScrollX = window.scrollX, oldScrollY = window.scrollY;
+        placeholder[0].style.marginTop = '600px';
+        var spacer = document.createElement('div');
+        spacer.style.height = '2000px';
+        document.body.appendChild(spacer);
+        window.scrollTo(0, 400);
+
+        try {
+            expect(window.scrollY).toBeGreaterThan(0);
+            plot = $.plot(placeholder, [[[0, 0], [10, 10]]], $.extend(true, {}, options, {
+                pan: { mode: 'manual', frameRate: -1 }
+            }));
+            eventHolder = plot.getEventHolder();
+            var xaxis = plot.getXAxes()[0], yaxis = plot.getYAxes()[0];
+            var x = xaxis.box.left + xaxis.box.width / 2;
+            var y = xaxis.box.top + xaxis.box.height / 2;
+
+            simulate.mouseWheel(eventHolder, x, y, 0, -100);
+            expect(xaxis.max - xaxis.min).toBeCloseTo(1, 1);
+            expect(yaxis.min).toBe(0);
+            expect(yaxis.max).toBe(10);
+
+            var previousMin = xaxis.min;
+            x = xaxis.box.left + xaxis.box.width / 2;
+            y = xaxis.box.top + xaxis.box.height / 2;
+            simulate.mouseDown(eventHolder, x, y);
+            simulate.mouseMove(eventHolder, x + 20, y);
+            simulate.mouseUp(eventHolder, x + 20, y);
+            expect(xaxis.min).not.toBe(previousMin);
+            expect(yaxis.min).toBe(0);
+            expect(yaxis.max).toBe(10);
+        } finally {
+            if (plot) {
+                plot.destroy();
+            }
+            spacer.remove();
+            window.scrollTo(oldScrollX, oldScrollY);
+        }
+    });
+
     // TODO: investigate why this fails on Firefox
     xit('zooms out proportional with the deltaY on Mac platforms', function () {
         var smallAmount = 0.4,

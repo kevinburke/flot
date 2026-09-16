@@ -163,50 +163,28 @@ import { plugins } from './plugin-registry.js';
 
 	/** @param {ErrorBarSeries} series @param {number} i @returns {ErrorRanges} */
 	function parseErrors(series, i) {
-        var points = series.datapoints.points;
-
-        // read errors from points array
+        var points = series.datapoints.points,
+            xerr = series.points.xerr,
+            yerr = series.points.yerr,
+            eb = series.points.errorbars;
         var /** @type {number | null} */ exl = null,
             /** @type {number | null} */ exu = null,
             /** @type {number | null} */ eyl = null,
             /** @type {number | null} */ eyu = null;
-        var xerr = series.points.xerr,
-            yerr = series.points.yerr;
 
-        var eb = series.points.errorbars;
-        // error bars - first X
+        // Skip the coordinates, then consume x errors followed by y errors.
+        // Hidden error bars still occupy their fields in the points array.
+        i += 2;
         if (eb === 'x' || eb === 'xy') {
+            exl = points[i++];
             if (xerr.asymmetric) {
-                exl = points[i + 2];
-                exu = points[i + 3];
-                if (eb === 'xy') {
-                    if (yerr.asymmetric) {
-                        eyl = points[i + 4];
-                        eyu = points[i + 5];
-                    } else {
-                        eyl = points[i + 4];
-                    }
-                }
-            } else {
-                exl = points[i + 2];
-                if (eb === 'xy') {
-                    if (yerr.asymmetric) {
-                        eyl = points[i + 3];
-                        eyu = points[i + 4];
-                    } else {
-                        eyl = points[i + 3];
-                    }
-                }
+                exu = points[i++];
             }
-        // only Y
-        } else {
-            if (eb === 'y') {
-                if (yerr.asymmetric) {
-                    eyl = points[i + 2];
-                    eyu = points[i + 3];
-                } else {
-                    eyl = points[i + 2];
-                }
+        }
+        if (eb === 'y' || eb === 'xy') {
+            eyl = points[i++];
+            if (yerr.asymmetric) {
+                eyu = points[i];
             }
         }
 
@@ -218,18 +196,12 @@ import { plugins } from './plugin-registry.js';
             eyu = eyl;
         }
 
-        /** @type {ErrorRanges} */
-        var errRanges = [exl, exu, eyl, eyu];
-        // nullify if not showing
-        if (!xerr.show) {
-            errRanges[0] = null;
-            errRanges[1] = null;
-        }
-        if (!yerr.show) {
-            errRanges[2] = null;
-            errRanges[3] = null;
-        }
-        return errRanges;
+        return [
+            xerr.show ? exl : null,
+            xerr.show ? exu : null,
+            yerr.show ? eyl : null,
+            yerr.show ? eyu : null
+        ];
     }
 
 	/** @param {ErrorBarPlot} plot @param {CanvasRenderingContext2D} ctx @param {ErrorBarSeries} s */

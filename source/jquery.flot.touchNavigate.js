@@ -309,9 +309,7 @@ import { trigger } from './helpers.js';
     /** @param {TouchNavigatePlot} plot @param {HTMLElementEventMap['doubletap']} e @param {GestureState} gestureState @param {NavigationState} navigationState */
     function recenterPlotOnDoubleTap(plot, e, gestureState, navigationState) {
         checkAxesForDoubleTap(plot, e, navigationState);
-        if ((navigationState.currentTouchedAxis === 'x' && navigationState.prevTouchedAxis === 'x') ||
-            (navigationState.currentTouchedAxis === 'y' && navigationState.prevTouchedAxis === 'y') ||
-            (navigationState.currentTouchedAxis === 'none' && navigationState.prevTouchedAxis === 'none')) {
+        if (navigationState.currentTouchedAxis === navigationState.prevTouchedAxis) {
             plot.recenter({ axes: navigationState.touchedAxis });
 
             if (navigationState.touchedAxis) {
@@ -377,10 +375,8 @@ import { trigger } from './helpers.js';
                 return axisTouch1;
             }
             return undefined;
-        } else if (e.type === 'panstart') {
-            return plot.getTouchedAxis(e.detail.touches[0].pageX, e.detail.touches[0].pageY);
-        } else if (e.type === 'pinchend') {
-            //update axis since instead on pinch, a pan event is made
+        } else if (e.type === 'panstart' || e.type === 'pinchend') {
+            // A pan starts with one touch, including the touch left after a pinch.
             return plot.getTouchedAxis(e.detail.touches[0].pageX, e.detail.touches[0].pageY);
         } else {
             return navigationState.touchedAxis;

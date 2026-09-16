@@ -261,6 +261,37 @@ describe('CanvasWrapper', function() {
         expect(elems.length).toBe(1);
     });
 
+    it('ignores inherited cache entries while rendering, removing, and clearing text', function() {
+        var canvas = newCanvas(placeholder);
+        canvas.addText('layer', 10, 20, 'one<br>two', 'a');
+
+        var inherited = Object.create(null, {
+            inherited: {
+                enumerable: true,
+                get: function() {
+                    throw new Error('Inherited cache entries must not be read');
+                }
+            }
+        });
+        Object.setPrototypeOf(canvas._textCache, inherited);
+        Object.setPrototypeOf(canvas._textCache.layer, inherited);
+        Object.setPrototypeOf(canvas._textCache.layer.a, inherited);
+
+        canvas.render();
+        var layer = canvas.getSVGLayer('layer');
+        var text = layer.firstChild;
+        expect(text.querySelectorAll('tspan').length).toBe(2);
+
+        canvas.removeText('layer');
+        canvas.render();
+        expect(text.parentNode).toBe(null);
+        expect(text.childNodes.length).toBe(0);
+
+        canvas.clearCache();
+        expect(layer.childNodes.length).toBe(0);
+        expect(Object.keys(canvas._textCache).length).toBe(0);
+    });
+
     it('should remove all text from a given layer', function() {
         var canvas = newCanvas(placeholder);
         canvas.addText('layerA', 100, 200, '123', 'a');
