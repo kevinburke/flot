@@ -192,12 +192,9 @@ export interface Marking {
 export interface LegendOptions {
 	show?: boolean;
 	labelFormatter?: ((label: string, series: unknown) => string) | null;
-	labelBoxBorderColor?: string;
 	noColumns?: number;
 	position?: "ne" | "nw" | "se" | "sw";
 	margin?: number | [number, number];
-	backgroundColor?: string | null;
-	backgroundOpacity?: number;
 	container?: HTMLElement | null;
 	sorted?:
 		| boolean

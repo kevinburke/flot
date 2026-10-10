@@ -50,7 +50,13 @@ import { plugins } from './plugin-registry.js';
 			});
 
         html[j++] = '<svg class="legendLayer" style="width:inherit;height:inherit;">';
-        html[j++] = '<rect class="background" width="100%" height="100%"/>';
+        // The background and label colors are SVG presentation attributes,
+        // which any stylesheet rule overrides, e.g.
+        // `.legendLayer .background { fill: white; }`. Without them the SVG
+        // defaults would paint an opaque black box with black text. Labels
+        // use currentColor so they follow the placeholder's (or legend
+        // container's) CSS color, like the axis tick labels.
+        html[j++] = '<rect class="background" width="100%" height="100%" fill="none"/>';
         html[j++] = svgShapeDefs;
 
         var left = 0;
@@ -132,7 +138,7 @@ import { plugins } from './plugin-registry.js';
                 iconHtml += getEntryIconHtml(shape);
             }
 
-            labelHtml = '<text x="' + shape.xPos + '" y="' + shape.yPos + '" text-anchor="start"><tspan dx="2em" dy="1.2em">' + shape.label + '</tspan></text>'
+            labelHtml = '<text x="' + shape.xPos + '" y="' + shape.yPos + '" text-anchor="start" fill="currentColor"><tspan dx="2em" dy="1.2em">' + shape.label + '</tspan></text>'
             html[j++] = '<g>' + iconHtml + labelHtml + '</g>';
         }
 

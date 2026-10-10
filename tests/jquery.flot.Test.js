@@ -1494,4 +1494,44 @@ describe('flot', function() {
             expect(Number.isFinite(y2.tickDecimals)).toBe(true);
         });
     });
+
+    describe('tick label color', function() {
+        var placeholder;
+
+        beforeEach(function() {
+            placeholder = setFixtures('<div id="test-container" style="width: 600px;height: 400px;color: rgb(10, 20, 30)">')
+                .find('#test-container');
+        });
+
+        it('should follow the placeholder CSS color when font is null', function() {
+            $.plot(placeholder, [[1, 2, 3]], {});
+
+            var label = placeholder[0].querySelector('.flot-tick-label');
+            expect(label).not.toBe(null);
+            expect(window.getComputedStyle(label).fill).toBe('rgb(10, 20, 30)');
+        });
+
+        it('should follow the placeholder CSS color when font has no color', function() {
+            // Before, font.color was defaulted to the axis line color (the
+            // grid color at 22% alpha), which would make labels faint.
+            var plot = $.plot(placeholder, [[1, 2, 3]], {
+                xaxis: { font: { size: 12 } }
+            });
+
+            expect(plot.getXAxes()[0].options.font.color).toBeUndefined();
+            var label = placeholder[0].querySelector('.flot-x-axis text');
+            expect(label).not.toBe(null);
+            expect(window.getComputedStyle(label).fill).toBe('rgb(10, 20, 30)');
+        });
+
+        it('should use font.color when it is set', function() {
+            $.plot(placeholder, [[1, 2, 3]], {
+                xaxis: { font: { size: 12, color: 'rgb(200, 100, 0)' } }
+            });
+
+            var label = placeholder[0].querySelector('.flot-x-axis text');
+            expect(label).not.toBe(null);
+            expect(window.getComputedStyle(label).fill).toBe('rgb(200, 100, 0)');
+        });
+    });
 });

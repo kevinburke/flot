@@ -63,6 +63,31 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   raw-data hook's mutation in a small adapter.
 - `.github/workflows/ci.yml`: run the strict check for migrated source files
   in GitHub Actions as well as through `make ci`.
+- `jquery.canvaswrapper.js` / `jquery.flot.legend.js`: SVG tick labels,
+  axis labels and legend labels now default to `fill="currentColor"`, so
+  they follow the placeholder's CSS `color` (and the page's light/dark
+  theme) instead of always rendering black. The default is a presentation
+  attribute, so existing stylesheet `fill` rules still take precedence.
+- `jquery.flot.legend.js`: the legend's `<rect class="background">` is now
+  transparent by default instead of SVG's default opaque black. Style it
+  with `.legendLayer .background { fill: ...; }`.
+- `jquery.flot.js`: a tick label font-spec object no longer has `color`
+  filled in from the axis color (the grid color at 22% alpha). It is left
+  unset unless the caller provides one.
+- `jquery.flot.composeImages.js`: copy the plot's computed CSS `color` onto
+  the exported SVG so `currentColor` text renders in the same color in the
+  composed image.
+- `docs/API.md` / `types/index.d.ts`: document how tick label and legend
+  colors work, and drop the legend `backgroundColor`, `backgroundOpacity` and
+  `labelBoxBorderColor` options from the docs and `LegendOptions` type,
+  since the legend plugin does not implement them.
+
+### Fixed
+
+- `jquery.canvaswrapper.js`: honor the documented `color` field of a
+  font-spec object. Previously only an undocumented `fill` field was read,
+  so `xaxis: { font: { color: "red" } }` had no effect. The color is now
+  part of the text cache key.
 
 ## [5.1.4] - 2026-05-22
 

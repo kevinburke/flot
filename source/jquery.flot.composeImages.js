@@ -137,8 +137,12 @@ import { browser } from './jquery.flot.browser.js';
 
     /** @param {any} rules @param {any} svg */
     function embedCSSRulesInSVG(rules, svg) {
+        // Text and legend labels default to fill="currentColor", which the
+        // live page resolves from inherited CSS. The serialized image has no
+        // ancestors to inherit from, so carry the computed color over.
+        var currentColor = window.getComputedStyle(svg).color;
         var text = [
-            '<svg class="snapshot ' + svg.classList + '" width="' + svg.width.baseVal.value * pixelRatio + '" height="' + svg.height.baseVal.value * pixelRatio + '" viewBox="0 0 ' + svg.width.baseVal.value + ' ' + svg.height.baseVal.value + '" xmlns="http://www.w3.org/2000/svg">',
+            '<svg class="snapshot ' + svg.classList + '" style="color: ' + currentColor + '" width="' + svg.width.baseVal.value * pixelRatio + '" height="' + svg.height.baseVal.value * pixelRatio + '" viewBox="0 0 ' + svg.width.baseVal.value + ' ' + svg.height.baseVal.value + '" xmlns="http://www.w3.org/2000/svg">',
             '<style>',
             '/* <![CDATA[ */',
             rules.join('\n'),

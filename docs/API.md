@@ -180,12 +180,9 @@ $.plot(placeholder, data, options);
 legend: {
     show: boolean
     labelFormatter: null or (fn: string, series object -> string)
-    labelBoxBorderColor: color
     noColumns: number
     position: "ne" or "nw" or "se" or "sw"
     margin: number of pixels or [x margin, y margin]
-    backgroundColor: null or color
-    backgroundOpacity: number between 0 and 1
     container: null or jQuery object/DOM element/jQuery expression
     sorted: null/false, true, "ascending", "descending", "reverse", or a comparator
 }
@@ -211,9 +208,27 @@ return null.
 "position" specifies the overall placement of the legend within the
 plot (top-right, top-left, etc.) and margin the distance to the plot
 edge (this can be either a number or an array of two numbers like [x,
-y]). "backgroundColor" and "backgroundOpacity" specifies the
-background. The default is a partly transparent auto-detected
-background.
+y]).
+
+The legend is drawn as an SVG element with the class "legendLayer". Its
+colors are set with CSS rather than options. The label text uses
+`fill="currentColor"`, so it follows the CSS `color` of the placeholder
+(or of the legend container), the same as the axis tick labels. The
+background, a `<rect class="background">`, is transparent by default.
+Both defaults are SVG presentation attributes, so any stylesheet rule
+overrides them:
+
+```css
+.legendLayer .background {
+    fill: rgba(255, 255, 255, 0.85);
+    stroke: rgba(0, 0, 0, 0.85);
+}
+.legendLayer text {
+    fill: #333;
+}
+```
+
+Note that SVG text is colored by the CSS `fill` property, not `color`.
 
 If you want the legend to appear somewhere else in the DOM, you can
 specify "container" as a jQuery object/expression to put the legend
@@ -312,7 +327,19 @@ defaults to the grid color with transparency. For more fine-grained control you
 can also set the color of the ticks separately with "tickColor".
 
 You can customize the font and color used to draw the axis tick labels with CSS
-or directly via the "font" option. When "font" is null - the default - each
+or directly via the "font" option. Tick labels are SVG `<text>` elements, which
+are colored by the CSS `fill` property rather than `color`. By default Flot
+sets `fill="currentColor"` on them, so they take the CSS `color` of the
+placeholder, and follow the page's theme (including `prefers-color-scheme`
+media queries) without any extra CSS. To give the labels a different color,
+set `fill` in a stylesheet, e.g. `.flot-tick-label { fill: #666; }`; a
+stylesheet rule overrides the default.
+
+Note that the "color" option above, and "grid.color", only affect the axis
+lines, tick marks and grid, which are drawn on a canvas; they do not change
+the color of the tick labels.
+
+When "font" is null - the default - each
 tick label is given the 'flot-tick-label' class. For compatibility with Flot
 0.7 and earlier the labels are also given the 'tickLabel' class, but this is
 deprecated and scheduled to be removed with the release of version 1.0.0.
@@ -324,10 +351,10 @@ the number of the axis when there are multiple axes.  For example, the x-axis
 labels for a simple plot with only a single x-axis might look like this:
 
 ```html
-<div class='flot-x-axis flot-x1-axis'>
-    <div class='flot-tick-label'>January 2013</div>
+<g class='flot-x-axis flot-x1-axis'>
+    <text class='flot-tick-label tickLabel' fill='currentColor'>January 2013</text>
     ...
-</div>
+</g>
 ```
 
 For direct control over label styles you can also provide "font" as an object
@@ -346,7 +373,10 @@ with this format:
 ```
 
 The size and lineHeight must be expressed in pixels; CSS units such as 'em'
-or 'smaller' are not allowed.
+or 'smaller' are not allowed. Font fields you leave out default from the
+placeholder's CSS (size defaults to 80% of its font-size). If "color" is set it becomes the labels' fill (as an inline
+style, so it takes precedence over stylesheets); if it is omitted, the labels
+use `currentColor` as described above.
 
 The options "min"/"max" are the precise minimum/maximum value on the
 scale. If you don't specify either of them, a value will automatically

@@ -107,6 +107,37 @@ describe("flot legend plugin", function() {
         expect(entryHTML.includes('#line')).toBe(true);
     });
 
+    it('should color the label text with the placeholder CSS color', function(){
+        placeholder[0].style.color = 'rgb(10, 20, 30)';
+        plot = $.plot(placeholder, [[1, 3, 5, 6]], options);
+
+        var legendSvg = document.getElementsByClassName('legendLayer')[0];
+        var entryLabel = legendSvg.getElementsByTagNameNS('http://www.w3.org/2000/svg', 'text')[0];
+
+        expect(window.getComputedStyle(entryLabel).fill).toBe('rgb(10, 20, 30)');
+    });
+
+    it('should not paint an opaque black background by default', function(){
+        plot = $.plot(placeholder, [[1, 3, 5, 6]], options);
+
+        var background = document.querySelector('.legendLayer .background');
+
+        expect(window.getComputedStyle(background).fill).toBe('none');
+    });
+
+    it('should let CSS style the legend background and text', function(){
+        appendSetStyleFixtures(
+            '.legendLayer .background { fill: rgb(1, 2, 3); }' +
+            '.legendLayer text { fill: rgb(4, 5, 6); }');
+        plot = $.plot(placeholder, [[1, 3, 5, 6]], options);
+
+        var background = document.querySelector('.legendLayer .background');
+        var entryLabel = document.querySelector('.legendLayer text');
+
+        expect(window.getComputedStyle(background).fill).toBe('rgb(1, 2, 3)');
+        expect(window.getComputedStyle(entryLabel).fill).toBe('rgb(4, 5, 6)');
+    });
+
     it('should take into account the show option', function() {
         options.legend.show = false;
         plot = $.plot(placeholder, [[1, 3, 5, 6]], options);

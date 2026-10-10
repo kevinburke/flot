@@ -23,7 +23,8 @@ import { width, height } from './helpers.js';
  * @property {number} size Font size in pixels.
  * @property {number} [lineHeight] Line height in pixels.
  * @property {string} family CSS font family.
- * @property {string} [fill] Text fill color.
+ * @property {string} [color] Text fill color.
+ * @property {string} [fill] Text fill color; older alias for color.
  */
 
 /** @typedef {string | FontSpec} CanvasFont */
@@ -333,18 +334,24 @@ var Canvas = function(cls, container) {
 	 * @param {number | null | undefined} width Maximum text width in pixels.
 	 */
 	Canvas.prototype.getTextInfo = function(layer, text, font, angle, width) {
-        var textStyle, layerCache, styleCache, info;
+        var textStyle, styleKey, fill, layerCache, styleCache, info;
 
         // Cast the value to a string, in case we were given a number or such
 
         var textString = '' + text;
 
-        // If the font is a font-spec object, generate a CSS font definition
+        // If the font is a font-spec object, generate a CSS font definition.
+        // "color" is the documented font-spec key for the text color; "fill"
+        // is accepted for backwards compatibility. The color is part of the
+        // cache key so that two font specs that differ only in color don't
+        // share a cached element.
 
         if (typeof font === 'object') {
             textStyle = font.style + ' ' + font.variant + ' ' + font.weight + ' ' + font.size + 'px/' + font.lineHeight + 'px ' + font.family;
+            fill = font.fill || font.color;
+            styleKey = fill ? textStyle + ' ' + fill : textStyle;
         } else {
-            textStyle = font;
+            textStyle = styleKey = font;
         }
 
         // Retrieve (or create) the cache for the text's layer and styles
@@ -355,10 +362,10 @@ var Canvas = function(cls, container) {
             layerCache = this._textCache[layer] = {};
         }
 
-        styleCache = layerCache[textStyle];
+        styleCache = layerCache[styleKey];
 
         if (styleCache == null) {
-            styleCache = layerCache[textStyle] = {};
+            styleCache = layerCache[styleKey] = {};
         }
 
         var key = generateKey(textString);
@@ -380,9 +387,19 @@ var Canvas = function(cls, container) {
             element.setAttributeNS(null, 'x', String(-9999));
             element.setAttributeNS(null, 'y', String(-9999));
 
+            // SVG text is colored by `fill`, which defaults to black and
+            // ignores the CSS `color` property. Default it to currentColor
+            // so text follows the placeholder's CSS color (and therefore
+            // the page theme). This is a presentation attribute rather
+            // than an inline style, so any stylesheet rule that sets
+            // `fill`, e.g. `.flot-tick-label { fill: red; }`, still wins.
+            element.setAttributeNS(null, 'fill', 'currentColor');
+
             if (typeof font === 'object') {
                 element.style.font = textStyle;
-                element.style.fill = font.fill;
+                if (fill) {
+                    element.style.fill = fill;
+                }
             } else if (typeof font === 'string') {
                 element.setAttribute('class', font);
             }

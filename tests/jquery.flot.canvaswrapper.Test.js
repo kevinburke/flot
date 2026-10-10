@@ -416,6 +416,66 @@ describe('CanvasWrapper', function() {
         expect(as.length).toBe(0);
     });
 
+    it('should color class-styled text with the placeholder CSS color by default', function() {
+        // SVG text ignores CSS `color` unless fill is currentColor; the
+        // default fill is black, which is unreadable on dark pages.
+        placeholder[0].style.color = 'rgb(10, 20, 30)';
+        var canvas = newCanvas(placeholder);
+        canvas.addText('layerA', 100, 200, '123', 'a');
+        canvas.render();
+
+        var elem = placeholder.find('.a')[0];
+        expect(elem.getAttribute('fill')).toBe('currentColor');
+        expect(window.getComputedStyle(elem).fill).toBe('rgb(10, 20, 30)');
+    });
+
+    it('should let a CSS fill rule override the default text color', function() {
+        appendSetStyleFixtures('.a { fill: rgb(1, 2, 3); }');
+        placeholder[0].style.color = 'rgb(10, 20, 30)';
+        var canvas = newCanvas(placeholder);
+        canvas.addText('layerA', 100, 200, '123', 'a');
+        canvas.render();
+
+        var elem = placeholder.find('.a')[0];
+        expect(window.getComputedStyle(elem).fill).toBe('rgb(1, 2, 3)');
+    });
+
+    it('should color font-object text with the placeholder CSS color by default', function() {
+        placeholder[0].style.color = 'rgb(10, 20, 30)';
+        var canvas = newCanvas(placeholder),
+            settings = {
+                style: 'normal',
+                variant: 'normal',
+                weight: '400',
+                size: '12',
+                lineHeight: '14',
+                family: 'sans-serif'
+            };
+        canvas.addText('layerA', 100, 200, '123', settings);
+        canvas.render();
+
+        var elem = placeholder.find('.layerA')[0].firstChild;
+        expect(window.getComputedStyle(elem).fill).toBe('rgb(10, 20, 30)');
+    });
+
+    it('should use the documented font.color property as the text fill', function() {
+        var canvas = newCanvas(placeholder),
+            settings = {
+                style: 'normal',
+                variant: 'normal',
+                weight: '400',
+                size: '12',
+                lineHeight: '14',
+                family: 'sans-serif',
+                color: 'rgb(200, 100, 0)'
+            };
+        canvas.addText('layerA', 100, 200, '123', settings);
+        canvas.render();
+
+        var elem = placeholder.find('.layerA')[0].firstChild;
+        expect(window.getComputedStyle(elem).fill).toBe('rgb(200, 100, 0)');
+    });
+
     function newCanvas(placeholder) {
         return new Flot.Canvas('myCanvas', placeholder[0]);
     }

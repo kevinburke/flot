@@ -580,10 +580,11 @@ import { plugins } from './plugin-registry.js';
                 options.xaxes[i] = axisOptions;
 
                 if (axisOptions.font) {
+                    // font.color is left unset unless the caller provides
+                    // one, so tick labels follow the placeholder's CSS
+                    // color. Don't default it to axisOptions.color: that is
+                    // the grid color at 22% alpha, meant for axis lines.
                     axisOptions.font = extend({}, fontDefaults, axisOptions.font);
-                    if (!axisOptions.font.color) {
-                        axisOptions.font.color = axisOptions.color;
-                    }
                     if (!axisOptions.font.lineHeight) {
                         axisOptions.font.lineHeight = Math.round(axisOptions.font.size * 1.15);
                     }
@@ -601,10 +602,11 @@ import { plugins } from './plugin-registry.js';
                 options.yaxes[i] = axisOptions;
 
                 if (axisOptions.font) {
+                    // font.color is left unset unless the caller provides
+                    // one, so tick labels follow the placeholder's CSS
+                    // color. Don't default it to axisOptions.color: that is
+                    // the grid color at 22% alpha, meant for axis lines.
                     axisOptions.font = extend({}, fontDefaults, axisOptions.font);
-                    if (!axisOptions.font.color) {
-                        axisOptions.font.color = axisOptions.color;
-                    }
                     if (!axisOptions.font.lineHeight) {
                         axisOptions.font.lineHeight = Math.round(axisOptions.font.size * 1.15);
                     }
