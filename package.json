@@ -66,7 +66,7 @@
 		"@rollup/plugin-terser": "^1.0.0",
 		"@size-limit/file": "^14.0.0",
 		"@types/jquery": "^4.0.0",
-		"happy-dom": "^20.9.0",
+		"happy-dom": "^21.0.1",
 		"jquery": "^4.0.0",
 		"rollup": "^4.60.1",
 		"size-limit": "^14.0.0",
