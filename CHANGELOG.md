@@ -17,6 +17,8 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
   no longer need a global `jQuery` variable.
 - Test the packed npm package through both module formats, including its
   TypeScript declarations, and treat package validation warnings as errors.
+- Remove the unused `@rollup/plugin-node-resolve` build dependency and its
+  transitive `deepmerge` dependency, which is affected by CVE-2026-93753.
 
 ## [5.1.5] - 2026-09-15
 
