@@ -49,7 +49,7 @@ plot(document.getElementById("placeholder"), data, options);
 Or via `<script>` tag from a CDN:
 
 ```html
-<script src="https://unpkg.com/@kevinburke/flot@5.1.5/dist/flot.min.js"></script>
+<script src="https://unpkg.com/@kevinburke/flot@5.1.6/dist/flot.min.js"></script>
 <script>
   Flot.plot(document.getElementById('placeholder'), data, options);
 </script>
@@ -59,7 +59,7 @@ Or via `<script>` tag from a CDN:
 
 ```html
 <script src="https://unpkg.com/jquery@3/dist/jquery.min.js"></script>
-<script src="https://unpkg.com/@kevinburke/flot@5.1.5/dist/jquery.flot.min.js"></script>
+<script src="https://unpkg.com/@kevinburke/flot@5.1.6/dist/jquery.flot.min.js"></script>
 <script>
   $.plot("#placeholder", data, options);
 </script>

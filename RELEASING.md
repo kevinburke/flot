@@ -17,7 +17,11 @@
    - `source/jquery.flot.js` → `export var version = "X.Y.Z";`
 
 3. Update `CHANGELOG.md` with a new section for the version. Include
-   the date and a summary of changes. Update the CDN URLs in `README.md`.
+   the date and a summary of changes since the previous release tag. Keep an
+   `Unreleased` heading above the new section for future changes, and check
+   that no post-release changes were added to an older release section.
+   Update the CDN URLs in `README.md`. Match both Biome schema URLs to the
+   locked `@biomejs/biome` version so lint treats warnings as errors cleanly.
 
    Install the locked dependencies, then run all release checks and inspect
    the package contents:
