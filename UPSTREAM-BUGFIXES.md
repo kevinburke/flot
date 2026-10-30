@@ -9,7 +9,6 @@ Scoring: recent + reproducible + small + has a test > older + speculative.
 
 Clean, recent, real crashes or miscalibrations. Port with a test where
 feasible, and reference the upstream issue/PR number in the commit.
-
 - [x] **upstream #1869 / PR #1870** — `setupTickGeneration` extraDec
   branch when `axis.delta == 0` (min == max). `Math.log(0) = -Infinity`
   → `extraDec = +Infinity` → either `toFixed(Infinity)` throws
@@ -71,7 +70,6 @@ feasible, and reference the upstream issue/PR number in the commit.
 
 Older but still legitimate; port after verifying the reported bug still
 reproduces against current `source/`.
-
 - [skip] **upstream PR #1744** — already present in our source as of
   upstream commit `0429a1e6` (2022-08-01). No action needed.
   - https://github.com/flot/flot/pull/1744
@@ -107,14 +105,13 @@ reproduces against current `source/`.
   (pie, errorbars, custom symbols) now render a `#box` fallback icon
   instead of label-only. Added a new `#box` SVG symbol and a `case
   'box'` in `getEntryIconHtml`. The upstream `else if` chain was
-  *not* ported because it regresses intentional overlay combos
+  _not_ ported because it regresses intentional overlay combos
   (e.g. lines + points).
   - https://github.com/flot/flot/pull/1641
 
 ## Tier 3 — investigate, possibly synthesize
 
 Competing patches or reports without PRs; need judgment.
-
 - [x] **upstream #1789 / PR #1790 / PR #1793** — pan gets locked at
   `panRange[0]` for y-axis. Ported the minimal form of PR #1793 into
   both `plot.pan` and `plot.smartPan`: when `axis.direction === 'y'`,
@@ -149,7 +146,6 @@ items. Upstream has 459 open issues and 172 open PRs as of
 archive items (IE6/7 bugs, 2012–2014 feature requests, old
 environment issues). A keyword scan for bug terms surfaced a handful
 worth re-examining if another patch pass happens:
-
 - [flot/flot#710](https://github.com/flot/flot/issues/710) — plot
   throws when all data points share a y-value. Related to but
   possibly distinct from the #1869 fix already ported.

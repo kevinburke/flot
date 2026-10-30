@@ -1,11 +1,11 @@
-## Frequently asked questions ##
+## Frequently asked questions
 
-#### Which browsers are supported by Flot? ####
+#### Which browsers are supported by Flot?
 
 Flot's distribution source is transpiled to ES5, which all major browsers support.
 For more information, [check here.](https://caniuse.com/#feat=es5)
 
-#### How much data can Flot cope with? ####
+#### How much data can Flot cope with?
 
 Flot will happily draw everything you send to it so the answer
 depends on the browser.
@@ -16,7 +16,7 @@ downsampling/aggregation as this is near the resolution limit of the
 chart anyway. If you downsample server-side, you also save bandwidth.
 
 
-#### Flot isn't working when I'm using JSON data as source! ####
+#### Flot isn't working when I'm using JSON data as source!
 
 Actually, Flot loves JSON data, you just got the format wrong.
 Double check that you're not inputting strings instead of numbers,
@@ -25,14 +25,14 @@ the error might not show up immediately because Javascript can do some
 conversion automatically.
 
 
-#### Can I export the graph? ####
+#### Can I export the graph?
 
 You can grab the image rendered by the canvas element used by Flot
 as a PNG or JPEG (remember to set a background). Note that it won't
 include anything not drawn in the canvas (such as the legend).
 
 
-#### The bars are all tiny in time mode? ####
+#### The bars are all tiny in time mode?
 
 It's not really possible to determine the bar width automatically.
 So you have to set the width with the barWidth option which is NOT in
@@ -41,7 +41,7 @@ bars). For time mode that's milliseconds so the default value of 1
 makes the bars 1 millisecond wide.
 
 
-#### Can I use Flot with libraries like Mootools or Prototype? ####
+#### Can I use Flot with libraries like Mootools or Prototype?
 
 Yes, Flot supports it out of the box and it's easy! Just use jQuery
 instead of $, e.g. call jQuery.plot instead of $.plot and use
@@ -55,7 +55,7 @@ libraries, see the documentation in jQuery ("Using jQuery with other
 libraries") for details.
 
 
-#### Flot doesn't work with [insert name of Javascript UI framework]! ####
+#### Flot doesn't work with [insert name of Javascript UI framework]!
 
 Flot is using standard HTML to make charts. If this is not working,
 it's probably because the framework you're using is doing something

@@ -12,7 +12,6 @@
    ```
 
 2. Bump the version consistently:
-
    - `package.json` → `"version": "X.Y.Z"`
    - `package-lock.json` → top-level and root package versions
    - `source/jquery.flot.js` → `export var version = "X.Y.Z";`
@@ -73,15 +72,14 @@
 
 9. Verify the package is available:
 
-    ```bash
-    npm view @kevinburke/flot version
-    curl --fail --head https://unpkg.com/@kevinburke/flot@X.Y.Z/dist/flot.min.js
-    ```
+   ```bash
+   npm view @kevinburke/flot version
+   curl --fail --head https://unpkg.com/@kevinburke/flot@X.Y.Z/dist/flot.min.js
+   ```
 
 ## Versioning
 
 Follow [semver](https://semver.org/):
-
 - **Patch** (5.0.1): bug fixes, no API changes.
 - **Minor** (5.1.0): new features, backwards compatible.
 - **Major** (6.0.0): breaking API changes.

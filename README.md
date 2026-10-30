@@ -41,9 +41,9 @@ directory if serving those entries yourself.
 As an ES module:
 
 ```js
-import { plot } from '@kevinburke/flot';
+import { plot } from "@kevinburke/flot";
 
-plot(document.getElementById('placeholder'), data, options);
+plot(document.getElementById("placeholder"), data, options);
 ```
 
 Or via `<script>` tag from a CDN:
@@ -71,10 +71,10 @@ existing code works unchanged.
 When using a bundler, import the adapter alongside jQuery:
 
 ```js
-import $ from 'jquery';
-import '@kevinburke/flot/jquery';
+import $ from "jquery";
+import "@kevinburke/flot/jquery";
 
-$.plot('#placeholder', data, options);
+$.plot("#placeholder", data, options);
 ```
 
 CommonJS consumers can use `const $ = require('jquery')` followed by
@@ -91,12 +91,24 @@ Create a placeholder div with explicit dimensions:
 Then call `plot`:
 
 ```js
-import { plot } from '@kevinburke/flot';
+import { plot } from "@kevinburke/flot";
 
-plot(document.getElementById('placeholder'), [
-  [[0, 0], [1, 1], [2, 4]],
-  [[0, 3], [4, 8], [8, 5]],
-], { yaxis: { max: 10 } });
+plot(
+	document.getElementById("placeholder"),
+	[
+		[
+			[0, 0],
+			[1, 1],
+			[2, 4],
+		],
+		[
+			[0, 3],
+			[4, 8],
+			[8, 5],
+		],
+	],
+	{ yaxis: { max: 10 } },
+);
 ```
 
 The plot function draws the chart immediately and returns a plot object. See
