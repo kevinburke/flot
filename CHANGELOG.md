@@ -172,6 +172,7 @@ For earlier upstream history, see the [flot/flot repository](https://github.com/
 All bug fixes in this release are ports or re-implementations of
 existing upstream work. Thanks to the reporters and submitters
 credited below.
+
 - `jquery.flot.js`: skip the `extraDec` branch in `setupTickGeneration`
   when `axis.delta` is zero. Previously, a second `setupGrid()` call
   (for example from the resize plugin) on an axis with `min === max`
@@ -726,7 +727,6 @@ interpolation should not occur outside the provided data
 
 - Multi lines labels
 
-
 ## [1.0.3]
 
 ### Changes
@@ -739,7 +739,6 @@ interpolation should not occur outside the provided data
 - Fixed pixel ratio for devices with a different pixel ratio than 1,
   for creating graph snapshots
 
-
 ## [1.0.2]
 
 ### Changes
@@ -751,13 +750,11 @@ interpolation should not occur outside the provided data
 - The speed of the zoom made on the Mac track pad
 - Invalid SVG width and height values red by composeImages on Firefox
 
-
 ## [1.0.1]
 
 ### Changes
 
 - Added jquery.flot.composeImages.js to distribution
-
 
 ## [1.0.0]
 
@@ -1107,8 +1104,6 @@ import the Axis Labels Plugin from http://github.com/markrcote/flot-axislabels
 
 - add an svg layer to Flot
 
-
-
 ## Flot 0.8.3
 
 ### Changes
@@ -1155,7 +1150,6 @@ import the Axis Labels Plugin from http://github.com/markrcote/flot-axislabels
 - Exposed the dateGenerator function on the plot object, as it used to be
   before time-mode was moved into a separate plugin.
   (patch by Paolo Valleri, pull request #1028)
-
 
 ## Flot 0.8.2
 
@@ -1287,7 +1281,6 @@ import the Axis Labels Plugin from http://github.com/markrcote/flot-axislabels
 
 - Fixed missing semicolons in the core library.
   (reported by Michal Zglinski)
-
 
 ## Flot 0.8.0
 
@@ -1527,7 +1520,6 @@ The base and overlay canvas are now using the CSS classes "flot-base" and
 - Fixed recalculation of tickSize and tickDecimals on calls to setupGrid.
   (patch by thecountofzero, pull request #861, issues #860, #1000)
 
-
 ## Flot 0.7
 
 ### API changes
@@ -1758,8 +1750,6 @@ also surfaced, if your graphs are slow in IE, you may want to give it a spin:
 - Update colorhelpers plugin to avoid dying when trying to parse an
   invalid string (reported by cadavor, issue 483).
 
-
-
 ## Flot 0.6
 
 ### API changes
@@ -1949,8 +1939,6 @@ in event handling speed.
 - Make sure points on top take precedence when finding nearby points when
   hovering. (reported by didroe, issue 224)
 
-
-
 ## Flot 0.5
 
 Timestamps are now in UTC. Also "selected" event -> becomes "plotselected"
@@ -2034,8 +2022,6 @@ code shouldn't break) and markings (formerly coloredAreas).
   instead of just appending to it, fixing the infinite legend bug. (reported
   by several people, fix by Brad Dewey)
 
-
-
 ## Flot 0.4
 
 ### API changes
@@ -2089,8 +2075,6 @@ min, max, tickDecimals, tickSize.
 
 - Prevent IE/Safari text selection when selecting stuff on the canvas.
 
-
-
 ## Flot 0.3
 
 This is mostly a quick-fix release because jquery.js wasn't included in the
@@ -2108,8 +2092,6 @@ previous zip/tarball.
 
 - Fixed a bug in dealing with data where min = max. (thanks to Michael
   Messinides)
-
-
 
 ## Flot 0.2
 
@@ -2133,8 +2115,6 @@ Moved labelMargin option to grid from x/yaxis.
   labels into links.
 
 - Reduced the size of the code. (patch by Guy Fraser)
-
-
 
 ## Flot 0.1
 

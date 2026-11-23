@@ -9,60 +9,61 @@ Scoring: recent + reproducible + small + has a test > older + speculative.
 
 Clean, recent, real crashes or miscalibrations. Port with a test where
 feasible, and reference the upstream issue/PR number in the commit.
+
 - [x] **upstream #1869 / PR #1870** — `setupTickGeneration` extraDec
-  branch when `axis.delta == 0` (min == max). `Math.log(0) = -Infinity`
-  → `extraDec = +Infinity` → either `toFixed(Infinity)` throws
-  downstream, or `axis.tickDecimals` silently becomes `Infinity`. Fix:
-  skip the extra-decimal branch when `axis.delta <= 0`. Regression test
-  in `tests/jquery.flot.Test.js` runs `plot.setupGrid()` a second time
-  (no autoScale, skips widening) and asserts `tickDecimals` is finite.
+      branch when `axis.delta == 0` (min == max). `Math.log(0) = -Infinity`
+      → `extraDec = +Infinity` → either `toFixed(Infinity)` throws
+      downstream, or `axis.tickDecimals` silently becomes `Infinity`. Fix:
+      skip the extra-decimal branch when `axis.delta <= 0`. Regression test
+      in `tests/jquery.flot.Test.js` runs `plot.setupGrid()` a second time
+      (no autoScale, skips widening) and asserts `tickDecimals` is finite.
   - Upstream PR: https://github.com/flot/flot/pull/1870
   - Upstream issue: https://github.com/flot/flot/issues/1869
 
 - [x] **upstream #1871 / PR #1872** — Hover highlights points outside
-  `mouseActiveRadius` when an axis has `transform`/`inverseTransform`.
-  Root cause: `smallestDistance` was seeded with `+Infinity`, so when
-  the `maxx`/`maxy` coordinate-space pre-filter is skipped (which it
-  is for transformed axes) nothing ever enforces the radius. Seed with
-  `maxDistance` (or `maxDistance * maxDistance` for the default
-  squared-distance metric). Regression test in
-  `tests/browser/hover.spec.ts` uses identity transform on both axes
-  and hovers past the radius.
+      `mouseActiveRadius` when an axis has `transform`/`inverseTransform`.
+      Root cause: `smallestDistance` was seeded with `+Infinity`, so when
+      the `maxx`/`maxy` coordinate-space pre-filter is skipped (which it
+      is for transformed axes) nothing ever enforces the radius. Seed with
+      `maxDistance` (or `maxDistance * maxDistance` for the default
+      squared-distance metric). Regression test in
+      `tests/browser/hover.spec.ts` uses identity transform on both axes
+      and hovers past the radius.
   - Upstream PR: https://github.com/flot/flot/pull/1872
   - Upstream issue: https://github.com/flot/flot/issues/1871
 
 - [x] **upstream #1867** — `ctx.createLinearGradient` threw
-  `Argument 4 is not finite floating-point value` when `top` or
-  `bottom` reached `NaN` or `±Infinity`. No upstream PR. Added
-  `isFinite` guard in the single `createLinearGradient` call site
-  (`getColorOrGradient` in `source/jquery.flot.js`) that falls back
-  to `defaultColor`. Global `isFinite` coerces `null → 0`, preserving
-  behavior for the `drawSeriesPoints` path that passes `(null, null)`.
-  Regression tests in `tests/jquery.flot.Test.js` corrupt an axis to
-  force non-finite coordinates and assert `plot.draw()` does not
-  throw, both for a bar series with gradient fill and for the grid
-  background.
+      `Argument 4 is not finite floating-point value` when `top` or
+      `bottom` reached `NaN` or `±Infinity`. No upstream PR. Added
+      `isFinite` guard in the single `createLinearGradient` call site
+      (`getColorOrGradient` in `source/jquery.flot.js`) that falls back
+      to `defaultColor`. Global `isFinite` coerces `null → 0`, preserving
+      behavior for the `drawSeriesPoints` path that passes `(null, null)`.
+      Regression tests in `tests/jquery.flot.Test.js` corrupt an axis to
+      force non-finite coordinates and assert `plot.draw()` does not
+      throw, both for a bar series with gradient fill and for the grid
+      background.
   - Upstream issue: https://github.com/flot/flot/issues/1867
 
 - [x] **upstream #1729 / #1788** — `measureTickLabels` skipped the
-  first and last ticks whenever `opts.showTickLabels` was `'major'`
-  (the default), because the original code keyed off both
-  `showMajorTickLabels` and `showEndpointsTickLabels` and the latter
-  is false in `'major'` mode. `drawAxisLabels` for `'major'` and
-  `'all'` modes draws every tick, so the widest endpoint label
-  (e.g. a top y-tick of `100` next to `40..90`) was not factored
-  into `labelWidth`; the axis box ended up too narrow and the wider
-  endpoint rendered with a negative `x` and was visually clipped.
-  Fix: collapse the two flags to a single `endpointsOnly` flag —
-  only `'endpoints'` mode skips middle ticks; no mode that reaches
-  this loop skips endpoints. Regression test in
-  `tests/jquery.flot.Test.js` (`drawAxisLabels` describe block)
-  forces a y-axis with ticks `[40,...,100]` and asserts no
-  `flot-tick-label` has a negative `x` attribute. Three pre-existing
-  tests in `selection`, `navigate-interaction`, and `touchNavigate`
-  were silently calibrated to the buggy narrow axis box; updated to
-  compute expected values dynamically or cache `plot.width()` /
-  loosen precision so they survive the new, correct dimensions.
+      first and last ticks whenever `opts.showTickLabels` was `'major'`
+      (the default), because the original code keyed off both
+      `showMajorTickLabels` and `showEndpointsTickLabels` and the latter
+      is false in `'major'` mode. `drawAxisLabels` for `'major'` and
+      `'all'` modes draws every tick, so the widest endpoint label
+      (e.g. a top y-tick of `100` next to `40..90`) was not factored
+      into `labelWidth`; the axis box ended up too narrow and the wider
+      endpoint rendered with a negative `x` and was visually clipped.
+      Fix: collapse the two flags to a single `endpointsOnly` flag —
+      only `'endpoints'` mode skips middle ticks; no mode that reaches
+      this loop skips endpoints. Regression test in
+      `tests/jquery.flot.Test.js` (`drawAxisLabels` describe block)
+      forces a y-axis with ticks `[40,...,100]` and asserts no
+      `flot-tick-label` has a negative `x` attribute. Three pre-existing
+      tests in `selection`, `navigate-interaction`, and `touchNavigate`
+      were silently calibrated to the buggy narrow axis box; updated to
+      compute expected values dynamically or cache `plot.width()` /
+      loosen precision so they survive the new, correct dimensions.
   - Upstream issues: https://github.com/flot/flot/issues/1729,
     https://github.com/flot/flot/issues/1788
 
@@ -70,6 +71,7 @@ feasible, and reference the upstream issue/PR number in the commit.
 
 Older but still legitimate; port after verifying the reported bug still
 reproduces against current `source/`.
+
 - [skip] **upstream PR #1744** — already present in our source as of
   upstream commit `0429a1e6` (2022-08-01). No action needed.
   - https://github.com/flot/flot/pull/1744
@@ -80,15 +82,15 @@ reproduces against current `source/`.
   - https://github.com/flot/flot/pull/1672
 
 - [x] **upstream PR #1559 / #1547** — pie plugin read `options` from
-  closure that was `null` until `processDatapoints` ran. Added a
-  local `var options = plot.getOptions();` at the top of
-  `drawDonutHole` and `triggerClickHoverEvent`.
+      closure that was `null` until `processDatapoints` ran. Added a
+      local `var options = plot.getOptions();` at the top of
+      `drawDonutHole` and `triggerClickHoverEvent`.
   - https://github.com/flot/flot/pull/1559
 
 - [x] **upstream PR #1750** — legend container could be a jQuery
-  wrapper rather than a DOM element. Inlined the unwrap
-  (`container.get(0)` → `container[0]`) inside
-  `insertLegend` since this fork is jQuery-optional.
+      wrapper rather than a DOM element. Inlined the unwrap
+      (`container.get(0)` → `container[0]`) inside
+      `insertLegend` since this fork is jQuery-optional.
   - https://github.com/flot/flot/pull/1750
 
 - [skip] **upstream PR #1528** — the PR changes range-update semantics
@@ -97,31 +99,32 @@ reproduces against current `source/`.
   - https://github.com/flot/flot/pull/1528
 
 - [x] **upstream PR #1444** — `positions == null` guard added in
-  `canvaswrapper.removeText` to avoid a crash when the text cache
-  contains entries without a `positions` array.
+      `canvaswrapper.removeText` to avoid a crash when the text cache
+      contains entries without a `positions` array.
   - https://github.com/flot/flot/pull/1444
 
 - [x] **upstream PR #1641** — legend entries for plugin-drawn series
-  (pie, errorbars, custom symbols) now render a `#box` fallback icon
-  instead of label-only. Added a new `#box` SVG symbol and a `case
+      (pie, errorbars, custom symbols) now render a `#box` fallback icon
+      instead of label-only. Added a new `#box` SVG symbol and a `case
   'box'` in `getEntryIconHtml`. The upstream `else if` chain was
-  _not_ ported because it regresses intentional overlay combos
-  (e.g. lines + points).
+      _not_ ported because it regresses intentional overlay combos
+      (e.g. lines + points).
   - https://github.com/flot/flot/pull/1641
 
 ## Tier 3 — investigate, possibly synthesize
 
 Competing patches or reports without PRs; need judgment.
+
 - [x] **upstream #1789 / PR #1790 / PR #1793** — pan gets locked at
-  `panRange[0]` for y-axis. Ported the minimal form of PR #1793 into
-  both `plot.pan` and `plot.smartPan`: when `axis.direction === 'y'`,
-  swap `minD` and `maxD` before clamping, because screen y
-  coordinates run opposite to data y. Regression test plots a data
-  range of `[0, 10]` with `panRange: [-50, 50]`, pans 20px, and
-  asserts the axis shifts by a small amount rather than snapping to
-  the panRange edge. PR #1790 bundled additional inverted-axis
-  handling (~190 lines) that isn't tied to any reported bug in this
-  fork; not ported.
+      `panRange[0]` for y-axis. Ported the minimal form of PR #1793 into
+      both `plot.pan` and `plot.smartPan`: when `axis.direction === 'y'`,
+      swap `minD` and `maxD` before clamping, because screen y
+      coordinates run opposite to data y. Regression test plots a data
+      range of `[0, 10]` with `panRange: [-50, 50]`, pans 20px, and
+      asserts the axis shifts by a small amount rather than snapping to
+      the panRange edge. PR #1790 bundled additional inverted-axis
+      handling (~190 lines) that isn't tied to any reported bug in this
+      fork; not ported.
   - https://github.com/flot/flot/pull/1793
 
 - [partial] **upstream #1838** — legend `Cannot set properties of
@@ -146,6 +149,7 @@ items. Upstream has 459 open issues and 172 open PRs as of
 archive items (IE6/7 bugs, 2012–2014 feature requests, old
 environment issues). A keyword scan for bug terms surfaced a handful
 worth re-examining if another patch pass happens:
+
 - [flot/flot#710](https://github.com/flot/flot/issues/710) — plot
   throws when all data points share a y-value. Related to but
   possibly distinct from the #1869 fix already ported.

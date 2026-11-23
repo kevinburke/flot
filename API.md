@@ -52,7 +52,6 @@ Note that in general Flot gives no guarantees if you change any of the
 objects you pass in to the plot function or get out of it since
 they're not necessarily deep-copied.
 
-
 ## Data Format
 
 The data is an array of data series:
@@ -173,7 +172,6 @@ Here's a complete example of a simple data specification:
 ];
 ```
 
-
 ## Plot Options
 
 All options are completely optional. They are documented individually
@@ -189,7 +187,6 @@ var options = {
 
 $.plot(placeholder, data, options);
 ```
-
 
 ## Customizing the legend
 
@@ -255,7 +252,6 @@ sorted: function(a, b) {
     )
 }
 ```
-
 
 ## Customizing the axes
 
@@ -399,7 +395,6 @@ required for converting from canvas coordinates to data coordinates,
 e.g. for a mouse interaction where a certain pixel is clicked. If you
 don't use any interactive features of Flot, you may not need it.
 
-
 The rest of the options deal with the ticks.
 
 If you don't specify any ticks, a tick generator algorithm will make
@@ -506,7 +501,6 @@ the right, because the grid lines will then match the ticks in both
 ends. The trade-off is that the forced ticks won't necessarily be at
 natural places.
 
-
 ## Multiple axes
 
 If you need more than one x axis or y axis, you need to specify for
@@ -540,7 +534,6 @@ Generally, the various interfaces in Flot dealing with data points
 either accept an xaxis/yaxis parameter to specify which axis number to
 use (starting from 1), or lets you specify the coordinate directly as
 x2/x3/... or x2axis/x3axis/... instead of "x" or "xaxis".
-
 
 ## Time series data
 
@@ -650,6 +643,7 @@ interpret the timestamps according to that time zone.
 Once you've gotten the timestamps into the data and specified "time"
 as the axis mode, Flot will automatically generate relevant ticks and
 format them. As always, you can tweak the ticks via the "ticks" option
+
 - just remember that the values should be timestamps (numbers), not
   Date objects.
 
@@ -756,7 +750,6 @@ to get a tick interval size of at least 1 month and correspondingly,
 if axis.tickSize is [2, "day"] in the tick formatter, the ticks have
 been produced with two days in-between.
 
-
 ## Customizing the data series
 
 ```js
@@ -830,6 +823,7 @@ opaque).
 
 For bars, fillColor can be a gradient, see the gradient documentation
 below. "barWidth" controls the width of each bar, and accepts two forms:
+
 - `barWidth: number` — a _relative_ width, multiplied by the minimum
   distance between consecutive x-values in the series. For example,
   `barWidth: 0.8` produces bars that cover 80% of the spacing between
@@ -907,7 +901,6 @@ colors: ["#d18b2c", "#dba255", "#919733"];
 
 If there are more data series than colors, Flot will try to generate
 extra colors by lightening and darkening colors in the theme.
-
 
 ## Customizing the grid
 
@@ -1089,7 +1082,6 @@ of interactive things (this works as a rate limiting device). The
 default is capped to 60 frames per second. You can set it to -1 to
 disable the rate limiting.
 
-
 ## Specifying gradients
 
 A gradient is specified like this:
@@ -1135,11 +1127,11 @@ bars: {
 Flot currently only supports vertical gradients drawn from top to
 bottom because that's what works with IE.
 
-
 ## Plot Methods
 
 The Plot object returned from the plot function has some methods you
 can call:
+
 - highlight(series, datapoint)
 
   Highlight a specific datapoint in the data series. You can either
@@ -1231,6 +1223,7 @@ There are also some members that let you peek inside the internal
 workings of Flot which is useful in some cases. Note that if you change
 something in the objects returned, you're changing the objects used by
 Flot to keep track of its state, so be careful.
+
 - getData()
 
   Returns an array of the data series currently used in normalized
@@ -1295,7 +1288,6 @@ Flot to keep track of its state, so be careful.
   If you change something, you probably have to call draw() or
   setupGrid() or triggerRedrawOverlay() to see the change.
 
-
 ## Hooks
 
 In addition to the public methods, the Plot object also has some hooks
@@ -1304,6 +1296,7 @@ callback function at various points in the process, the function then
 gets access to the internal data structures in Flot.
 
 Here's an overview of the phases Flot goes through:
+
 1. Plugin initialization, parsing options
 
 2. Constructing the canvases used for drawing
@@ -1344,6 +1337,7 @@ var plot = $.plot(placeholder, data, { hooks: { draw: [hellohook] } });
 The available hooks are described below. All hook callbacks get the
 plot object as first parameter. You can find some examples of defined
 hooks in the plugins bundled with Flot.
+
 - processOptions [phase 1]
 
   `function(plot, options)`
@@ -1520,7 +1514,6 @@ hooks in the plugins bundled with Flot.
   add a callback to clean up after you. Take a look at the section in
   the [PLUGINS](PLUGINS.md) document for more info.
 
-
 ## Plugins
 
 Plugins extend the functionality of Flot. To use a plugin, simply
@@ -1542,7 +1535,6 @@ and add new public methods if needed.
 
 See the [PLUGINS](PLUGINS.md) document for details on how to write a plugin. As the
 above description hints, it's actually pretty easy.
-
 
 ## Version number
 

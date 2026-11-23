@@ -84,6 +84,7 @@
 ## Versioning
 
 Follow [semver](https://semver.org/):
+
 - **Patch** (5.0.1): bug fixes, no API changes.
 - **Minor** (5.1.0): new features, backwards compatible.
 - **Major** (6.0.0): breaking API changes.

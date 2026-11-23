@@ -25,6 +25,7 @@ duplicated effort.
 ### Pull Requests
 
 To make merging as easy as possible, please keep these rules in mind:
+
 1. Submit new features or architectural changes to the _&lt;version&gt;-work_
    branch for the next major release. Submit bug fixes to the master branch.
 
